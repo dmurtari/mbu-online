@@ -205,9 +205,9 @@ describe.only('using preference and assignments', function () {
   });
 
   describe('getting scouts that are assigned to a class', function () {
-    it('should get all offering assignments for an event', function (done) {
+    it('should get all assignees for an event', function (done) {
       request.get('/api/events/' + events[0].id + '/offerings/assignees')
-        .set('Authorization', generatedUsers.teacher.token)
+        .set('Authorization', generatedUsers.admin.token)
         .expect(status.OK)
         .end(function (err, res) {
           if (err) return done(err);
@@ -225,6 +225,18 @@ describe.only('using preference and assignments', function () {
 
           return done();
         });
+    });
+
+    it('should allow teachers to access assignees', function (done) {
+      request.get('/api/events/' + events[0].id + '/offerings/assignees')
+        .set('Authorization', generatedUsers.teacher.token)
+        .expect(status.OK, done);
+    });
+
+    it('should not allow coordinators to access assignees', function (done) {
+      request.get('/api/events/' + events[0].id + '/offerings/assignees')
+        .set('Authorization', generatedUsers.coordinator.token)
+        .expect(status.UNAUTHORIZED, done);
     });
   });
 });
