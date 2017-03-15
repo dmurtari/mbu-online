@@ -1,0 +1,10 @@
+extends layout
+
+block content
+  if (!user)
+    a(href="/api/login") Login
+    br
+    a(href="/api/register") Register
+  if (user)
+    p Logged in as #{user.email}
+    a(href="/api/logout") Logout
