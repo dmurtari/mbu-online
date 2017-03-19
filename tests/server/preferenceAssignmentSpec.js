@@ -10,7 +10,7 @@ var expect = chai.expect;
 var utils = require('./testUtils');
 var testScouts = require('./testScouts');
 
-describe.only('using preference and assignments', function () {
+describe('using preference and assignments', function () {
   var generatedUsers, generatedScouts, generatedBadges, generatedOfferings,
     events, purchasables;
   var preferences = {};
