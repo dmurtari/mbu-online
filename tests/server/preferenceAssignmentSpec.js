@@ -10,7 +10,7 @@ var expect = chai.expect;
 var utils = require('./testUtils');
 var testScouts = require('./testScouts');
 
-describe('using preference and assignments', function () {
+describe.only('using preference and assignments', function () {
   var generatedUsers, generatedScouts, generatedBadges, generatedOfferings,
     events, purchasables;
   var preferences = {};
@@ -63,6 +63,13 @@ describe('using preference and assignments', function () {
     utils.createScoutsForUser(generatedUsers.coordinator, testScouts(5), generatedUsers.coordinator.token, function (err, scouts) {
       if (err) return done(err);
       generatedScouts = scouts;
+      return done();
+    });
+  });
+
+  before(function (done) {
+    utils.createScoutsForUser(generatedUsers.coordinator2, testScouts(5), generatedUsers.coordinator2.token, function (err, scouts) {
+      if (err) return done(err);
       return done();
     });
   });
@@ -201,4 +208,77 @@ describe('using preference and assignments', function () {
     });
   });
 
+  describe('getting all scouts and all registrations', function (done) {
+    it('should get all scouts of the site', function (done) {
+      request.get('/api/scouts')
+        .set('Authorization', generatedUsers.admin.token)
+        .expect(status.OK)
+        .end(function (err, res) {
+          if (err) return done(err);
+          var scouts = res.body;
+          expect(scouts).to.have.lengthOf(10);
+          _.forEach(scouts, function (scout) {
+            expect(scout.firstname).to.exist;
+            expect(scout.lastname).to.exist;
+            expect(scout.troop).to.exist;
+            expect(scout.emergency_name).to.exist;
+            expect(scout.emergency_phone).to.exist;
+            expect(scout.emergency_relation).to.exist;
+            expect(scout.notes).to.exist;
+            expect(scout.registrations).to.exist;
+            expect(scout.user).to.exist;
+          });
+          return done();
+        });
+    });
+
+    it('should get some details of the registration', function (done) {
+      request.get('/api/scouts')
+        .set('Authorization', generatedUsers.admin.token)
+        .expect(status.OK)
+        .end(function (err, res) {
+          if (err) return done(err);
+          var scouts = res.body;
+          expect(scouts).to.have.lengthOf(10);
+          _.forEach(scouts, function (scout) {
+            _.forEach(scout.registrations, function (registration) {
+              expect(registration.registration_id).to.exist;
+              expect(registration.event_id).to.exist;
+              expect(registration.assignments).to.exist;
+              expect(registration.purchases).to.exist;
+            });
+          });
+          return done();
+        });
+    });
+
+    it('should get some details of the user', function (done) {
+      request.get('/api/scouts')
+        .set('Authorization', generatedUsers.admin.token)
+        .expect(status.OK)
+        .end(function (err, res) {
+          if (err) return done(err);
+          var scouts = res.body;
+          expect(scouts).to.have.lengthOf(10);
+          _.forEach(scouts, function (scout) {
+            expect(scout.user.name).to.exist;
+            expect(scout.user.email).to.exist;
+            expect(scout.user.user_id).to.exist;
+          });
+          return done();
+        });
+    });
+
+    it('should allow teachers to get a list of scouts', function (done) {
+      request.get('/api/scouts')
+        .set('Authorization', generatedUsers.teacher.token)
+        .expect(status.OK, done);
+    });
+
+    it('should not allow coordinators to access', function (done) {
+      request.get('/api/scouts')
+        .set('Authorization', generatedUsers.coordinator.token)
+        .expect(status.UNAUTHORIZED, done);
+    })
+  });
 });
