@@ -261,7 +261,7 @@ describe.only('using preference and assignments', function () {
           var scouts = res.body;
           expect(scouts).to.have.lengthOf(10);
           _.forEach(scouts, function (scout) {
-            expect(scout.user.name).to.exist;
+            expect(scout.user.fullname).to.exist;
             expect(scout.user.email).to.exist;
             expect(scout.user.user_id).to.exist;
           });

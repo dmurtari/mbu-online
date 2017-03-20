@@ -4,6 +4,26 @@ var Models = require('../../models');
 var registrationInformation = require('../../models/queries/registrationInformation');
 
 module.exports = {
+  getAll: function (req, res) {
+    Models.Scout.findAll({
+      attributes: [['id', 'scout_id'], 'firstname', 'lastname', 'troop', 'notes',
+                   'emergency_name', 'emergency_relation', 'emergency_phone'],
+      include: [{
+        model: Models.Event,
+        as: 'registrations',
+      }, {
+        model: Models.User,
+        as: 'user'
+      }]
+    })
+      .then(function (scouts) {
+        res.status(status.OK).json(scouts);
+      })
+      .catch(function (err) {
+        console.log(err);
+        res.status(status.BAD_REQUEST).json(err);
+      });
+  },
   getRegistrations: function (req, res) {
     var query = registrationInformation;
     var scoutId = req.params.scoutId;

@@ -40,6 +40,8 @@ User.hasMany(Scout, {
   foreignKey: 'user_id'
 });
 
+Scout.belongsTo(User, { as: 'user' });
+
 // Current Event
 CurrentEvent.belongsTo(Event, {
   foreignKey: 'event_id'
