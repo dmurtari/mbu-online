@@ -11,9 +11,14 @@ module.exports = {
       include: [{
         model: Models.Event,
         as: 'registrations',
+        attributes: [['id', 'event_id'], 'year', 'semester'],
+        through: {
+          as: 'details'
+        },
       }, {
         model: Models.User,
-        as: 'user'
+        as: 'user',
+        attributes: [['id', 'user_id'], 'firstname', 'lastname', 'email']
       }]
     })
       .then(function (scouts) {

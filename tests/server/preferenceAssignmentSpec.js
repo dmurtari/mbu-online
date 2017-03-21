@@ -242,10 +242,10 @@ describe.only('using preference and assignments', function () {
           expect(scouts).to.have.lengthOf(10);
           _.forEach(scouts, function (scout) {
             _.forEach(scout.registrations, function (registration) {
-              expect(registration.registration_id).to.exist;
+              expect(registration.details.id).to.exist;
               expect(registration.event_id).to.exist;
-              expect(registration.assignments).to.exist;
-              expect(registration.purchases).to.exist;
+              expect(registration.year).to.exist;
+              expect(registration.semester).to.exist;
             });
           });
           return done();
