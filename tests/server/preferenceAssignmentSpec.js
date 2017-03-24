@@ -10,7 +10,7 @@ var expect = chai.expect;
 var utils = require('./testUtils');
 var testScouts = require('./testScouts');
 
-describe.only('using preference and assignments', function () {
+describe('using preference and assignments', function () {
   var generatedUsers, generatedScouts, generatedBadges, generatedOfferings,
     events, purchasables;
   var preferences = {};
@@ -279,6 +279,21 @@ describe.only('using preference and assignments', function () {
       request.get('/api/scouts')
         .set('Authorization', generatedUsers.coordinator.token)
         .expect(status.UNAUTHORIZED, done);
-    })
+    });
+
+    it('should also get details for a single scout', function (done) {
+      request.get('/api/scouts/' + generatedScouts[0].id)
+        .set('Authorization', generatedUsers.admin.token)
+        .expect(status.OK)
+        .end(function (err, res) {
+          if (err) return done(err);
+          var scout = res.body
+          expect(scout.scout_id).to.equal(generatedScouts[0].id);
+          expect(scout.registrations).to.have.lengthOf(1);
+          console.log(scout.registrations)
+          expect(scout.user).to.exist;
+          return done();
+        });
+    });
   });
 });

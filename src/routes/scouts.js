@@ -12,6 +12,7 @@ var router = express.Router();
 router.param('scoutId', isOwner);
 
 router.get('/', isAuthorized(['admin', 'teacher']), getScouts.getAll);
+router.get('/:scoutId', isAuthorized(['admin', 'teacher', 'coordinator']), getScouts.getScout);
 
 // Registration
 router.post('/:scoutId/registrations', isAuthorized(['teacher', 'coordinator']), postScouts.createRegistration);

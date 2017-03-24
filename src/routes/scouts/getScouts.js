@@ -7,7 +7,32 @@ module.exports = {
   getAll: function (req, res) {
     Models.Scout.findAll({
       attributes: [['id', 'scout_id'], 'firstname', 'lastname', 'troop', 'notes',
-                   'emergency_name', 'emergency_relation', 'emergency_phone'],
+        'emergency_name', 'emergency_relation', 'emergency_phone'],
+      include: [{
+        model: Models.Event,
+        as: 'registrations',
+        attributes: [['id', 'event_id'], 'year', 'semester'],
+        through: {
+          as: 'details'
+        },
+      }, {
+        model: Models.User,
+        as: 'user',
+        attributes: [['id', 'user_id'], 'firstname', 'lastname', 'email']
+      }]
+    })
+      .then(function (scouts) {
+        res.status(status.OK).json(scouts);
+      })
+      .catch(function (err) {
+        res.status(status.BAD_REQUEST).send(err);
+      });
+  },
+  getScout: function (req, res) {
+    Models.Scout.findById(req.params.scoutId, {
+      attributes: [['id', 'scout_id'], 'firstname', 'lastname', 'troop', 'notes',
+        'emergency_name', 'emergency_relation', 'emergency_phone',
+        'birthday'],
       include: [{
         model: Models.Event,
         as: 'registrations',
