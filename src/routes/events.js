@@ -34,4 +34,6 @@ router.delete('/:eventId/purchasables/:purchasableId', isAuthorized(['admin']), 
 router.get('/:id/potentialIncome', isAuthorized(['admin']), getEvents.getPotentialIncome);
 router.get('/:id/income', isAuthorized(['admin']), getEvents.getIncome);
 
+router.get('/:id/offerings/assignees', isAuthorized(['admin', 'teacher']), getEvents.getAssignees);
+
 module.exports = router;

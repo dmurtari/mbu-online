@@ -132,8 +132,11 @@ describe('using preference and assignments', function () {
             periods: [1],
             offering: generatedOfferings[0].id
           }, {
-            periods: [2, 3],
+            periods: [2],
             offering: generatedOfferings[1].id
+          }, {
+            periods: [3],
+            offering: generatedOfferings[2].id
           }];
 
           request.post('/api/scouts/' + scout.id + '/registrations/' + registrationId + '/assignments')
@@ -164,7 +167,7 @@ describe('using preference and assignments', function () {
             expect(registration.scout.lastname).to.exist;
             expect(registration.scout.troop).to.exist;
             expect(registration.preferences).to.have.lengthOf(2);
-            expect(registration.assignments).to.have.lengthOf(2);
+            expect(registration.assignments).to.have.lengthOf(3);
             expect(registration.purchases).to.have.lengthOf(1);
 
             _.forEach(registration.preferences, function (preference) {
@@ -232,6 +235,12 @@ describe('using preference and assignments', function () {
         });
     });
 
+    it('should allow teachers to get a list of scouts', function (done) {
+      request.get('/api/scouts')
+        .set('Authorization', generatedUsers.teacher.token)
+        .expect(status.OK, done);
+    });
+
     it('should get some details of the registration', function (done) {
       request.get('/api/scouts')
         .set('Authorization', generatedUsers.admin.token)
@@ -269,12 +278,6 @@ describe('using preference and assignments', function () {
         });
     });
 
-    it('should allow teachers to get a list of scouts', function (done) {
-      request.get('/api/scouts')
-        .set('Authorization', generatedUsers.teacher.token)
-        .expect(status.OK, done);
-    });
-
     it('should not allow coordinators to access', function (done) {
       request.get('/api/scouts')
         .set('Authorization', generatedUsers.coordinator.token)
@@ -290,10 +293,47 @@ describe('using preference and assignments', function () {
           var scout = res.body
           expect(scout.scout_id).to.equal(generatedScouts[0].id);
           expect(scout.registrations).to.have.lengthOf(1);
-          console.log(scout.registrations)
           expect(scout.user).to.exist;
           return done();
         });
+    });
+
+  });
+
+  describe('getting scouts that are assigned to a class', function () {
+    it('should get all assignees for an event', function (done) {
+      request.get('/api/events/' + events[0].id + '/offerings/assignees')
+        .set('Authorization', generatedUsers.admin.token)
+        .expect(status.OK)
+        .end(function (err, res) {
+          if (err) return done(err);
+          var offerings = res.body;
+          expect(offerings).to.have.lengthOf(3);
+          _.forEach(offerings, function (offering) {
+            expect(offering.badge.name).to.exist;
+            expect(offering.assignees).to.have.lengthOf(5);
+            _.forEach(offering.assignees, function (assignee) {
+              expect(assignee.scout.fullname).to.exist;
+              expect(assignee.scout.troop).to.exist;
+              expect(assignee.assignment.periods).to.exist;
+            });
+          });
+
+          return done();
+        });
+    });
+
+
+    it('should allow teachers to access assignees', function (done) {
+      request.get('/api/events/' + events[0].id + '/offerings/assignees')
+        .set('Authorization', generatedUsers.teacher.token)
+        .expect(status.OK, done);
+    });
+
+    it('should not allow coordinators to access assignees', function (done) {
+      request.get('/api/events/' + events[0].id + '/offerings/assignees')
+        .set('Authorization', generatedUsers.coordinator.token)
+        .expect(status.UNAUTHORIZED, done);
     });
   });
 });

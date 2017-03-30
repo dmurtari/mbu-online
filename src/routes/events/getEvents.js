@@ -40,6 +40,44 @@ module.exports = {
         });
       });
   },
+  getAssignees: function (req, res) {
+    var eventId = req.params.id;
+
+    Model.Offering.findAll({
+      where: {
+        event_id: eventId
+      },
+      attributes: [['id', 'offering_id'], 'duration', 'periods'],
+      include: [{
+        model: Model.Badge,
+        as: 'badge',
+        attributes: ['name']
+      }, {
+        model: Model.Registration,
+        as: 'assignees',
+        attributes: {
+          exclude: ['projectedCost', 'actualCost'],
+          include: [['id', 'registration_id'], 'notes'],
+        },
+        through: {
+          as: 'assignment',
+          attributes: ['periods']
+        },
+        include: [{
+          model: Model.Scout,
+          as: 'scout',
+          attributes: ['firstname', 'lastname', 'troop']
+        }]
+      }]
+    })
+      .then(function (offerings) {
+        return res.status(status.OK).json(offerings);
+      })
+      .catch(function (err) {
+        console.log(err)
+        res.status(status.BAD_REQUEST).end();
+      })
+  },
   getPurchasables: function (req, res) {
     var eventId = req.params.id;
 
