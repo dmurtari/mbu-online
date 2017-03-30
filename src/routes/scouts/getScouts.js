@@ -43,7 +43,7 @@ module.exports = {
       }, {
         model: Models.User,
         as: 'user',
-        attributes: [['id', 'user_id'], 'firstname', 'lastname', 'email']
+        attributes: [['id', 'user_id'], 'firstname', 'lastname', 'email', 'details']
       }]
     })
       .then(function (scouts) {
