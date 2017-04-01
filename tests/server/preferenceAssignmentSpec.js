@@ -185,6 +185,7 @@ describe('using preference and assignments', function () {
             _.forEach(registration.assignments, function (assignment) {
               expect(assignment.badge.name).to.exist;
               expect(assignment.details.periods).to.exist;
+              expect(assignment.details.completions).to.exist
               expect(assignment.price).to.exist;
             });
           });
@@ -316,6 +317,7 @@ describe('using preference and assignments', function () {
               expect(assignee.scout.fullname).to.exist;
               expect(assignee.scout.troop).to.exist;
               expect(assignee.assignment.periods).to.exist;
+              expect(assignee.assignment.completions).to.exist;
             });
           });
 

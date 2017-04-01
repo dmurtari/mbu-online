@@ -16,6 +16,12 @@ describe('assignments', function () {
   var badId = utils.badId;
   var scoutId;
   var registrationIds = [];
+  var defaultRequirements = ['1', '2', '3a'];
+  var expectedCompletions = _.map(defaultRequirements, function (requirement) {
+    var result = {};
+    result[requirement] = false
+    return result;
+  });
 
   before(function (done) {
     utils.dropDb(done);
@@ -50,7 +56,8 @@ describe('assignments', function () {
     var defaultPostData = {
       price: 10,
       periods: [1, 2, 3],
-      duration: 1
+      duration: 1,
+      requirements: defaultRequirements
     };
 
     utils.createOfferingsForEvent(events[0], badges, defaultPostData, generatedUsers.admin.token, function (err, offerings) {
@@ -131,6 +138,28 @@ describe('assignments', function () {
         });
     });
 
+    it('should create a blank object of completions', function (done) {
+      var postData = {
+        periods: [1],
+        offering: generatedOfferings[1].id
+      };
+
+      request.post('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/assignments')
+        .set('Authorization', generatedUsers.teacher.token)
+        .send(postData)
+        .expect(status.CREATED)
+        .end(function (err, res) {
+          if (err) return done(err);
+          var registration = res.body.registration;
+          expect(registration.assignments).to.have.length(1);
+          var assignment = registration.assignments[0];
+          expect(assignment.offering_id).to.equal(postData.offering);
+          expect(assignment.details.completions).to.deep.equal(expectedCompletions)
+          expect(assignment.details.periods).to.deep.equal(postData.periods);
+          return done();
+        });
+    });
+
     it('should be able to batch assign to offerings', function (done) {
       var postData = [{
         periods: [1],
@@ -161,7 +190,7 @@ describe('assignments', function () {
         });
     });
 
-    it('should allow an empty periot', function (done) {
+    it('should allow an empty period', function (done) {
       var postData = [{
         periods: [2],
         offering: generatedOfferings[1].id
@@ -274,8 +303,10 @@ describe('assignments', function () {
             expect(assignments).to.have.length(2);
             expect(assignments[0].offering_id).to.equal(generatedOfferings[0].id);
             expect(assignments[0].details.periods).to.deep.equal([1]);
+            expect(assignments[0].details.completions).to.exist;
             expect(assignments[1].offering_id).to.equal(generatedOfferings[1].id);
             expect(assignments[1].details.periods).to.deep.equal([2, 3]);
+            expect(assignments[1].details.completions).to.exist;
             return done();
           });
       });
