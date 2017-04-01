@@ -61,7 +61,7 @@ module.exports = {
         },
         through: {
           as: 'assignment',
-          attributes: ['periods']
+          attributes: ['periods', 'completions']
         },
         include: [{
           model: Model.Scout,
@@ -142,7 +142,11 @@ function income(req, res, type) {
         throw new Error('No registrations found');
       }
 
-      return Promise.all(_.map(registrations, type));
+      var items = _.map(registrations, function (registration) {
+        return registration[type]();
+      });
+
+      return Promise.all(items);
     })
     .then(function (costs) {
       totalIncome = _.reduce(costs, function (sum, cost) {
@@ -153,7 +157,7 @@ function income(req, res, type) {
         income: String(totalIncome.toFixed(2))
       });
     })
-    .catch(function () {
-      return res.status(status.BAD_REQUEST).end();
+    .catch(function (err) {
+      return res.status(status.BAD_REQUEST).send(err);
     });
 }

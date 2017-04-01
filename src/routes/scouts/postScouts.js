@@ -128,6 +128,7 @@ module.exports = {
         } else {
           // Add assignment, without overriding
           return registration.addAssignment(req.body.offering, {
+            individualHooks: true,
             periods: req.body.periods
           });
         }
@@ -140,7 +141,7 @@ module.exports = {
             attributes: ['badge_id', ['id', 'offering_id'], 'price'],
             through: {
               as: 'details',
-              attributes: ['periods']
+              attributes: ['periods', 'completions']
             },
             include: [{
               model: Models.Badge,

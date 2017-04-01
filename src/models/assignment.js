@@ -1,3 +1,5 @@
+var _ = require('lodash');
+
 module.exports = function (sequelize, DataTypes) {
   var Assignment = sequelize.define('Assignment', {
     periods: {
@@ -11,10 +13,29 @@ module.exports = function (sequelize, DataTypes) {
     registration_id: {
       type: DataTypes.INTEGER,
       allowNull: false
+    },
+    completions: {
+      type: DataTypes.JSON,
+      allowNull: false,
+      defaultValue: {}
     }
   }, {
-      underscored: true
-    });
+      underscored: true,
+      hooks: {
+        beforeCreate: function (assignment) {
+          return sequelize.models.Offering.findById(assignment.offering_id)
+            .then(function (offering) {
+              var completions = _.map(offering.requirements, function (requirement) {
+                var result = {};
+                result[requirement] = false
+                return result;
+              });
+
+              return assignment.completions = completions;
+            })
+        }
+      }
+  });
 
   return Assignment;
 };

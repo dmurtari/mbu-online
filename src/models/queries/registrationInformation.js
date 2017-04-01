@@ -28,7 +28,7 @@ module.exports = {
     attributes: [['id', 'offering_id'], 'price'],
     through: {
       as: 'details',
-      attributes: ['periods']
+      attributes: ['periods', 'completions']
     },
     include: [{
       model: Model.Badge,

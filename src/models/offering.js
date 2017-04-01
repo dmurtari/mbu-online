@@ -25,6 +25,11 @@ module.exports = function (sequelize, DataTypes) {
       allowNull: false,
       defaultValue: 0.0
     },
+    requirements: {
+      type: DataTypes.ARRAY(DataTypes.STRING),
+      allowNull: false,
+      defaultValue: []
+    },
     event_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -52,7 +57,31 @@ module.exports = function (sequelize, DataTypes) {
       beforeValidate: function (offering) {
         offering.periods = _.without(offering.periods, null);
       },
+      afterUpdate: function (offering) {
+        sequelize.models.Assignment.findAll({
+          where: {
+            offering_id: offering.id
+          }
+        })
+          .then(function (assignments) {
+            if (!assignments || assignments.length < 1) {
+              return;
+            }
+            _.forEach(assignments, function (assignment) {
+              var newRequirements = [];
+              _.forEach(offering.requirements, function (requirement) {
+                if (!_.has(assignment.completions, requirement)) {
+                  var obj = {};
+                  obj[requirement] = false
+                  newRequirements.push(obj);
+                }
+              });
 
+              assignment.completions = assignment.completions.concat(newRequirements);
+              assignment.save();
+            });
+          });
+      }
     },
     underscored: true
   });

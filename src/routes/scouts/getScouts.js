@@ -103,7 +103,7 @@ function getRegistrationDetails(req, res, object) {
     'assignments': {
       model: Models.Offering,
       modelAttributes: ['badge_id', ['id', 'offering_id']],
-      joinAttributes: ['periods']
+      joinAttributes: ['periods', 'completions']
     },
     'purchases': {
       model: Models.Purchasable,
@@ -149,7 +149,7 @@ function getCost(req, res, type) {
     }
   })
     .then(function (registration) {
-      return registration[type];
+      return registration[type]();
     })
     .then(function (cost) {
       res.status(status.OK).json({
