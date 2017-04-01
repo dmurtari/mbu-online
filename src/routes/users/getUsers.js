@@ -130,7 +130,10 @@ function getCost(req, res, type) {
         throw new Error('No scouts found');
       }
 
-      var prices = _.map(scouts, 'registrations[0].details.' + type);
+      var prices = _.map(scouts, function (scout) {
+        return scout.registrations[0].details[type]();
+      });
+
       return Promise.all(prices);
     })
     .then(function (results) {

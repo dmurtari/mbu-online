@@ -22,7 +22,7 @@ module.exports = function (sequelize, DataTypes) {
     }
   }, {
     underscored: true,
-    getterMethods: {
+    instanceMethods: {
       projectedCost: function () {
         var totalCost = 0;
         var registration = this;
