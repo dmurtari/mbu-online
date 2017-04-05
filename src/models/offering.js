@@ -1,5 +1,7 @@
 var validators = require('./validators');
+var combineCompletionsAndReqs = require('./utilities').combineCompletionsAndReqs;
 var _ = require('lodash');
+
 
 module.exports = function (sequelize, DataTypes) {
   var Offering = sequelize.define('Offering', {
@@ -68,16 +70,7 @@ module.exports = function (sequelize, DataTypes) {
               return;
             }
             _.forEach(assignments, function (assignment) {
-              var newRequirements = [];
-              _.forEach(offering.requirements, function (requirement) {
-                if (!_.has(assignment.completions, requirement)) {
-                  var obj = {};
-                  obj[requirement] = false
-                  newRequirements.push(obj);
-                }
-              });
-
-              assignment.completions = assignment.completions.concat(newRequirements);
+              assignment.completions = combineCompletionsAndReqs(offering.requirements, assignment.completions);
               assignment.save();
             });
           });
