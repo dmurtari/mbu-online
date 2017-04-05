@@ -17,11 +17,10 @@ describe('assignments', function () {
   var scoutId;
   var registrationIds = [];
   var defaultRequirements = ['1', '2', '3a'];
-  var expectedCompletions = _.map(defaultRequirements, function (requirement) {
-    var result = {};
-    result[requirement] = false
+  var expectedCompletions = _.reduce(defaultRequirements, function (result, requirement) {
+    result[requirement] = false;
     return result;
-  });
+  }, {});
 
   before(function (done) {
     utils.dropDb(done);

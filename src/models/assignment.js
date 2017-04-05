@@ -25,11 +25,10 @@ module.exports = function (sequelize, DataTypes) {
         beforeCreate: function (assignment) {
           return sequelize.models.Offering.findById(assignment.offering_id)
             .then(function (offering) {
-              var completions = _.map(offering.requirements, function (requirement) {
-                var result = {};
-                result[requirement] = false
+              var completions = _.reduce(offering.requirements, function (result, requirement) {
+                result[requirement] = false;
                 return result;
-              });
+              }, {});
 
               return assignment.completions = completions;
             })

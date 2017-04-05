@@ -17,16 +17,14 @@ describe('completion records', function () {
   var scoutId;
   var registrationIds = [];
   var defaultRequirements = ['1', '2', '3a'];
-  var expectedCompletions = _.map(defaultRequirements, function (requirement) {
-    var result = {};
-    result[requirement] = false
+  var expectedCompletions = _.reduce(defaultRequirements, function (result, requirement) {
+    result[requirement] = false;
     return result;
-  });
-  var newCompletion = _.map(defaultRequirements, function (requirement) {
-    var result = {};
-    result[requirement] = true
+  }, {});
+  var newCompletion = _.reduce(defaultRequirements, function (result, requirement) {
+    result[requirement] = true;
     return result;
-  });
+  }, {});
 
   before(function (done) {
     utils.dropDb(done);
@@ -254,7 +252,7 @@ describe('completion records', function () {
         });
     });
 
-    it('should handle changing requirements if a completion record exists', function (done) {
+    it('should handle adding to requirements if a completion record exists', function (done) {
       async.series([
         function (cb) {
           var postData = {
@@ -304,7 +302,81 @@ describe('completion records', function () {
         },
         function (cb) {
           var newExpectedCompletions = newCompletion;
-          newExpectedCompletions.push({ '3b': false });
+          newExpectedCompletions['3b'] = false;
+
+          request.get('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/assignments')
+            .set('Authorization', generatedUsers.teacher.token)
+            .expect(status.OK)
+            .end(function (err, res) {
+              if (err) return done(err);
+              var assignments = res.body;
+              expect(assignments).to.have.length(1);
+              expect(assignments[0].offering_id).to.equal(generatedOfferings[0].id);
+              expect(assignments[0].details.completions).to.deep.equal(newExpectedCompletions);
+              return cb();
+            });
+        }
+      ], done);
+    });
+
+    it('should not remove completed requirements if requirements change', function (done) {
+      async.series([
+        function (cb) {
+          var postData = {
+            periods: [1],
+            offering: generatedOfferings[0].id
+          };
+
+          request.post('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/assignments')
+            .set('Authorization', generatedUsers.teacher.token)
+            .send(postData)
+            .expect(status.CREATED)
+            .end(function (err, res) {
+              if (err) return done(err);
+              var registration = res.body.registration;
+              expect(registration.assignments).to.have.length(1);
+              var assignment = registration.assignments[0];
+              expect(assignment.offering_id).to.equal(postData.offering);
+              expect(assignment.details.completions).to.deep.equal(expectedCompletions)
+              expect(assignment.details.periods).to.deep.equal(postData.periods);
+              return cb();
+            });
+        },
+        function (cb) {
+          var postData = {
+            '1': true,
+            '3a': false
+          };
+
+          request.put('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/assignments/' + generatedOfferings[0].id)
+            .set('Authorization', generatedUsers.admin.token)
+            .send({ completions: postData })
+            .expect(status.OK)
+            .end(function (err, res) {
+              if (err) return done(err);
+              var assignment = res.body.assignment;
+              expect(assignment.offering_id).to.equal(generatedOfferings[0].id);
+              expect(assignment.completions).to.deep.equal(postData);
+              return cb();
+            });
+        },
+        function (cb) {
+          request.put('/api/events/' + events[0].id + '/badges/' + generatedOfferings[0].id)
+            .set('Authorization', generatedUsers.admin.token)
+            .send({ requirements: newRequirements })
+            .expect(status.OK)
+            .end(function (err, res) {
+              if (err) return done(err);
+              var offering = res.body.offering;
+              expect(offering.requirements).to.deep.equal(newRequirements);
+              return cb();
+            });
+        },
+        function (cb) {
+          var newExpectedCompletions = {
+            '1': true,
+            '3b': false
+          };
 
           request.get('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/assignments')
             .set('Authorization', generatedUsers.teacher.token)
