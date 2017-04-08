@@ -47,7 +47,7 @@ module.exports = {
       where: {
         event_id: eventId
       },
-      attributes: [['id', 'offering_id'], 'duration', 'periods'],
+      attributes: [['id', 'offering_id'], 'duration', 'periods', 'requirements'],
       include: [{
         model: Model.Badge,
         as: 'badge',
