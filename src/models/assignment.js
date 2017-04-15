@@ -15,25 +15,12 @@ module.exports = function (sequelize, DataTypes) {
       allowNull: false
     },
     completions: {
-      type: DataTypes.JSON,
+      type: DataTypes.ARRAY(DataTypes.STRING),
       allowNull: false,
-      defaultValue: {}
+      defaultValue: []
     }
   }, {
-      underscored: true,
-      hooks: {
-        beforeCreate: function (assignment) {
-          return sequelize.models.Offering.findById(assignment.offering_id)
-            .then(function (offering) {
-              var completions = _.reduce(offering.requirements, function (result, requirement) {
-                result[requirement] = false;
-                return result;
-              }, {});
-
-              return assignment.completions = completions;
-            })
-        }
-      }
+    underscored: true
   });
 
   return Assignment;

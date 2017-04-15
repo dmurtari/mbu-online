@@ -9,9 +9,9 @@ module.exports = {
     });
 
     queryInterface.addColumn('Assignments', 'completions', {
-      type: Sequelize.JSON,
+      type: Sequelize.ARRAY(Sequelize.STRING),
       allowNull: false,
-      defaultValue: {}
+      defaultValue: []
     });
   },
 

@@ -1,5 +1,4 @@
 var validators = require('./validators');
-var combineCompletionsAndReqs = require('./utilities').combineCompletionsAndReqs;
 var _ = require('lodash');
 
 
@@ -58,22 +57,6 @@ module.exports = function (sequelize, DataTypes) {
       },
       beforeValidate: function (offering) {
         offering.periods = _.without(offering.periods, null);
-      },
-      afterUpdate: function (offering) {
-        sequelize.models.Assignment.findAll({
-          where: {
-            offering_id: offering.id
-          }
-        })
-          .then(function (assignments) {
-            if (!assignments || assignments.length < 1) {
-              return;
-            }
-            _.forEach(assignments, function (assignment) {
-              assignment.completions = combineCompletionsAndReqs(offering.requirements, assignment.completions);
-              assignment.save();
-            });
-          });
       }
     },
     underscored: true
