@@ -17,10 +17,6 @@ describe('assignments', function () {
   var scoutId;
   var registrationIds = [];
   var defaultRequirements = ['1', '2', '3a'];
-  var expectedCompletions = _.reduce(defaultRequirements, function (result, requirement) {
-    result[requirement] = false;
-    return result;
-  }, {});
 
   before(function (done) {
     utils.dropDb(done);
@@ -153,7 +149,7 @@ describe('assignments', function () {
           expect(registration.assignments).to.have.length(1);
           var assignment = registration.assignments[0];
           expect(assignment.offering_id).to.equal(postData.offering);
-          expect(assignment.details.completions).to.deep.equal(expectedCompletions)
+          expect(assignment.details.completions).to.deep.equal([])
           expect(assignment.details.periods).to.deep.equal(postData.periods);
           return done();
         });
