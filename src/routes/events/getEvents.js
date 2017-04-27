@@ -126,6 +126,9 @@ module.exports = {
   },
   getIncome: function (req, res) {
     income(req, res, 'actualCost');
+  },
+  getStats: function (req, res) {
+
   }
 };
 
