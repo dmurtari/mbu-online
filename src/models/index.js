@@ -80,6 +80,7 @@ Event.belongsToMany(Badge, {
 
 Registration.belongsTo(Scout, { as: 'scout' });
 Offering.belongsTo(Badge, { as: 'badge' });
+Purchasable.hasMany(Purchase, { as: 'sold' });
 
 // Registration/Offering relationship as preference or requester
 Offering.belongsToMany(Registration, {

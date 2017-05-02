@@ -1,6 +1,7 @@
 var app = require('../../src/app');
 var request = require('supertest')(app);
 var async = require('async');
+var _ = require('lodash');
 var status = require('http-status-codes');
 
 var chai = require('chai');
@@ -310,13 +311,13 @@ describe.only('statistics', function () {
 
   describe('getting stats for a troop', function () {
     it('should get event statistics for a troop', function (done) {
-      request.get('/api/events/' + generatedEvents[0] + '/stats?troop=' + generatedUsers.coordinator.profile.troop)
+      request.get('/api/events/' + generatedEvents[0].id + '/stats?troop=' + generatedUsers.coordinator.profile.troop)
         .set('Authorization', generatedUsers.coordinator.token)
         .expect(status.OK)
         .end(function (err, res) {
           if (err) return done(err);
           var stats = res.body;
-          console.log(stats)
+          console.log(stats.purchases)
         });
     });
   });

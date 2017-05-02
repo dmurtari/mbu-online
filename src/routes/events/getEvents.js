@@ -128,7 +128,54 @@ module.exports = {
     income(req, res, 'actualCost');
   },
   getStats: function (req, res) {
+    var resultObject = {};
 
+    Model.Event.findById(req.params.id, {
+      include: [{
+        model: Model.Scout,
+        as: 'attendees',
+        attributes: ['id', 'firstname', 'lastname', 'troop']
+      }, {
+        model: Model.Badge,
+        as: 'offerings',
+        attributes: ['id', 'name'],
+      }]
+    })
+      .then(function (event) {
+        resultObject.scouts = event.attendees;
+        resultObject.offerings = event.offerings;
+
+        return Model.Registration.findAll({
+          where: {
+            event_id: req.params.id
+          },
+          attributes: ['scout_id']
+        });
+      })
+      .then(function (registrations) {
+        resultObject.registrations = registrations;
+
+        return Model.Purchasable.findAll({
+          where: {
+            event_id: req.params.id
+          },
+          attributes: ['id', 'price', 'has_size'],
+          include: [{
+            model: Model.Purchase,
+            as: 'sold',
+            attributes: ['quantity', 'size']
+          }]
+        })
+      })
+      .then(function (purchases) {
+        resultObject.purchases = _.groupBy(purchases, 'id');
+        console.log(resultObject.purchases);
+        res.status(status.OK).send(resultObject);
+      })
+      .catch(function (err) {
+        console.log("Error it", err);
+        res.status(status.BAD_REQUEST).send(err);
+      });
   }
 };
 
