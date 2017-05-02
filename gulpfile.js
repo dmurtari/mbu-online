@@ -34,8 +34,7 @@ gulp.task('test:unit', ['env:test'], function() {
 
 gulp.task('test:api', ['env:test'], function() {
   gulp.src([paths.srcIntegration])
-    .pipe(mocha())
-    .on('error', gutil.log);
+    .pipe(mocha());
 });
 
 gulp.task('test:unit:watch', ['test:unit'], function() {
