@@ -33,7 +33,7 @@ describe.only('statistics', function () {
   });
 
   afterEach(function (done) {
-    mockEvent.cleanEvent(done);
+    // mockEvent.cleanEvent(done);
   });
 
   describe('getting stats for a troop', function () {

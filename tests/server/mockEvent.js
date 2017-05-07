@@ -1,4 +1,5 @@
 var async = require('async');
+var _ = require('lodash');
 
 var testEvents = require('./testEvents').events;
 var testBadges = require('./testBadges').badges;
@@ -14,6 +15,9 @@ module.exports = {
   events: [],
   badges: [],
   troops: [],
+  offerings: [],
+  purchasables: [],
+  registrations: [],
   createPopulatedEvent: function (done) {
     async.series([
       function (cb) {
@@ -50,6 +54,81 @@ module.exports = {
           module.exports.troops[module.exports.users.coordinator2.profile.id] = scouts;
           return cb();
         });
+      },
+      function (cb) {
+        var offeringData = {
+          duration: 2,
+          periods: [2, 3],
+          price: 12
+        }
+        utils.createOfferingsForEvent(
+          module.exports.events[0],
+          [module.exports.badges[0]],
+          offeringData,
+          module.exports.users.admin.token,
+          function (err, offerings) {
+            if (err) return done(err);
+            module.exports.offerings[module.exports.events[0].id] = offerings;
+            return cb();
+          }
+        );
+      },
+      function (cb) {
+        var offeringData = {
+          duration: 1,
+          periods: [1, 2, 3],
+          price: 5
+        }
+        utils.createOfferingsForEvent(
+          module.exports.events[0],
+          _.tail(module.exports.badges),
+          offeringData,
+          module.exports.users.admin.token,
+          function (err, offerings) {
+            if (err) return done(err);
+            module.exports.offerings[module.exports.events[0].id].push(offerings);
+            return cb();
+          }
+        );
+      },
+      function (cb) {
+        var offeringData = {
+          duration: 1,
+          periods: [1, 2, 3],
+          price: 0
+        }
+        utils.createOfferingsForEvent(
+          module.exports.events[1],
+          module.exports.badges,
+          offeringData,
+          module.exports.users.admin.token,
+          function (err, offerings) {
+            if (err) return done(err);
+            module.exports.offerings[module.exports.events[1].id] = offerings;
+            return cb();
+          }
+        );
+      },
+      function (cb) {
+        utils.createPurchasablesForEvent(
+          module.exports.events[0].id,
+          function (err, purchasables) {
+            if (err) return cb(err);
+            module.exports.purchasables[module.exports.events[0].id] = purchasables;
+            return cb();
+          });
+      },
+      function (cb) {
+        utils.registerScoutsForEvent(
+          module.exports.events[0].id,
+          module.exports.troops[module.exports.users.coordinator.profile.id],
+          module.exports.users.coordinator.token,
+          function (err, registrationIds) {
+            if (err) return done(err);
+            module.exports.registrations[module.exports.users.coordinator.profile.id] = registrationIds;
+            return cb();
+          }
+        )
       }
     ], done);
   },

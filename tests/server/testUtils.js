@@ -218,6 +218,24 @@ module.exports = {
         });
       });
   },
+  registerScoutsForEvent: function (eventId, scoutIds, token, done) {
+    var registrationIds = [];
+    async.forEachOfSeries(scoutIds, function (scoutId, index, cb) {
+      request.post('/api/scouts/' + scoutId + '/registrations')
+          .set('Authorization', token)
+          .send({
+            event_id: eventId
+          })
+          .expect(status.CREATED)
+          .end(function (err, res) {
+            console.log(err)
+            registrationIds.push(res.body.registration.id);
+            return cb();
+          });
+    }, function (err) {
+      done(err, registrationIds);
+    });
+  },
   removeScoutsForUser: function (user, done) {
     Models.User.findById(user.profile.id)
       .then(function (user) {
