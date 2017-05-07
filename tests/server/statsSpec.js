@@ -26,26 +26,24 @@ describe.only('statistics', function () {
   });
 
   beforeEach(function (done) {
-    mockEvent.createPopulatedEvent();
+    mockEvent.createPopulatedEvent(function (err) {
+      if (err) return done(err);
+      done();
+    });
   });
 
   afterEach(function (done) {
-    mockEvent.cleanEvent();
-  });
-
-  after(function (done) {
-    utils.dropDb(done);
+    mockEvent.cleanEvent(done);
   });
 
   describe('getting stats for a troop', function () {
     it('should get event statistics for a troop', function (done) {
-      request.get('/api/events/' + generatedEvents[0].id + '/stats?troop=' + generatedUsers.coordinator.profile.troop)
-        .set('Authorization', generatedUsers.coordinator.token)
+      request.get('/api/events/' + mockEvent.events[0].id + '/stats?troop=' + mockEvent.users.coordinator.profile.troop)
+        .set('Authorization', mockEvent.users.coordinator.token)
         .expect(status.OK)
         .end(function (err, res) {
           if (err) return done(err);
           var stats = res.body;
-          console.log(stats.purchases)
         });
     });
   });
