@@ -7,8 +7,8 @@ var testPurchasables = require('./testPurchasables').purchasables;
 
 var utils = require('./testUtils');
 var Models = require('../../src/models');
-var scoutsGroup1 = require('./testScouts')(2);
-var scoutsGroup2 = require('./testScouts')(2);
+var scoutsGroup1 = require('./testScouts')(4);
+var scoutsGroup2 = require('./testScouts')(4);
 
 module.exports = {
   users: [],
@@ -121,14 +121,26 @@ module.exports = {
       function (cb) {
         utils.registerScoutsForEvent(
           module.exports.events[0].id,
-          module.exports.troops[module.exports.users.coordinator.profile.id],
+          _.map(module.exports.troops[module.exports.users.coordinator.profile.id], 'id'),
           module.exports.users.coordinator.token,
           function (err, registrationIds) {
             if (err) return done(err);
             module.exports.registrations[module.exports.users.coordinator.profile.id] = registrationIds;
             return cb();
           }
-        )
+        );
+      },
+      function (cb) {
+        utils.registerScoutsForEvent(
+          module.exports.events[0].id,
+          _.map(module.exports.troops[module.exports.users.coordinator2.profile.id], 'id'),
+          module.exports.users.coordinator2.token,
+          function (err, registrationIds) {
+            if (err) return done(err);
+            module.exports.registrations[module.exports.users.coordinator2.profile.id] = registrationIds;
+            return cb();
+          }
+        );
       }
     ], done);
   },

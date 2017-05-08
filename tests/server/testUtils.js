@@ -228,7 +228,7 @@ module.exports = {
           })
           .expect(status.CREATED)
           .end(function (err, res) {
-            console.log(err)
+            if (err) return cb(err);
             registrationIds.push(res.body.registration.id);
             return cb();
           });
