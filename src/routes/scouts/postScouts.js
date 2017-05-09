@@ -52,13 +52,12 @@ module.exports = {
                   rank: preference.rank
                 };
               });
-
               return Models.Preference.bulkCreate(preferences, {
                 validate: true,
                 individualHooks: true
               });
             })
-            .catch(function () {
+            .catch(function (err) {
               throw new Error('Failed to destroy existing preferences');
             });
         } else {
@@ -88,6 +87,7 @@ module.exports = {
         });
       })
       .catch(function (err) {
+        console.log(err)
         res.status(status.BAD_REQUEST).json({
           message: 'Preference could not be created',
           error: err

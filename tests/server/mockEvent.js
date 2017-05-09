@@ -1,5 +1,8 @@
 var async = require('async');
 var _ = require('lodash');
+var app = require('../../src/app');
+var request = require('supertest')(app);
+var status = require('http-status-codes');
 
 var testEvents = require('./testEvents').events;
 var testBadges = require('./testBadges').badges;
@@ -68,7 +71,7 @@ module.exports = {
           module.exports.users.admin.token,
           function (err, offerings) {
             if (err) return done(err);
-            module.exports.offerings[module.exports.events[0].id] = offerings;
+            module.exports.offerings[module.exports.events[0].id] = _.map(offerings, 'offering');
             return cb();
           }
         );
@@ -79,6 +82,7 @@ module.exports = {
           periods: [1, 2, 3],
           price: 5
         }
+        console.log(_.tail(module.exports.badges))
         utils.createOfferingsForEvent(
           module.exports.events[0],
           _.tail(module.exports.badges),
@@ -86,7 +90,9 @@ module.exports = {
           module.exports.users.admin.token,
           function (err, offerings) {
             if (err) return done(err);
-            module.exports.offerings[module.exports.events[0].id].push(offerings);
+            console.log(module.exports.offerings[module.exports.events[0].id], _.map(offerings, 'offering'))
+            module.exports.offerings[module.exports.events[0].id] =
+              module.exports.offerings[module.exports.events[0].id].concat(_.map(offerings, 'offering'));
             return cb();
           }
         );
@@ -141,6 +147,23 @@ module.exports = {
             return cb();
           }
         );
+      },
+      function (cb) {
+        var eventId = module.exports.events[0].id;
+        var userId = module.exports.users.coordinator.profile.id;
+        console.log(module.exports.offerings[eventId])
+        var postData = [{
+          offering: module.exports.offerings[eventId][0].id,
+          rank: 1
+        }, {
+          offering: module.exports.offerings[eventId][1].id,
+          rank: 2
+        }];
+        request.post('/api/scouts/' + module.exports.troops[userId][0].id + '/registrations/' +
+          module.exports.registrations[userId][0] + '/preferences')
+          .set('Authorization', module.exports.users.coordinator.token)
+          .send(postData)
+          .expect(status.CREATED, cb);
       }
     ], done);
   },
