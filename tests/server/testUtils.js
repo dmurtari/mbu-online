@@ -132,27 +132,25 @@ module.exports = {
   },
   createOfferingsForEvent: function (event, badges, offering, token, done) {
     var offerings = [];
-    console.log("creating for", badges)
     async.forEachOfSeries(badges, function (item, index, cb) {
       var postData = {};
       postData.badge_id = item.id;
       postData.offering = offering;
-      console.log(postData)
       request.post('/api/events/' + event.id + '/badges')
         .set('Authorization', token)
         .send(postData)
         .expect(status.CREATED)
         .end(function (err, res) {
           if (err) return done(err);
-          console.log(res.body)
-          offerings.push({
-            id: res.body.event.offerings[index].details.id,
-            offering: res.body.event.offerings[index].details
+          offerings = _.map(res.body.event.offerings, function (offering) {
+            return {
+              id: offering.details.id,
+              offering: offering.details
+            };
           });
           return cb();
         });
     }, function (err) {
-      console.log("created", offerings)
       done(err, offerings);
     });
   },
