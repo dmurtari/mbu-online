@@ -38,7 +38,7 @@ module.exports = {
   }, {
     model: Model.Purchasable,
     as: 'purchases',
-    attributes: [['id', 'purchasable_id'], 'item', 'price'],
+    attributes: [['id', 'purchasable_id'], 'item', 'price', 'has_size'],
     through: {
       as: 'details',
       attributes: ['size', 'quantity']
