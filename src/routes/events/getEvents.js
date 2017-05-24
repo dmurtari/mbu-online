@@ -118,7 +118,7 @@ module.exports = {
         res.status(status.OK).send(currentEvent.Event);
       })
       .catch(function () {
-        res.status(status.BAD_REQUEST).end();
+        res.status(status.OK).end();
       });
   },
   getPotentialIncome: function (req, res) {
@@ -149,27 +149,35 @@ module.exports = {
           where: {
             event_id: req.params.id
           },
-          attributes: ['scout_id']
+          attributes: ['scout_id'],
+          include: [{
+            model: Model.Purchasable,
+            as: 'purchases',
+            attributes: ['id', 'price', 'has_size'],
+            through: [{
+              as: 'details',
+              attributes: ['quantity', 'size']
+            }]
+          }]
         });
       })
       .then(function (registrations) {
         resultObject.registrations = registrations;
 
-        return Model.Purchasable.findAll({
-          where: {
-            event_id: req.params.id
-          },
-          attributes: ['id', 'price', 'has_size'],
-          include: [{
-            model: Model.Purchase,
-            as: 'sold',
-            attributes: ['quantity', 'size']
-          }]
-        })
-      })
-      .then(function (purchases) {
-        resultObject.purchases = _.groupBy(purchases, 'id');
-        console.log(resultObject.purchases);
+      //   return Model.Purchasable.findAll({
+      //     where: {
+      //       event_id: req.params.id
+      //     },
+      //     attributes: ['id', 'price', 'has_size'],
+      //     include: [{
+      //       model: Model.Purchase,
+      //       as: 'sold',
+      //       attributes: ['quantity', 'size']
+      //     }]
+      //   })
+      // })
+      // .then(function (purchases) {
+      //   resultObject.purchases = purchases;
         res.status(status.OK).send(resultObject);
       })
       .catch(function (err) {
