@@ -92,7 +92,6 @@ module.exports = {
         return res.status(status.OK).json(scouts);
       })
       .catch(function (err) {
-        console.log(err)
         return res.status(status.BAD_REQUEST).json({
           error: err,
           message: 'Error getting registrations'

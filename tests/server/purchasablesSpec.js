@@ -651,7 +651,7 @@ describe('purchasables', function () {
           ], done);
         });
 
-        it('should allow scouts to purchase an item multiple times', function (done) {
+        xit('should allow scouts to purchase an item multiple times', function (done) {
           var postData = {
             purchasable: purchasables[1].id,
             quantity: 3
@@ -669,9 +669,19 @@ describe('purchasables', function () {
                 .set('Authorization', generatedUsers.coordinator.token)
                 .send(postData)
                 .expect(status.CREATED, cb);
+            },
+            function (cb) {
+              request.get('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/purchases')
+                .set('Authorization', generatedUsers.coordinator.token)
+                .expect(status.OK)
+                .end(function (err, res) {
+                  if (err) return done(err);
+                  var purchases = res.body;
+                  expect(purchases).to.have.length(2);
+                  return cb();
+                });
             }
           ], done);
-
         });
 
         xit('should not allow a scout that is too old to purchase', function (done) {

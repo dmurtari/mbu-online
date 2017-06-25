@@ -74,7 +74,6 @@ module.exports = {
         return res.status(status.OK).json(offerings);
       })
       .catch(function (err) {
-        console.log(err)
         res.status(status.BAD_REQUEST).end();
       })
   },
@@ -181,7 +180,6 @@ module.exports = {
         res.status(status.OK).send(resultObject);
       })
       .catch(function (err) {
-        console.log("Error it", err);
         res.status(status.BAD_REQUEST).send(err);
       });
   }

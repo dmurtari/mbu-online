@@ -87,7 +87,6 @@ module.exports = {
         });
       })
       .catch(function (err) {
-        console.log(err)
         res.status(status.BAD_REQUEST).json({
           message: 'Preference could not be created',
           error: err

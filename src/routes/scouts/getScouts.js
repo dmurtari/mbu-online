@@ -50,7 +50,6 @@ module.exports = {
         res.status(status.OK).json(scouts);
       })
       .catch(function (err) {
-        console.log(err);
         res.status(status.BAD_REQUEST).json(err);
       });
   },
