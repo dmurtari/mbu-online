@@ -8,7 +8,7 @@ var expect = chai.expect;
 var status = require('http-status-codes');
 var utils = require('./testUtils');
 
-describe.only('users', function () {
+describe('users', function () {
   beforeEach(function (done) {
     utils.dropDb(done);
   });

@@ -21,6 +21,7 @@ router.get('/profile', passport.authenticate('jwt', { session: false }), postUse
 router.get('/users/:userId?', isCurrentUser(['teacher']), getUsers.get(false));
 router.put('/users/:userId', [isCurrentUser(['teacher']), canUpdateRole], putUsers.updateProfile);
 router.delete('/users/:userId', isCurrentUser(), deleteUsers.deleteUser);
+router.get('/users/exists/:email', getUsers.exists);
 
 // Scouts
 var scoutMiddleware = [isCurrentUser(['teacher']), isAuthorized(['teacher', 'coordinator'])];

@@ -5,6 +5,22 @@ var Models = require('../../models');
 var registrationInformation = require('../../models/queries/registrationInformation');
 
 module.exports = {
+  exists: function (req, res) {
+    return Models.User.findAll({
+      where: {
+        email: {
+          ilike: req.params.email
+        }
+      }
+    })
+      .then(function (users) {
+        var exists = users.length > 0;
+
+        res.status(status.OK).json({
+          exists: exists
+        })
+      })
+  },
   get: function (shouldIncludeScouts) {
     return function (req, res) {
       var query = {};
