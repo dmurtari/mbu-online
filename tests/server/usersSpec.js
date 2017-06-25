@@ -8,7 +8,7 @@ var expect = chai.expect;
 var status = require('http-status-codes');
 var utils = require('./testUtils');
 
-describe('users', function () {
+describe.only('users', function () {
   beforeEach(function (done) {
     utils.dropDb(done);
   });
@@ -126,55 +126,50 @@ describe('users', function () {
       ], done);
     });
 
-    it('should not create duplicate accounts', function (done) {
-      var postData = {
-        email: 'test@test.com',
-        password: 'password',
-        firstname: 'firstname',
-        lastname: 'lastname'
-      };
+    describe('when a user already exists', function () {
+      var postData;
 
-      async.series([
-        function (cb) {
+      beforeEach(function (done) {
+        postData = {
+          email: 'test@test.com',
+          password: 'password',
+          firstname: 'firstname',
+          lastname: 'lastname'
+        };
+
+        request.post('/api/signup')
+          .send(postData)
+          .expect(status.CREATED, done);
+      });
+
+      it('should know if a user exists by email', function (done) {
+        request.get('/api/users/exists/Test@test.com')
+          .expect(status.OK)
+          .end(function (err, res) {
+            if (err) return done(err);
+            expect(res.body.exists).to.be.true;
+            done();
+          })
+      });
+
+      it('should not create a duplicate user', function (done) {
           request.post('/api/signup')
             .send(postData)
-            .expect(status.CREATED, cb);
-        },
-        function (cb) {
-          request.post('/api/signup')
-            .send(postData)
-            .expect(status.BAD_REQUEST, cb);
-        }
-      ], done);
-    });
+            .expect(status.BAD_REQUEST, done);
+      });
 
-    it('should treat emails as case insensitive', function (done) {
-      var postData = {
-        email: 'test@test.com',
-        password: 'password',
-        firstname: 'firstname',
-        lastname: 'lastname'
-      };
+      it('should treat email as case insensitive', function (done) {
+        var uppercaseData = {
+          email: 'Test@Test.com',
+          password: 'password',
+          firstname: 'firstname',
+          lastname: 'lastname'
+        };
 
-      var uppercaseData = {
-        email: 'Test@Test.com',
-        password: 'password',
-        firstname: 'firstname',
-        lastname: 'lastname'
-      };
-
-      async.series([
-        function (cb) {
-          request.post('/api/signup')
-            .send(postData)
-            .expect(status.CREATED, cb);
-        },
-        function (cb) {
-          request.post('/api/signup')
+        request.post('/api/signup')
             .send(uppercaseData)
-            .expect(status.BAD_REQUEST, cb);
-        }
-      ], done);
+            .expect(status.BAD_REQUEST, done);
+      });
     });
   });
 
