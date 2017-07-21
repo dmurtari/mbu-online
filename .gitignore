@@ -39,7 +39,6 @@ jspm_packages
 # Compiled files
 dist
 
-# Secrets
-src/config/secrets.js
-
 .DS_Store
+
+setup.sh
