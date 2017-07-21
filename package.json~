@@ -5,7 +5,7 @@
   "main": "./src/index.js",
   "scripts": {
     "test": "gulp test:unit:watch",
-    "start": "./node_modules/.bin/gulp"
+    "start": "gulp serve"
   },
   "repository": {
     "type": "git",
@@ -16,7 +16,7 @@
   "bugs": {
     "url": "https://github.com/dmurtari/mbu-online/issues"
   },
-  "engines": {
+  "engine": {
     "node": "7.8.0"
   },
   "homepage": "https://github.com/dmurtari/mbu-online#readme",
