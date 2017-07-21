@@ -5,7 +5,7 @@
   "main": "./src/index.js",
   "scripts": {
     "test": "gulp test:unit:watch",
-    "start": "./node_modules/.bin/gulp"
+    "start": "gulp serve"
   },
   "repository": {
     "type": "git",
@@ -16,7 +16,7 @@
   "bugs": {
     "url": "https://github.com/dmurtari/mbu-online/issues"
   },
-  "engines": {
+  "engine": {
     "node": "7.8.0"
   },
   "homepage": "https://github.com/dmurtari/mbu-online#readme",
@@ -26,6 +26,7 @@
     "eslint-config-airbnb-base": "^11.1.0",
     "eslint-plugin-import": "^2.2.0",
     "faker": "^4.1.0",
+    "gulp": "^3.9.1",
     "gulp-mocha": "^4.3.0",
     "gulp-watch": "^4.3.5",
     "mocha": "^3.2.0",
@@ -40,7 +41,6 @@
     "body-parser": "^1.15.0",
     "express": "^4.13.4",
     "express-session": "^1.13.0",
-    "gulp": "^3.9.1",
     "http-status-codes": "^1.1.6",
     "jsonwebtoken": "^7.3.0",
     "lodash": "^4.17.4",
