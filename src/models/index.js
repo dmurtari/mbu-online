@@ -6,7 +6,13 @@ var db = {};
 var sequelize;
 
 // Configuration for Environments
-if (env === 'development') {
+if (process.env.DATABASE_URL){
+  sequelize = new Sequelize(process.env.DATABASE_URL, {
+    dialect:  'postgres',
+    protocol: 'postgres',
+    logging:  true
+  });
+} else if (env === 'development') {
   sequelize = new Sequelize('postgres://mbu:@localhost/mbu');
 } else if (env === 'test') {
   sequelize = new Sequelize('postgres://mbu:@localhost/mbutest', {
