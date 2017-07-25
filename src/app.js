@@ -8,15 +8,23 @@ var passport = require('passport');
 var models = require('./models');
 
 var app = express();
+var history = require('connect-history-api-fallback');
 var env = process.env.NODE_ENV || 'development';
 var port = process.env.PORT || 3000;
 
+app.use(history({
+  verbose: true
+}));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 if (env === 'development') {
   app.use(logger('dev'));
 }
+
+// if (env === 'production') {
+  app.use(express.static('./build'));
+// }
 
 app.use(function (req, res, next) {
   res.setHeader('Access-Control-Allow-Origin', 'http://localhost:8080');

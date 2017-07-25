@@ -53,7 +53,7 @@ CurrentEvent.belongsTo(Event, {
   foreignKey: 'event_id'
 });
 
-// Event/Purchasable relationship
+// Event/Purchasable relatprocionship
 Event.hasMany(Purchasable, {
   as: 'purchasables'
 });

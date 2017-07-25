@@ -16,7 +16,13 @@ module.exports = {
         });
       },
       function (token, done) {
-        Models.User.find({ where: { email: req.body.email } })
+        Models.User.find({
+          where: {
+            email: {
+              ilike: req.body.email
+            }
+          }
+        })
           .then(function (user) {
             if (!user) {
               throw new Error('User to reset not found');
@@ -45,7 +51,7 @@ module.exports = {
         var url = req.body.url || 'http://' + req.headers.host + '/api/reset/';
         var mailOptions = {
           to: user.email,
-          from: 'no-reply@apo-gammatheta.org',
+          from: 'no-reply@mbu.online',
           subject: 'MBU Online Password Reset',
           text: 'You are receiving this because you (or someone else) have requested a password reset for your account.\n\n' +
           'Please click on the following link, or paste into your browser to complete the process:\n\n' +
@@ -110,7 +116,7 @@ module.exports = {
         });
         var mailOptions = {
           to: user.email,
-          from: 'no-reply@apo-gammatheta.org',
+          from: 'no-reply@mbu.online',
           subject: 'MBU Online Password Changed',
           text: 'Hello,\n\n' +
           'This is a confirmation that the password for your account ' + user.email + ' has just been changed.\n'
