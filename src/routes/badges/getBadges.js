@@ -14,10 +14,6 @@ module.exports = {
 
     Model.Badge.findAll({ where: query })
       .then(function (badges) {
-        if (badges.length < 1) {
-          return res.status(status.NOT_FOUND).end();
-        }
-
         return res.status(status.OK).json(badges);
       });
   }

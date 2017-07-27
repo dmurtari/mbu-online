@@ -13,7 +13,7 @@ var env = process.env.NODE_ENV || 'development';
 var port = process.env.PORT || 3000;
 
 app.use(history({
-  verbose: true
+  // verbose: true
 }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -22,9 +22,9 @@ if (env === 'development') {
   app.use(logger('dev'));
 }
 
-// if (env === 'production') {
+if (env === 'production') {
   app.use(express.static('./build'));
-// }
+}
 
 app.use(function (req, res, next) {
   res.setHeader('Access-Control-Allow-Origin', 'http://localhost:8080');

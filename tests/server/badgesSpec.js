@@ -208,9 +208,9 @@ describe('merit badges', function() {
         .expect(status.OK, done);
     });
 
-    it('should not fail if a badge does not exist does not exist', function(done) {
+    it('should not fail if a badge does not exist', function(done) {
       request.get('/api/badges?name=dne')
-        .expect(status.NOT_FOUND, done);
+        .expect(status.OK, done);
     });
   });
 
@@ -241,7 +241,13 @@ describe('merit badges', function() {
         },
         function(cb) {
           request.get('/api/badges?id=' + id)
-            .expect(status.NOT_FOUND, cb);
+            .expect(status.OK)
+            .end(function (err, res) {
+              if (err) return done(err);
+              var badges = res.body;
+              badges.length.should.equal(0);
+              cb();
+            });
         }
       ], done);
     });

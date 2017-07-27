@@ -27,10 +27,6 @@ module.exports = {
       }]
     })
       .then(function (events) {
-        if (events.length < 1) {
-          return res.status(status.NOT_FOUND).end();
-        }
-
         return res.status(status.OK).json(events);
       })
       .catch(function (err) {

@@ -319,24 +319,48 @@ describe('events', function () {
           });
       });
 
-      it('should return not found if an event is not found by id', function (done) {
+      it('should return empty if an event is not found by id', function (done) {
         request.get('/api/events?id=123123')
-          .expect(status.NOT_FOUND, done);
+          .expect(status.OK)
+          .end(function (err, res) {
+            if (err) return done(err);
+            var events = res.body;
+            events.length.should.equal(0);
+            done();
+          });;
       });
 
-      it('should return not found if an event is not found by semester', function (done) {
+      it('should return empty if an event is not found by semester', function (done) {
         request.get('/api/events?semester=Summer')
-          .expect(status.NOT_FOUND, done);
+          .expect(status.OK)
+          .end(function (err, res) {
+            if (err) return done(err);
+            var events = res.body;
+            events.length.should.equal(0);
+            done();
+          });;
       });
 
-      it('should return not found if an event is not found by year', function (done) {
+      it('should return empty if an event is not found by year', function (done) {
         request.get('/api/events?year=1914')
-          .expect(status.NOT_FOUND, done);
+          .expect(status.OK)
+          .end(function (err, res) {
+            if (err) return done(err);
+            var events = res.body;
+            events.length.should.equal(0);
+            done();
+          });;
       });
 
-      it('should return not found if an event is not found by year and semester', function (done) {
+      it('should return empty if an event is not found by year and semester', function (done) {
         request.get('/api/events?year=1916&semester=Spring')
-          .expect(status.NOT_FOUND, done);
+          .expect(status.OK)
+          .end(function (err, res) {
+            if (err) return done(err);
+            var events = res.body;
+            events.length.should.equal(0);
+            done();
+          });;
       });
     });
 
@@ -359,7 +383,13 @@ describe('events', function () {
           },
           function (cb) {
             request.get('/api/events?id=' + id2)
-              .expect(status.NOT_FOUND, cb);
+              .expect(status.OK)
+              .end(function (err, res) {
+                if (err) return done(err);
+                var events = res.body;
+                events.length.should.equal(0);
+                done();
+              });
           }
         ], done);
       });
