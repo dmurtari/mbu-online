@@ -1,4 +1,7 @@
 language: node_js
+services:
+  - postgresql
 before_script:
   - npm install -g gulp-cli
+  - psql -c 'create database mbutest;' -U mbu
 script: gulp test:api

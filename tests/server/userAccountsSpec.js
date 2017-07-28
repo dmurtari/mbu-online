@@ -445,6 +445,53 @@ describe('user profiles', function () {
       ], done);
     });
 
+    it('should allow changes to the same password', function (done) {
+      var newToken;
+
+      async.series([
+        function (cb) {
+          request.post('/api/authenticate')
+            .send({
+              email: user2.email,
+              password: user2.password
+            })
+            .expect(status.OK, cb);
+        },
+        function (cb) {
+          request.put('/api/users/' + user2.id)
+            .set('Authorization', user2.token)
+            .send({
+              password: user2.password
+            })
+            .expect(status.OK)
+            .end(function (err, res) {
+              if (err) return done(err);
+              newToken = res.body.token;
+              cb();
+            });
+        },
+        function (cb) {
+          request.post('/api/authenticate')
+            .send({
+              email: user2.email,
+              password: user2.password
+            })
+            .expect(status.OK, cb);
+        },
+        function (cb) {
+          request.get('/api/profile')
+            .set('Authorization', newToken)
+            .expect(status.OK)
+            .end(function (err, res) {
+              if (err) return done(err);
+              expect(res.body.profile.email).to.equal(user2.email);
+              expect(res.body.profile.details).to.deep.equal(user2.details);
+              return cb();
+            });
+        }
+      ], done);
+    });
+
     it('should allow admins to edit a role', function (done) {
       async.series([
         function (cb) {
