@@ -15,15 +15,27 @@ var port = process.env.PORT || 3000;
 app.use(history({
   // verbose: true
 }));
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 if (env === 'development') {
   app.use(logger('dev'));
+  app.use(function (req, res, next) {
+    setTimeout(function () {
+      next();
+    }, 500);
+  });
 }
 
 if (env === 'production') {
   app.use(express.static('./build'));
+  app.use(function (req, res, next) {
+    if (!req.secure) {
+      return res.redirect('https://' + req.get('host') + req.url);
+    }
+    next();
+  });
 }
 
 app.use(function (req, res, next) {
