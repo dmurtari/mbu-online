@@ -3,5 +3,6 @@ services:
   - postgresql
 before_script:
   - npm install -g gulp-cli
-  - psql -c 'create database mbutest;' -U mbu
+  - psql -c "CREATE DATABASE mbutest;" -U postgres
+  - psql -c "CREATE USER mbu;" -U postgres
 script: gulp test:api
