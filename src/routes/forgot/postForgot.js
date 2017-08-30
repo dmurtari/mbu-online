@@ -2,6 +2,7 @@ var crypto = require('crypto');
 var async = require('async');
 var nodemailer = require('nodemailer');
 var status = require('http-status-codes');
+var mailer = require('@sendgrid/mail');
 
 var Models = require('../../models');
 var config = require('../../config/secrets');
@@ -41,31 +42,32 @@ module.exports = {
           });
       },
       function (token, user, done) {
-        var smtpTransport = nodemailer.createTransport({
-          service: 'SendGrid',
-          auth: {
-            user: config.SENDGRID_USERNAME,
-            pass: config.SENDGRID_PASSWORD
-          }
-        });
+        mailer.setApiKey(config.SENDGRID_API_KEY);
+        mailer.setSubstitutionWrappers('{{', '}}');
+
         var url = req.body.url || 'http://' + req.headers.host + '/api/reset/';
-        var mailOptions = {
+        var msg = {
           to: user.email,
           from: 'no-reply@mbu.online',
           subject: 'MBU Online Password Reset',
-          text: 'You are receiving this because you (or someone else) have requested a password reset for your account.\n\n' +
-          'Please click on the following link, or paste into your browser to complete the process:\n\n' +
-          url + token + '\n\n' +
-          'If you did not request this, please ignore this email and your password will remain unchanged.\n'
-        };
-        smtpTransport.sendMail(mailOptions, function (err) {
-          if (err) {
-            res.status(status.INTERNAL_SERVER_ERROR).json({ message: 'Got error' + err });
-          } else {
-            res.status(status.OK).json({ message: 'An e-mail has been sent to ' + user.email + ' with further instructions.' });
+          templateId: 'b6cd8257-e07c-4390-9c58-cf2267e36e20',
+          substitutions: {
+            url: url,
+            token: token
           }
-          done(err, 'done');
-        });
+        };
+
+        return mailer.send(msg)
+          .then(function () {
+            console.log('sent message');
+            res.status(status.OK).json({ message: 'An e-mail has been sent to ' + user.email + ' with further instructions.' });
+            return done(null, 'done');
+          })
+          .catch(function (err) {
+            console.log('Failed to send msg', err.response.body);
+            res.status(status.INTERNAL_SERVER_ERROR).json({ message: 'Got error' + err });
+            return done(err, 'done');
+          });
       }
     ], function (err) {
       if (err) {
