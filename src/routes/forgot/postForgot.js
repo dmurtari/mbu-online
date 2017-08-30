@@ -54,20 +54,24 @@ module.exports = {
           substitutions: {
             url: url,
             token: token
-          }
+          },
+          content: [
+            {
+              type: "text/plain",
+              value: "Textual content"
+            }
+          ]
         };
 
-        return mailer.send(msg)
-          .then(function () {
-            console.log('sent message');
+        return mailer.send(msg, function (error, result) {
+          if (error) {
+            res.status(status.INTERNAL_SERVER_ERROR).json({ message: 'Got error' + error });
+          }
+          else {
             res.status(status.OK).json({ message: 'An e-mail has been sent to ' + user.email + ' with further instructions.' });
-            return done(null, 'done');
-          })
-          .catch(function (err) {
-            console.log('Failed to send msg', err.response.body);
-            res.status(status.INTERNAL_SERVER_ERROR).json({ message: 'Got error' + err });
-            return done(err, 'done');
-          });
+          }
+          return done(error, 'done');
+        });
       }
     ], function (err) {
       if (err) {
@@ -109,27 +113,33 @@ module.exports = {
           });
       },
       function (user, done) {
-        var smtpTransport = nodemailer.createTransport({
-          service: 'SendGrid',
-          auth: {
-            user: config.SENDGRID_USERNAME,
-            pass: config.SENDGRID_PASSWORD
-          }
-        });
-        var mailOptions = {
+        mailer.setApiKey(config.SENDGRID_API_KEY);
+        mailer.setSubstitutionWrappers('{{', '}}');
+
+        var url = req.body.url || 'http://' + req.headers.host + '/api/reset/';
+        var msg = {
           to: user.email,
           from: 'no-reply@mbu.online',
           subject: 'MBU Online Password Changed',
-          text: 'Hello,\n\n' +
-          'This is a confirmation that the password for your account ' + user.email + ' has just been changed.\n'
+          templateId: '6822bdf9-bdb2-4359-ab1a-6f5dc9ca2d2c',
+          substitutions: {
+            email: user.email
+          },
+          content: [
+            {
+              type: "text/plain",
+              value: "Textual content"
+            }
+          ]
         };
-        smtpTransport.sendMail(mailOptions, function (err) {
-          if (err) {
-            res.status(status.INTERNAL_SERVER_ERROR).json({ message: 'Error sending' + err });
+
+        return mailer.send(msg, function (error, result) {
+          if (error) {
+            res.status(status.INTERNAL_SERVER_ERROR).json({ message: 'Error sending' + error });
           } else {
             res.status(status.OK).json({ message: 'Email sent' });
           }
-          done(err, 'done');
+          done(error, 'done');
         });
       }
     ], function (err) {
