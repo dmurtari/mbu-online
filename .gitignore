@@ -42,3 +42,5 @@ dist
 .DS_Store
 
 setup.sh
+
+!build/*
