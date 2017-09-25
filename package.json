@@ -46,6 +46,7 @@
     "http-status-codes": "^1.1.6",
     "jsonwebtoken": "^7.3.0",
     "lodash": "^4.17.4",
+    "mbu-frontend": "git+https://git@github.com/dmurtari/mbu-frontend.git#v1.0.1",
     "moment": "^2.18.0",
     "morgan": "^1.7.0",
     "nodemailer": "^3.1.3",

@@ -4,6 +4,7 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var logger = require('morgan');
 var passport = require('passport');
+var path = require('path');
 
 var models = require('./models');
 
@@ -29,7 +30,7 @@ if (env === 'development') {
 }
 
 if (env === 'production') {
-  app.use(express.static('./build'));
+  app.use(express.static(path.join(__dirname, '../node_modules/mbu-frontend/dist')));
 }
 
 app.use(function (req, res, next) {
