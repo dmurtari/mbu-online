@@ -1,6 +1,5 @@
 var crypto = require('crypto');
 var async = require('async');
-var nodemailer = require('nodemailer');
 var status = require('http-status-codes');
 var mailer = require('@sendgrid/mail');
 
@@ -68,7 +67,9 @@ module.exports = {
             res.status(status.INTERNAL_SERVER_ERROR).json({ message: 'Got error' + error });
           }
           else {
-            res.status(status.OK).json({ message: 'An e-mail has been sent to ' + user.email + ' with further instructions.' });
+            res.status(status.OK).json({
+              message: 'An e-mail has been sent to ' + user.email + ' with further instructions.'
+            });
           }
           return done(error, 'done');
         });
