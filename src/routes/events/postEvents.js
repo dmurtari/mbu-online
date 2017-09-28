@@ -24,7 +24,7 @@ module.exports = {
 
     Model.Event.findById(eventId)
       .then(function (event) {
-        return event.addOffering(req.body.badge_id, req.body.offering);
+        return event.addOffering(req.body.badge_id, { through: req.body.offering });
       })
       .then(function (offering) {
         if (!offering) {

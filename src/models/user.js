@@ -27,17 +27,25 @@ module.exports = function (sequelize, DataTypes) {
     reset_token_expires: DataTypes.DATE,
     firstname: {
       type: DataTypes.STRING,
-      validate: { notEmpty: true },
+      validate: {
+        notEmpty: true
+      },
       allowNull: false
     },
     lastname: {
       type: DataTypes.STRING,
-      validate: { notEmpty: true },
+      validate: {
+        notEmpty: true
+      },
       allowNull: false
     },
     role: {
       type: DataTypes.STRING,
-      validate: { isIn: [['admin', 'coordinator', 'teacher', 'anonymous']] },
+      validate: {
+        isIn: [
+          ['admin', 'coordinator', 'teacher', 'anonymous']
+        ]
+      },
       allowNull: false,
       defaultValue: 'anonymous'
     },
@@ -51,20 +59,13 @@ module.exports = function (sequelize, DataTypes) {
       defaultValue: {}
     }
   }, {
-    indexes: [
-      {
-        unique: true,
-        fields: [sequelize.fn('lower', sequelize.col('email'))]
-      }
-    ],
+    indexes: [{
+      unique: true,
+      fields: [sequelize.fn('lower', sequelize.col('email'))]
+    }],
     getterMethods: {
       fullname: function () {
         return this.firstname + ' ' + this.lastname;
-      }
-    },
-    instanceMethods: {
-      comparePassword: function (candidatePassword) {
-        return bcrypt.compare(candidatePassword, this.password);
       }
     },
     hooks: {
@@ -110,6 +111,10 @@ module.exports = function (sequelize, DataTypes) {
     },
     underscored: true
   });
+
+  User.prototype.comparePassword = function (candidatePassword) {
+    return bcrypt.compare(candidatePassword, this.password);
+  }
 
   return User;
 };

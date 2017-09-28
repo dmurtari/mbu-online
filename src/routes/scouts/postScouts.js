@@ -35,15 +35,19 @@ module.exports = {
     var registrationId = req.params.registrationId;
 
     return Models.Registration.find({
-      where: {
-        id: registrationId,
-        scout_id: scoutId
-      }
-    })
+        where: {
+          id: registrationId,
+          scout_id: scoutId
+        }
+      })
       .then(function (registration) {
         if (Array.isArray(req.body)) {
           // Update preferences, override existing
-          return Models.Preference.destroy({ where: { registration_id: registrationId } })
+          return Models.Preference.destroy({
+              where: {
+                registration_id: registrationId
+              }
+            })
             .then(function () {
               var preferences = _.map(req.body, function (preference) {
                 return {
@@ -63,7 +67,9 @@ module.exports = {
         } else {
           // Add preference, without overriding
           return registration.addPreference(req.body.offering, {
-            rank: req.body.rank
+            through: {
+              rank: req.body.rank
+            }
           });
         }
       })
@@ -98,15 +104,19 @@ module.exports = {
     var registrationId = req.params.registrationId;
 
     return Models.Registration.find({
-      where: {
-        id: registrationId,
-        scout_id: scoutId
-      }
-    })
+        where: {
+          id: registrationId,
+          scout_id: scoutId
+        }
+      })
       .then(function (registration) {
         if (Array.isArray(req.body)) {
           // Update assignments, override existing
-          return Models.Assignment.destroy({ where: { registration_id: registrationId } })
+          return Models.Assignment.destroy({
+              where: {
+                registration_id: registrationId
+              }
+            })
             .then(function () {
               var assignments = _.map(req.body, function (assignment) {
                 return {
@@ -128,7 +138,9 @@ module.exports = {
           // Add assignment, without overriding
           return registration.addAssignment(req.body.offering, {
             individualHooks: true,
-            periods: req.body.periods
+            through: {
+              periods: req.body.periods
+            }
           });
         }
       })
@@ -168,15 +180,17 @@ module.exports = {
     var registrationId = req.params.registrationId;
 
     return Models.Registration.find({
-      where: {
-        id: registrationId,
-        scout_id: scoutId
-      }
-    })
+        where: {
+          id: registrationId,
+          scout_id: scoutId
+        }
+      })
       .then(function (registration) {
         return registration.addPurchase(req.body.purchasable, {
-          quantity: req.body.quantity,
-          size: req.body.size
+          through: {
+            quantity: req.body.quantity,
+            size: req.body.size
+          }
         });
       })
       .then(function () {
