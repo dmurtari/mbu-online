@@ -43,18 +43,18 @@
     "express": "^4.13.4",
     "express-session": "^1.13.0",
     "gulp": "^3.9.1",
-    "http-status-codes": "^1.1.6",
-    "jsonwebtoken": "^7.3.0",
+    "http-status-codes": "^1.3.0",
+    "jsonwebtoken": "^8.0.1",
     "lodash": "^4.17.4",
     "mbu-frontend": "git+https://git@github.com/dmurtari/mbu-frontend.git#v1.0.1",
     "moment": "^2.18.0",
     "morgan": "^1.7.0",
     "npm": "^5.3.0",
-    "passport": "^0.3.2",
-    "passport-jwt": "^2.2.1",
+    "passport": "^0.4.0",
+    "passport-jwt": "^3.0.0",
     "path": "^0.12.7",
-    "pg": "^6.1.2",
-    "sequelize": "^3.30.2",
-    "sequelize-cli": "^2.7.0"
+    "pg": "^7.3.0",
+    "sequelize": "^4.11.1",
+    "sequelize-cli": "^3.0.0"
   }
 }
