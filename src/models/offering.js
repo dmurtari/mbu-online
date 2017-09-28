@@ -40,6 +40,10 @@ module.exports = function (sequelize, DataTypes) {
       type: DataTypes.INTEGER,
       allowNull: false,
       unique: 'event_offering'
+    },
+    size_limit: {
+      type: DataTypes.INTEGER,
+      defaultValue: 20
     }
   }, {
     validate: {
