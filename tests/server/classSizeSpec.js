@@ -59,11 +59,8 @@ describe.only('Class sizes', function () {
   });
 
   beforeEach(function (done) {
-    scoutId = generatedScouts[0].id;
-    registrationIds = [];
-    async.series([
-      function (cb) {
-        request.post('/api/scouts/' + scoutId + '/registrations')
+    async.forEachOfSeries(generatedScouts, function (scout, index, cb) {
+        request.post('/api/scouts/' + scout.id + '/registrations')
           .set('Authorization', generatedUsers.coordinator.token)
           .send({
             event_id: events[0].id
@@ -74,21 +71,9 @@ describe.only('Class sizes', function () {
             registrationIds.push(res.body.registration.id);
             return cb();
           });
-      },
-      function (cb) {
-        request.post('/api/scouts/' + scoutId + '/registrations')
-          .set('Authorization', generatedUsers.coordinator.token)
-          .send({
-            event_id: events[1].id
-          })
-          .expect(status.CREATED)
-          .end(function (err, res) {
-            if (err) return done(err);
-            registrationIds.push(res.body.registration.id);
-            return cb();
-          });
-      }
-    ], done);
+    }, function (err) {
+      done(err);
+    });
   });
 
   after(function (done) {
@@ -160,7 +145,7 @@ describe.only('Class sizes', function () {
   });
 
   describe('when an offering exists', function () {
-    var offering;
+    var offering, assignmentData;
 
     beforeEach(function (done) {
       var postData = {
@@ -186,8 +171,37 @@ describe.only('Class sizes', function () {
         });
     });
 
-    it('should allow joining if under the limit', function (done) {
-      done();
+    beforeEach(function () {
+      assignmentData = {
+        periods: [1],
+        offering: offering.details.id
+      };
+    });
+
+    it('should allow joining if under the limit for a period', function (done) {
+      request.post('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/assignments')
+        .set('Authorization', generatedUsers.teacher.token)
+        .send(assignmentData)
+        .expect(status.CREATED, done);
+    });
+
+    it('should allow joining multiple periods under the limit', function (done) {
+      async.series([
+        function (cb) {
+          request.post('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/assignments')
+            .set('Authorization', generatedUsers.teacher.token)
+            .send(assignmentData)
+            .expect(status.CREATED, cb);
+        },
+        function (cb) {
+          assignmentData.periods = [2];
+
+          request.post('/api/scouts/' + generatedScouts[1].id + '/registrations/' + registrationIds[1] + '/assignments')
+            .set('Authorization', generatedUsers.teacher.token)
+            .send(assignmentData)
+            .expect(status.CREATED, cb);
+        }
+      ], done);
     });
   });
 });
