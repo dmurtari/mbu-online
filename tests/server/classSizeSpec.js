@@ -203,5 +203,22 @@ describe.only('Class sizes', function () {
         }
       ], done);
     });
+
+    it('should not allow creating an assignment over the limit', function (done) {
+      async.series([
+        function (cb) {
+          request.post('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/assignments')
+            .set('Authorization', generatedUsers.teacher.token)
+            .send(assignmentData)
+            .expect(status.CREATED, cb);
+        },
+        function (cb) {
+          request.post('/api/scouts/' + generatedScouts[1].id + '/registrations/' + registrationIds[1] + '/assignments')
+            .set('Authorization', generatedUsers.teacher.token)
+            .send(assignmentData)
+            .expect(status.BAD_REQUEST, cb);
+        }
+      ], done);
+    });
   });
 });
