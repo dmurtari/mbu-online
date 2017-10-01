@@ -43,7 +43,10 @@ module.exports = function (sequelize, DataTypes) {
     },
     size_limit: {
       type: DataTypes.INTEGER,
-      defaultValue: 20
+      defaultValue: 20,
+      validate: {
+        min: 0
+      }
     }
   }, {
     validate: {

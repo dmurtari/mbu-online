@@ -51,8 +51,10 @@ describe.only('Class sizes', function () {
   });
 
   describe('when offerings do not exist', function () {
-    it('should default to 20 as the size limit', function (done) {
-      var postData = {
+    var postData;
+
+    beforeEach(function () {
+      postData = {
         badge_id: badges[1].id,
         offering: {
           duration: 1,
@@ -62,6 +64,8 @@ describe.only('Class sizes', function () {
         }
       };
 
+    })
+    it('should default to 20 as the size limit', function (done) {
       request.post('/api/events/' + events[0].id + '/badges')
         .set('Authorization', adminToken)
         .send(postData)
@@ -76,16 +80,7 @@ describe.only('Class sizes', function () {
     });
 
     it('should accept an input for class size', function (done) {
-      var postData = {
-        badge_id: badges[1].id,
-        offering: {
-          duration: 1,
-          periods: [1, 2, 3],
-          price: '10.00',
-          requirements: ['1', '2', '3a', '3b'],
-          size_limit: 30
-        }
-      };
+      postData.offering.size_limit = 30;
 
       request.post('/api/events/' + events[0].id + '/badges')
         .set('Authorization', adminToken)
@@ -98,6 +93,24 @@ describe.only('Class sizes', function () {
           expect(event.offerings[0].details.size_limit).to.equal(30);
           return done();
         });
+    });
+
+    it('should not allow a negative class size', function (done) {
+      postData.offering.size_limit = -1;
+
+      request.post('/api/events/' + events[0].id + '/badges')
+        .set('Authorization', adminToken)
+        .send(postData)
+        .expect(status.BAD_REQUEST, done);
+    });
+
+    it('should expect a number', function (done) {
+      postData.offering.size_limit = 'hello';
+
+      request.post('/api/events/' + events[0].id + '/badges')
+        .set('Authorization', adminToken)
+        .send(postData)
+        .expect(status.BAD_REQUEST, done);
     });
   });
 });
