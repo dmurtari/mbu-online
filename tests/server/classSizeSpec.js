@@ -63,8 +63,8 @@ describe.only('Class sizes', function () {
           requirements: ['1', '2', '3a', '3b']
         }
       };
+    });
 
-    })
     it('should default to 20 as the size limit', function (done) {
       request.post('/api/events/' + events[0].id + '/badges')
         .set('Authorization', adminToken)
