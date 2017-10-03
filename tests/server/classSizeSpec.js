@@ -60,17 +60,17 @@ describe.only('Class sizes', function () {
 
   beforeEach(function (done) {
     async.forEachOfSeries(generatedScouts, function (scout, index, cb) {
-        request.post('/api/scouts/' + scout.id + '/registrations')
-          .set('Authorization', generatedUsers.coordinator.token)
-          .send({
-            event_id: events[0].id
-          })
-          .expect(status.CREATED)
-          .end(function (err, res) {
-            if (err) return done(err);
-            registrationIds.push(res.body.registration.id);
-            return cb();
-          });
+      request.post('/api/scouts/' + scout.id + '/registrations')
+        .set('Authorization', generatedUsers.coordinator.token)
+        .send({
+          event_id: events[0].id
+        })
+        .expect(status.CREATED)
+        .end(function (err, res) {
+          if (err) return done(err);
+          registrationIds.push(res.body.registration.id);
+          return cb();
+        });
     }, function (err) {
       done(err);
     });
@@ -176,6 +176,34 @@ describe.only('Class sizes', function () {
         periods: [1],
         offering: offering.details.id
       };
+    });
+
+    it('should get the allowed class size', function (done) {
+      request.get('/api/events?id=' + events[0].id)
+        .expect(status.OK)
+        .end(function (err, res) {
+          if (err) return done(err);
+          var event = res.body[0];
+          expect(event.offerings.length).to.equal(1);
+          var offering = event.offerings[0];
+          expect(offering.details.size_limit).to.equal(1);
+          return done();
+        });
+    });
+
+    it('should know that there are no enrolled scouts', function (done) {
+      request.get('/api/events/' + events[0].id + '/badges/' + offering.id + '/limits')
+        .expect(status.OK)
+        .end(function (err, res) {
+          if (err) return done(err);
+          var sizeInfo = res.body;
+          expect(sizeInfo).to.deep.equal({
+            size_limit: 1,
+            1: 0,
+            2: 0,
+            3: 0
+          });
+        });
     });
 
     it('should allow joining if under the limit for a period', function (done) {
