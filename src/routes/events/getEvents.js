@@ -178,6 +178,17 @@ module.exports = {
       .catch(function (err) {
         res.status(status.BAD_REQUEST).send(err);
       });
+  },
+  classSize(req, res) {
+    Model.Offering.findOne({
+      where: {
+        badge_id: req.params.badgeId,
+        event_id: req.params.eventId
+      }
+    })
+      .then(function (offering) {
+
+      })
   }
 };
 

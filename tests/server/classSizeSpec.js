@@ -193,6 +193,7 @@ describe.only('Class sizes', function () {
 
     it('should know that there are no enrolled scouts', function (done) {
       request.get('/api/events/' + events[0].id + '/badges/' + offering.id + '/limits')
+        .set('Authorization', generatedUsers.teacher.token)
         .expect(status.OK)
         .end(function (err, res) {
           if (err) return done(err);

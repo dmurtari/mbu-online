@@ -22,6 +22,7 @@ router.get('/current', getEvents.getCurrentEvent);
 router.post('/:id/badges', isAuthorized(['admin']), postEvents.createOffering);
 router.put('/:eventId/badges/:badgeId', isAuthorized(['admin']), updateEvents.updateOffering);
 router.delete('/:eventId/badges/:badgeId', isAuthorized(['admin']), deleteEvents.deleteOffering);
+router.get('/:eventId/badges/:badgeId/limits', isAuthorized(['admin', 'teacher']), getEvents.classSize);
 
 // Routes for Purchasable CRUD
 router.post('/:id/purchasables', isAuthorized(['admin']), postEvents.createPurchasable);
