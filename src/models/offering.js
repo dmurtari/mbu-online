@@ -69,5 +69,14 @@ module.exports = function (sequelize, DataTypes) {
     underscored: true
   });
 
+  Offering.prototype.getClassSizes = function () {
+    return {
+      size_limit: this.size_limit,
+      1: 0,
+      2: 0,
+      3: 0
+    }
+  };
+
   return Offering;
 };
