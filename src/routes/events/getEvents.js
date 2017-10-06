@@ -190,15 +190,7 @@ module.exports = {
     })
       .then(function (offeringFromDb) {
         offering = offeringFromDb;
-        return offeringFromDb.getAssignees()
-      })
-      .then(function (assignees) {
-        return {
-          size_limit: offering.size_limit,
-          1: 0,
-          2: 0,
-          3: 0
-        }
+        return offeringFromDb.getClassSizes()
       })
       .then(function (results) {
         res.status(status.OK).send(results);
