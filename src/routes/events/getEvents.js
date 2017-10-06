@@ -180,14 +180,31 @@ module.exports = {
       });
   },
   classSize(req, res) {
+    var offering;
+
     Model.Offering.findOne({
       where: {
         badge_id: req.params.badgeId,
         event_id: req.params.eventId
       }
     })
-      .then(function (offering) {
-
+      .then(function (offeringFromDb) {
+        offering = offeringFromDb;
+        return offeringFromDb.getAssignees()
+      })
+      .then(function (assignees) {
+        return {
+          size_limit: offering.size_limit,
+          1: 0,
+          2: 0,
+          3: 0
+        }
+      })
+      .then(function (results) {
+        res.status(status.OK).send(results);
+      })
+      .catch(function (err) {
+        res.status(status.BAD_REQUEST).send(err);
       })
   }
 };
