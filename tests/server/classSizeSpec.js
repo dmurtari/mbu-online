@@ -204,6 +204,7 @@ describe.only('Class sizes', function () {
             2: 0,
             3: 0
           });
+          return done();
         });
     });
 
