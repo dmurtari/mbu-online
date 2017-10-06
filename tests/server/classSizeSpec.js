@@ -144,7 +144,7 @@ describe.only('Class sizes', function () {
     });
   });
 
-  describe('when an offering exists', function () {
+  describe('when an offering exists with a size limit of 1', function () {
     var offering, assignmentData;
 
     beforeEach(function (done) {
@@ -234,21 +234,37 @@ describe.only('Class sizes', function () {
       ], done);
     });
 
-    it('should not allow creating an assignment over the limit', function (done) {
-      async.series([
-        function (cb) {
-          request.post('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/assignments')
-            .set('Authorization', generatedUsers.teacher.token)
-            .send(assignmentData)
-            .expect(status.CREATED, cb);
-        },
-        function (cb) {
-          request.post('/api/scouts/' + generatedScouts[1].id + '/registrations/' + registrationIds[1] + '/assignments')
-            .set('Authorization', generatedUsers.teacher.token)
-            .send(assignmentData)
-            .expect(status.BAD_REQUEST, cb);
-        }
-      ], done);
+    describe('and one scout has already been assigned', function () {
+      beforeEach(function (done) {
+        request.post('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/assignments')
+          .set('Authorization', generatedUsers.teacher.token)
+          .send(assignmentData)
+          .expect(status.CREATED, done);
+      });
+
+      it('should know that there is one scout registered', function (done) {
+        request.get('/api/events/' + events[0].id + '/badges/' + offering.id + '/limits')
+          .set('Authorization', generatedUsers.teacher.token)
+          .expect(status.OK)
+          .end(function (err, res) {
+            if (err) return done(err);
+            var sizeInfo = res.body;
+            expect(sizeInfo).to.deep.equal({
+              size_limit: 1,
+              1: 1,
+              2: 0,
+              3: 0
+            });
+            return done();
+          });
+      });
+
+      it('should not allow another scout to join the same period', function (done) {
+        request.post('/api/scouts/' + generatedScouts[1].id + '/registrations/' + registrationIds[1] + '/assignments')
+          .set('Authorization', generatedUsers.teacher.token)
+          .send(assignmentData)
+          .expect(status.BAD_REQUEST, done);
+      });
     });
   });
 });
