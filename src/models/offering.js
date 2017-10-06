@@ -1,7 +1,6 @@
 var validators = require('./validators');
 var _ = require('lodash');
 
-
 module.exports = function (sequelize, DataTypes) {
   var Offering = sequelize.define('Offering', {
     id: {
@@ -70,12 +69,22 @@ module.exports = function (sequelize, DataTypes) {
   });
 
   Offering.prototype.getClassSizes = function () {
-    return {
-      size_limit: this.size_limit,
-      1: 0,
-      2: 0,
-      3: 0
-    }
+    var offering = this;
+    return this.getAssignees()
+      .then(function (assignees) {
+        return _.reduce(assignees, function (result, assignee) {
+          _.forEach(assignee.Assignment.periods, function (period) {
+            result[period] += 1
+          });
+
+          return result;
+        }, {
+          size_limit: offering.size_limit,
+          1: 0,
+          2: 0,
+          3: 0
+        });
+      });
   };
 
   return Offering;
