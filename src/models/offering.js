@@ -70,6 +70,7 @@ module.exports = function (sequelize, DataTypes) {
 
   Offering.prototype.getClassSizes = function () {
     var offering = this;
+
     return this.getAssignees()
       .then(function (assignees) {
         return _.reduce(assignees, function (result, assignee) {
