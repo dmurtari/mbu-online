@@ -259,8 +259,168 @@ describe.only('Class sizes', function () {
           });
       });
 
-      it.only('should not allow another scout to join the same period', function (done) {
+      it('should not allow the scout to join a different period', function (done) {
+        request.put('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/assignments/' + assignmentData.offering)
+          .set('Authorization', generatedUsers.teacher.token)
+          .send({
+            periods: [3]
+          })
+          .expect(status.OK, done);
+      });
+
+      it('should allow a scout to join a different period', function (done) {
+        assignmentData.periods = [2];
+
         request.post('/api/scouts/' + generatedScouts[1].id + '/registrations/' + registrationIds[1] + '/assignments')
+          .set('Authorization', generatedUsers.teacher.token)
+          .send(assignmentData)
+          .expect(status.CREATED, done);
+      });
+
+      it('should not allow another scout to join the same period', function (done) {
+        request.post('/api/scouts/' + generatedScouts[1].id + '/registrations/' + registrationIds[1] + '/assignments')
+          .set('Authorization', generatedUsers.teacher.token)
+          .send(assignmentData)
+          .expect(status.BAD_REQUEST, done);
+      });
+
+      describe('and a scout has joined a different period', function () {
+        beforeEach(function (done) {
+          assignmentData.periods = [2];
+
+          request.post('/api/scouts/' + generatedScouts[1].id + '/registrations/' + registrationIds[1] + '/assignments')
+            .set('Authorization', generatedUsers.teacher.token)
+            .send(assignmentData)
+            .expect(status.CREATED, done);
+        });
+
+        it('should not allow editing the scout to be in a full class', function (done) {
+          request.put('/api/scouts/' + generatedScouts[1].id + '/registrations/' + registrationIds[1] + '/assignments/' + assignmentData.offering)
+            .set('Authorization', generatedUsers.teacher.token)
+            .send({
+              periods: [1]
+            })
+            .expect(status.BAD_REQUEST, done);
+        });
+      });
+    });
+  });
+
+  describe('when an offering exists with a limit of 3', function (done) {
+    var offering, assignmentData;
+
+    beforeEach(function (done) {
+      var postData = {
+        badge_id: badges[1].id,
+        offering: {
+          duration: 1,
+          periods: [1, 2, 3],
+          price: '10.00',
+          requirements: ['1', '2', '3a', '3b'],
+          size_limit: 3
+        }
+      };
+
+      request.post('/api/events/' + events[0].id + '/badges')
+        .set('Authorization', generatedUsers.admin.token)
+        .send(postData)
+        .expect(status.CREATED)
+        .end(function (err, res) {
+          if (err) return done(err);
+          var event = res.body.event;
+          offering = event.offerings[0];
+          return done();
+        });
+    });
+
+    beforeEach(function () {
+      assignmentData = {
+        periods: [1],
+        offering: offering.details.id
+      };
+    });
+
+    it('should know that there are no scouts assigned', function (done) {
+      request.get('/api/events/' + events[0].id + '/badges/' + offering.id + '/limits')
+        .set('Authorization', generatedUsers.teacher.token)
+        .expect(status.OK)
+        .end(function (err, res) {
+          if (err) return done(err);
+          var sizeInfo = res.body;
+          expect(sizeInfo).to.deep.equal({
+            size_limit: 3,
+            1: 0,
+            2: 0,
+            3: 0
+          });
+          return done();
+        });
+    });
+
+    describe('and scouts have been assigned', function (done) {
+      beforeEach(function (done) {
+        async.series([
+          function (cb) {
+            request.post('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/assignments')
+              .set('Authorization', generatedUsers.teacher.token)
+              .send(assignmentData)
+              .expect(status.CREATED, cb);
+          },
+          function (cb) {
+            request.post('/api/scouts/' + generatedScouts[1].id + '/registrations/' + registrationIds[1] + '/assignments')
+              .set('Authorization', generatedUsers.teacher.token)
+              .send(assignmentData)
+              .expect(status.CREATED, cb);
+          },
+          function (cb) {
+            request.post('/api/scouts/' + generatedScouts[2].id + '/registrations/' + registrationIds[2] + '/assignments')
+              .set('Authorization', generatedUsers.teacher.token)
+              .send(assignmentData)
+              .expect(status.CREATED, cb);
+          },
+          function (cb) {
+            assignmentData.periods = [2];
+            cb();
+          },
+          function (cb) {
+            request.post('/api/scouts/' + generatedScouts[3].id + '/registrations/' + registrationIds[3] + '/assignments')
+              .set('Authorization', generatedUsers.teacher.token)
+              .send(assignmentData)
+              .expect(status.CREATED, cb);
+          }
+        ], done);
+      });
+
+      it('should return the correct class sizes', function (done) {
+        request.get('/api/events/' + events[0].id + '/badges/' + offering.id + '/limits')
+          .set('Authorization', generatedUsers.teacher.token)
+          .expect(status.OK)
+          .end(function (err, res) {
+            if (err) return done(err);
+            var sizeInfo = res.body;
+            expect(sizeInfo).to.deep.equal({
+              size_limit: 3,
+              1: 3,
+              2: 1,
+              3: 0
+            });
+            return done();
+          });
+      });
+
+      it('should not allow joining a full class period', function (done) {
+        assignmentData.periods = [1];
+
+        request.post('/api/scouts/' + generatedScouts[5].id + '/registrations/' + registrationIds[5] + '/assignments')
+          .set('Authorization', generatedUsers.teacher.token)
+          .send(assignmentData)
+          .expect(status.BAD_REQUEST, done);
+      });
+
+      it('should allow joining a class period with room', function (done) {
+        assignmentData.periods = [2];
+
+        request.post('/api/scouts/' + generatedScouts[5].id + '/registrations/' + registrationIds[5] + '/assignments')
           .set('Authorization', generatedUsers.teacher.token)
           .send(assignmentData)
           .expect(status.BAD_REQUEST, done);

@@ -23,7 +23,7 @@ module.exports = function (sequelize, DataTypes) {
     underscored: true
   });
 
-  Assignment.addHook('beforeCreate', 'ensureSizeLimit', function (assignment) {
+  Assignment.addHook('beforeValidate', 'ensureSizeLimit', function (assignment) {
     return sequelize.models.Offering.findById(assignment.offering_id)
       .then(function (offering) {
         return offering.getClassSizes()
