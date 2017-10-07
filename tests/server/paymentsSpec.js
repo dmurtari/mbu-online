@@ -19,11 +19,11 @@ describe('payments', function () {
   var purchasableIds = [];
   var registrationIds = [];
 
-  before(function (done) {
+  beforeEach(function (done) {
     utils.dropDb(done);
   });
 
-  before(function (done) {
+  beforeEach(function (done) {
     this.timeout(10000);
     utils.generateTokens(['admin', 'teacher', 'coordinator', 'coordinator2'], function (err, generatedTokens) {
       if (err) return done(err);
@@ -32,7 +32,7 @@ describe('payments', function () {
     });
   });
 
-  before(function (done) {
+  beforeEach(function (done) {
     utils.createEvents(generatedUsers.admin.token, function (err, events) {
       if (err) return done(err);
       generatedEvents = events;
@@ -40,16 +40,12 @@ describe('payments', function () {
     });
   });
 
-  before(function (done) {
+  beforeEach(function (done) {
     utils.createBadges(generatedUsers.admin.token, function (err, badges) {
       if (err) return done(err);
       generatedBadges = badges;
       return done();
     });
-  });
-
-  beforeEach(function (done) {
-    utils.dropTable(['Scout', 'Registration', 'Offering', 'Purchase'], done);
   });
 
   beforeEach(function (done) {
