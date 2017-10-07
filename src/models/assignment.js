@@ -33,12 +33,12 @@ module.exports = function (sequelize, DataTypes) {
           if (classSizes[period] >= classSizes.size_limit) {
             throw new Error('Offering is at the size limit for period', period);
           }
-        })
+        });
       })
       .catch(function (err) {
         throw new Error('Offering is at the class limit for the given periods');
       });
-  })
+  });
 
   return Assignment;
 };
