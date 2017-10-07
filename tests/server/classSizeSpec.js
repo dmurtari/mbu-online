@@ -259,7 +259,7 @@ describe.only('Class sizes', function () {
           });
       });
 
-      it('should not allow another scout to join the same period', function (done) {
+      it.only('should not allow another scout to join the same period', function (done) {
         request.post('/api/scouts/' + generatedScouts[1].id + '/registrations/' + registrationIds[1] + '/assignments')
           .set('Authorization', generatedUsers.teacher.token)
           .send(assignmentData)
