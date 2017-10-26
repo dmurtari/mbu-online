@@ -47,7 +47,7 @@ module.exports = {
       include: [{
         model: Model.Badge,
         as: 'badge',
-        attributes: ['name']
+        attributes: ['name', ['id', 'badge_id']]
       }, {
         model: Model.Registration,
         as: 'assignees',
