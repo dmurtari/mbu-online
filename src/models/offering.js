@@ -81,6 +81,7 @@ module.exports = function (sequelize, DataTypes) {
           return result;
         }, {
           size_limit: offering.size_limit,
+          total: assignees.length,
           1: 0,
           2: 0,
           3: 0
