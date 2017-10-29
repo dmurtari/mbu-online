@@ -9,7 +9,7 @@ var expect = chai.expect;
 var utils = require('./testUtils');
 var testScouts = require('./testScouts');
 
-describe('Class sizes', function () {
+describe.only('Class sizes', function () {
   var badges, events;
   var generatedUsers, generatedScouts, generatedOfferings;
   var scoutId;
@@ -200,6 +200,7 @@ describe('Class sizes', function () {
           var sizeInfo = res.body;
           expect(sizeInfo).to.deep.equal({
             size_limit: 1,
+            total: 0,
             1: 0,
             2: 0,
             3: 0
@@ -251,6 +252,7 @@ describe('Class sizes', function () {
             var sizeInfo = res.body;
             expect(sizeInfo).to.deep.equal({
               size_limit: 1,
+              total: 1,
               1: 1,
               2: 0,
               3: 0
@@ -306,6 +308,10 @@ describe('Class sizes', function () {
     });
   });
 
+  xdescribe('when a 2 period offering exists', function (done) {
+
+  });
+
   describe('when an offering exists with a limit of 3', function (done) {
     var offering, assignmentData;
 
@@ -349,6 +355,7 @@ describe('Class sizes', function () {
           var sizeInfo = res.body;
           expect(sizeInfo).to.deep.equal({
             size_limit: 3,
+            total: 0,
             1: 0,
             2: 0,
             3: 0
@@ -400,6 +407,7 @@ describe('Class sizes', function () {
             var sizeInfo = res.body;
             expect(sizeInfo).to.deep.equal({
               size_limit: 3,
+              total: 4,
               1: 3,
               2: 1,
               3: 0
