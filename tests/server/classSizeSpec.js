@@ -9,7 +9,7 @@ var expect = chai.expect;
 var utils = require('./testUtils');
 var testScouts = require('./testScouts');
 
-describe.only('Class sizes', function () {
+describe('Class sizes', function () {
   var badges, events;
   var generatedUsers, generatedScouts, generatedOfferings;
   var scoutId;
@@ -308,8 +308,84 @@ describe.only('Class sizes', function () {
     });
   });
 
-  xdescribe('when a 2 period offering exists', function (done) {
+  describe('when a 2 period offering exists', function (done) {
+    var offering, assignmentData;
 
+    beforeEach(function (done) {
+      var postData = {
+        badge_id: badges[1].id,
+        offering: {
+          duration: 2,
+          periods: [2, 3],
+          price: '10.00',
+          requirements: ['1', '2', '3a', '3b'],
+          size_limit: 3
+        }
+      };
+
+      request.post('/api/events/' + events[0].id + '/badges')
+        .set('Authorization', generatedUsers.admin.token)
+        .send(postData)
+        .expect(status.CREATED)
+        .end(function (err, res) {
+          if (err) return done(err);
+          var event = res.body.event;
+          offering = event.offerings[0];
+          return done();
+        });
+    });
+
+    beforeEach(function () {
+      assignmentData = {
+        periods: [1],
+        offering: offering.details.id
+      };
+    });
+
+    it('should know that there are no scouts assigned', function (done) {
+      request.get('/api/events/' + events[0].id + '/badges/' + offering.id + '/limits')
+        .set('Authorization', generatedUsers.teacher.token)
+        .expect(status.OK)
+        .end(function (err, res) {
+          if (err) return done(err);
+          var sizeInfo = res.body;
+          expect(sizeInfo).to.deep.equal({
+            size_limit: 3,
+            total: 0,
+            1: 0,
+            2: 0,
+            3: 0
+          });
+          return done();
+        });
+    });
+
+    describe('when a scout is assigned', function (done) {
+      beforeEach(function (done) {
+        request.post('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/assignments')
+          .set('Authorization', generatedUsers.teacher.token)
+          .send(assignmentData)
+          .expect(status.CREATED, done);
+      });
+
+      it('should know there is only one scout registered', function (done) {
+        request.get('/api/events/' + events[0].id + '/badges/' + offering.id + '/limits')
+          .set('Authorization', generatedUsers.teacher.token)
+          .expect(status.OK)
+          .end(function (err, res) {
+            if (err) return done(err);
+            var sizeInfo = res.body;
+            expect(sizeInfo).to.deep.equal({
+              size_limit: 3,
+              total: 1,
+              1: 1,
+              2: 0,
+              3: 0
+            });
+            return done();
+          });
+      });
+    });
   });
 
   describe('when an offering exists with a limit of 3', function (done) {
