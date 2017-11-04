@@ -122,7 +122,8 @@ module.exports = {
                 return {
                   registration_id: registrationId,
                   offering_id: assignment.offering,
-                  periods: assignment.periods
+                  periods: assignment.periods,
+                  completions: assignment.completions
                 };
               });
 
