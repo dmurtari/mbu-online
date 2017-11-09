@@ -2,6 +2,7 @@ var app = require('../../src/app');
 var request = require('supertest')(app);
 var async = require('async');
 var status = require('http-status-codes');
+var _ = require('lodash');
 
 var chai = require('chai');
 var expect = chai.expect;
@@ -301,7 +302,8 @@ describe('preferences', function () {
               .expect(status.OK)
               .end(function (err, res) {
                 if (err) return done(err);
-                expect(res.body[0].details.rank).to.equal(1);
+                var preference = _.find(res.body, { 'offering_id': 1 });
+                expect(preference.details.rank).to.equal(1);
                 return cb();
               });
           },
@@ -319,7 +321,8 @@ describe('preferences', function () {
               .expect(status.OK)
               .end(function (err, res) {
                 if (err) return done(err);
-                expect(res.body[0].details.rank).to.equal(3);
+                var preference = _.find(res.body, { 'offering_id': 1 });
+                expect(preference.details.rank).to.equal(3);
                 return cb();
               });
           },
