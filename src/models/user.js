@@ -65,7 +65,7 @@ module.exports = function (sequelize, DataTypes) {
     }],
     getterMethods: {
       fullname: function () {
-        return this.firstname + ' ' + this.lastname;
+        return this.firstname.trim() + ' ' + this.lastname.trim();
       }
     },
     hooks: {
