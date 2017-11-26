@@ -32,7 +32,7 @@ module.exports = {
     Models.Scout.findById(req.params.scoutId, {
       attributes: [['id', 'scout_id'], 'firstname', 'lastname', 'troop', 'notes',
         'emergency_name', 'emergency_relation', 'emergency_phone',
-        'birthday'],
+        'birthday', 'created_at'],
       include: [{
         model: Models.Event,
         as: 'registrations',
