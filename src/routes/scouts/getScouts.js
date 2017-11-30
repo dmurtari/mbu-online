@@ -1,4 +1,5 @@
 var status = require('http-status-codes');
+var _ = require('lodash');
 
 var Models = require('../../models');
 var registrationInformation = require('../../models/queries/registrationInformation');
@@ -54,7 +55,7 @@ module.exports = {
       });
   },
   getRegistrations: function (req, res) {
-    var query = registrationInformation;
+    var query = _.cloneDeep(registrationInformation);
     var scoutId = req.params.scoutId;
 
     query.where = {

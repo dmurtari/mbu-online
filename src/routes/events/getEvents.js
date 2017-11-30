@@ -89,7 +89,7 @@ module.exports = {
   },
   getRegistrations: function (req, res) {
     var eventId = req.params.id;
-    var query = registrationInformation;
+    var query = _.cloneDeep(registrationInformation);
 
     query.where = {
       event_id: eventId

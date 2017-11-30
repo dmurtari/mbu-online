@@ -9,7 +9,7 @@ var expect = chai.expect;
 var utils = require('./testUtils');
 var testScouts = require('./testScouts');
 
-describe.only('Assignments and registrations', function () {
+describe('Assignments and registrations', function () {
   var badges, events;
   var generatedUsers, generatedTroop2, generatedTroop2, generatedOfferings;
   var scoutId;
