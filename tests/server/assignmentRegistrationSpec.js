@@ -152,6 +152,25 @@ describe.only('Assignments and registrations', function () {
             return done();
           });
       });
+
+      describe('and a coordinator requests registration information', function (done) {
+        beforeEach(function (done) {
+          request.get('/api/users/' + generatedUsers.coordinator1.profile.id + '/events/' + events[0].id + '/registrations')
+            .set('Authorization', generatedUsers.coordinator1.token)
+            .expect(status.OK, done);
+        });
+
+        it('should contain the correct registrations', function (done) {
+          request.get('/api/events/' + events[0].id + '/registrations')
+            .set('Authorization', generatedUsers.admin.token)
+            .expect(status.OK)
+            .end(function (err, res) {
+              if (err) return done(err);
+              expect(res.body).to.have.lengthOf(10);
+              return done();
+            });
+        });
+      });
     });
 
     describe('and they have been assigned to classes', function (done) {
