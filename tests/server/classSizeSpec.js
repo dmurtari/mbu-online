@@ -9,7 +9,7 @@ var expect = chai.expect;
 var utils = require('./testUtils');
 var testScouts = require('./testScouts');
 
-describe('Class sizes', function () {
+describe.only('Class sizes', function () {
   var badges, events;
   var generatedUsers, generatedScouts, generatedOfferings;
   var scoutId;
@@ -235,12 +235,18 @@ describe('Class sizes', function () {
       ], done);
     });
 
-    describe('and one scout has already been assigned', function () {
+    describe('and one scout has been assigned', function () {
+      var offeringId;
+
       beforeEach(function (done) {
         request.post('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/assignments')
           .set('Authorization', generatedUsers.teacher.token)
           .send(assignmentData)
-          .expect(status.CREATED, done);
+          .expect(status.CREATED)
+          .end(function (err, res) {
+            offeringId = res.body.registration.assignments[0].offering_id;
+            return done();
+          });
       });
 
       it('should know that there is one scout registered', function (done) {
@@ -284,6 +290,15 @@ describe('Class sizes', function () {
           .set('Authorization', generatedUsers.teacher.token)
           .send(assignmentData)
           .expect(status.BAD_REQUEST, done);
+      });
+
+      it.only('should allow setting completions for that scout', function (done) {
+        request.put('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/assignments/' + offeringId)
+          .set('Authorization', generatedUsers.admin.token)
+          .send({
+            completions: ['1']
+          })
+          .expect(status.CREATED, done);
       });
 
       describe('and a scout has joined a different period', function () {
