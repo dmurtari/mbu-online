@@ -9,7 +9,7 @@ var expect = chai.expect;
 var utils = require('./testUtils');
 var testScouts = require('./testScouts');
 
-describe.only('Class sizes', function () {
+describe('Class sizes', function () {
   var badges, events;
   var generatedUsers, generatedScouts, generatedOfferings;
   var scoutId;
@@ -292,13 +292,13 @@ describe.only('Class sizes', function () {
           .expect(status.BAD_REQUEST, done);
       });
 
-      it.only('should allow setting completions for that scout', function (done) {
+      it('should allow setting completions for that scout', function (done) {
         request.put('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/assignments/' + offeringId)
           .set('Authorization', generatedUsers.admin.token)
           .send({
             completions: ['1']
           })
-          .expect(status.CREATED, done);
+          .expect(status.OK, done);
       });
 
       describe('and a scout has joined a different period', function () {

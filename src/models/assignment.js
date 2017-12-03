@@ -24,6 +24,10 @@ module.exports = function (sequelize, DataTypes) {
   });
 
   Assignment.addHook('beforeValidate', 'ensureSizeLimit', function (assignment) {
+    if (!assignment.changed('periods')) {
+      return;
+    };
+
     return sequelize.models.Offering.findById(assignment.offering_id)
       .then(function (offering) {
         return offering.getClassSizes()

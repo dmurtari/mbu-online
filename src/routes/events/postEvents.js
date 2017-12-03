@@ -43,7 +43,7 @@ module.exports = {
       })
       .then(function (event) {
         res.status(status.CREATED).json({
-          mesage: 'Offering successfully created',
+          message: 'Offering successfully created',
           event: event
         });
       })
