@@ -5,6 +5,8 @@ var bodyParser = require('body-parser');
 var morgan = require('morgan');
 var passport = require('passport');
 var path = require('path');
+var compression = require('compression');
+var helmet = require('helmet');
 
 var models = require('./models');
 
@@ -18,6 +20,8 @@ app.use(history({
   // verbose: true
 }));
 
+app.use(compression());
+app.use(helmet());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
