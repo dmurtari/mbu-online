@@ -2,9 +2,11 @@
 
 var express = require('express');
 var bodyParser = require('body-parser');
-var logger = require('morgan');
+var morgan = require('morgan');
 var passport = require('passport');
 var path = require('path');
+var compression = require('compression');
+var helmet = require('helmet');
 
 var models = require('./models');
 
@@ -12,16 +14,19 @@ var app = express();
 var history = require('connect-history-api-fallback');
 var env = process.env.NODE_ENV || 'development';
 var port = process.env.PORT || 3000;
+var morganFormat = ':method :url :status :res[content-length] - :response-time ms';
 
 app.use(history({
   // verbose: true
 }));
 
+app.use(compression());
+app.use(helmet());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 if (env === 'development') {
-  app.use(logger('dev'));
+  app.use(morgan(morganFormat));
   app.use(function (req, res, next) {
     setTimeout(function () {
       next();
@@ -30,6 +35,7 @@ if (env === 'development') {
 }
 
 if (env === 'production') {
+  app.use(morgan(morganFormat));
   app.use(express.static(path.join(__dirname, '../node_modules/mbu-frontend/dist')));
 }
 
