@@ -196,6 +196,15 @@ describe('users', function () {
         .expect(status.OK, done);
     });
 
+    it('should not enforce case sensitivity for emails', function (done) {
+      request.post('/api/authenticate')
+        .send({
+          email: 'Test@Test.com',
+          password: 'password'
+        })
+        .expect(status.OK, done);
+    });
+
     it('should fail gracefully if no email is supplied', function (done) {
       request.post('/api/authenticate')
         .expect(status.UNAUTHORIZED, done);

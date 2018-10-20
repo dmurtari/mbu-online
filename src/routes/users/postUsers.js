@@ -36,7 +36,7 @@ module.exports = {
   authenticate: function (req, res) {
     var user;
 
-    Model.User.findOne({ where: { email: req.body.email } })
+    Model.User.findOne({ where: { email: { $ilike: req.body.email } } })
       .then(function (userFromDb) {
         if (!userFromDb) {
           throw new Error('No matching email found');
