@@ -1,6 +1,6 @@
 {
   "name": "mbu-online",
-  "version": "1.3.2",
+  "version": "1.4.0",
   "description": "MBU Registration Website",
   "main": "./src/index.js",
   "scripts": {
