@@ -41,7 +41,7 @@ gulp.task('env:prod', function(done) {
 });
 
 gulp.task('serve', gulp.series(['env:dev', 'src'], function() {
-  return gulp.watch([paths.srcJs], ['src']);
+  return gulp.watch([paths.srcJs], gulp.series(['src']));
 }));
 
 gulp.task('test:unit', gulp.series(['env:test'], function() {
@@ -52,15 +52,15 @@ gulp.task('test:unit', gulp.series(['env:test'], function() {
 
 gulp.task('test:api', gulp.series(['env:test'], function() {
   return gulp.src([paths.srcIntegration])
-    .pipe(mocha());
+    .pipe(mocha({ exit: true }));
 }));
 
 gulp.task('test:unit:watch', gulp.series(['test:unit'], function() {
-  return gulp.watch([paths.srcUnit, paths.srcJs], ['test:unit']);
+  return gulp.watch([paths.srcUnit, paths.srcJs], gulp.series(['test:unit']));
 }));
 
 gulp.task('test:api:watch', gulp.series(['test:api'], function() {
-  return gulp.watch([paths.srcIntegration, paths.srcJs], ['test:api']);
+  return gulp.watch([paths.srcIntegration, paths.srcJs], gulp.series(['test:api']));
 }));
 
 gulp.task('default', gulp.series(['serve']));
