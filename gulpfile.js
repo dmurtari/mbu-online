@@ -1,7 +1,7 @@
 var gulp = require('gulp');
 var spawn = require('child_process').spawn;
 var mocha = require('gulp-mocha');
-var gutil = require('gulp-util');
+var log = require('fancy-log');
 
 var node;
 var paths = {
@@ -22,44 +22,48 @@ gulp.task('src', function() {
   });
 });
 
-gulp.task('serve', ['env:dev', 'src'], function() {
-  gulp.watch([paths.srcJs], ['src']);
-});
-
-gulp.task('test:unit', ['env:test'], function() {
-  gulp.src([paths.srcUnit])
-    .pipe(mocha())
-    .on('error', gutil.log);
-});
-
-gulp.task('test:api', ['env:test'], function() {
-  gulp.src([paths.srcIntegration])
-    .pipe(mocha());
-});
-
-gulp.task('test:unit:watch', ['test:unit'], function() {
-  gulp.watch([paths.srcUnit, paths.srcJs], ['test:unit']);
-});
-
-gulp.task('test:api:watch', ['test:api'], function() {
-  gulp.watch([paths.srcIntegration, paths.srcJs], ['test:api']);
-});
-
-gulp.task('env:dev', function() {
+gulp.task('env:dev', function(done) {
   process.env.PORT = 3000;
-  return process.env.NODE_ENV = 'development';
+  process.env.NODE_ENV = 'development';
+  done();
 });
 
-gulp.task('env:test', function() {
+gulp.task('env:test', function(done) {
   process.env.PORT = 3001;
-  return process.env.NODE_ENV = 'test';
+  process.env.NODE_ENV = 'test';
+  done();
 });
 
-gulp.task('env:prod', function() {
-  return process.env.NODE_ENV = 'production';
+
+gulp.task('env:prod', function(done) {
+  process.env.NODE_ENV = 'production';
+  done();
 });
 
-gulp.task('default', ['serve']);
+gulp.task('serve', gulp.series(['env:dev', 'src'], function() {
+  return gulp.watch([paths.srcJs], ['src']);
+}));
+
+gulp.task('test:unit', gulp.series(['env:test'], function() {
+  return gulp.src([paths.srcUnit])
+    .pipe(mocha())
+    .on('error', log);
+}));
+
+gulp.task('test:api', gulp.series(['env:test'], function() {
+  return gulp.src([paths.srcIntegration])
+    .pipe(mocha());
+}));
+
+gulp.task('test:unit:watch', gulp.series(['test:unit'], function() {
+  return gulp.watch([paths.srcUnit, paths.srcJs], ['test:unit']);
+}));
+
+gulp.task('test:api:watch', gulp.series(['test:api'], function() {
+  return gulp.watch([paths.srcIntegration, paths.srcJs], ['test:api']);
+}));
+
+gulp.task('default', gulp.series(['serve']));
 
 process.on('exit', function() {
   if (node) {
