@@ -13,9 +13,9 @@ if (process.env.DATABASE_URL){
     logging:  false
   });
 } else if (env === 'development') {
-  sequelize = new Sequelize('postgres://mbu:@localhost/mbu');
+  sequelize = new Sequelize('postgres://mbu:mbu@localhost/mbu');
 } else if (env === 'test') {
-  sequelize = new Sequelize('postgres://mbu:@localhost/mbutest', {
+  sequelize = new Sequelize('postgres://mbu:mbu@localhost/mbutest', {
     logging: false
   });
 }

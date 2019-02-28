@@ -44,7 +44,11 @@ module.exports = {
         user = userFromDb;
         return userFromDb.comparePassword(req.body.password);
       })
-      .then(function () {
+      .then(function (equal) {
+        if (!equal) {
+          throw new Error('Passwords do not match');
+        }
+
         var token = jwt.sign(user.dataValues.id, config.APP_SECRET);
         delete user.dataValues['password'];
         return res.status(status.OK).json({

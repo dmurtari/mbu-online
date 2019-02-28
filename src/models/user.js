@@ -1,4 +1,4 @@
-var bcrypt = require('bcrypt-as-promised');
+var bcrypt = require('bcrypt');
 var _ = require('lodash');
 var SALT_FACTOR;
 
