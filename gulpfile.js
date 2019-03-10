@@ -2,19 +2,28 @@ var gulp = require('gulp');
 var spawn = require('child_process').spawn;
 var mocha = require('gulp-mocha');
 var log = require('fancy-log');
+var ts = require("gulp-typescript");
+var tsProject = ts.createProject("tsconfig.json");
 
 var node;
 var paths = {
   srcJs: './src/**/*.js',
+  srcTs: './src/**/*.ts',
   srcUnit: './src/**/*Spec.js',
   srcIntegration: './tests/**/*.js'
 };
 
-gulp.task('src', function() {
+gulp.task('compile', function() {
+  return tsProject.src()
+    .pipe(tsProject())
+    .js.pipe(gulp.dest('dist'));
+});
+
+gulp.task('src', gulp.series(['compile']), function() {
   if (node){
     node.kill();
   }
-  node = spawn('node', ['./src/app.js'], {stdio: 'inherit'});
+  node = spawn('node', ['./dist/app.js'], {stdio: 'inherit'});
   node.on('close', function (code) {
     if (code === 8) {
       gulp.log('Error detected, waiting for changes...');
@@ -41,7 +50,7 @@ gulp.task('env:prod', function(done) {
 });
 
 gulp.task('serve', gulp.series(['env:dev', 'src'], function() {
-  return gulp.watch([paths.srcJs], gulp.series(['src']));
+  return gulp.watch([paths.srcJs, paths.srcTs], gulp.series(['src']));
 }));
 
 gulp.task('test:unit', gulp.series(['env:test'], function() {
