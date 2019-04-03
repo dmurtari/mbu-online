@@ -1,16 +1,15 @@
 /* eslint no-console: "off" */
 
-import * as express from 'express';
-import * as bodyParser from 'body-parser';
-import * as morgan from 'morgan';
-import * as passport from 'passport';
-import * as path from 'path';
-import * as compression from 'compression';
-import * as helmet from 'helmet';
-import * as history from 'connect-history-api-fallback';
+import express from 'express';
+import bodyParser from 'body-parser';
+import morgan from 'morgan';
+import passport from 'passport';
+import path from 'path';
+import compression from 'compression';
+import helmet from 'helmet';
+import history from 'connect-history-api-fallback';
 
-import * as models from './models';
-
+const models = require('./models');
 const app = express();
 const env = process.env.NODE_ENV || 'development';
 const port = process.env.PORT || 3000;
@@ -39,7 +38,7 @@ if (env === 'production') {
     app.use(express.static(path.join(__dirname, '../node_modules/mbu-frontend/dist')));
 }
 
-app.use((req, res, next) => {
+app.use((_req, res, next) => {
     if (env === 'development') {
         res.setHeader('Access-Control-Allow-Origin', 'http://localhost:8080');
     }
@@ -61,14 +60,14 @@ app.use('/api/events', require('./routes/events'));
 app.use('/api/badges', require('./routes/badges'));
 app.use('/api/scouts', require('./routes/scouts'));
 
-app.use((req, res, next) => {
+app.use((_req, res, _next) => {
     res.status(404).send();
 });
 
 if (!module.parent) {
     models.sequelize.sync().then(() => {
         app.listen(port, () => {
-            console.log('MBU src listening on port', port);
+            console.log('Listening on port:', port);
         });
     });
 }
