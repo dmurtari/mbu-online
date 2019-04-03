@@ -9,7 +9,8 @@ import compression from 'compression';
 import helmet from 'helmet';
 import history from 'connect-history-api-fallback';
 
-const models = require('./models');
+import { sequelize } from './sequelize';
+
 const app = express();
 const env = process.env.NODE_ENV || 'development';
 const port = process.env.PORT || 3000;
@@ -65,7 +66,7 @@ app.use((_req, res, _next) => {
 });
 
 if (!module.parent) {
-    models.sequelize.sync().then(() => {
+    sequelize.sync().then(() => {
         app.listen(port, () => {
             console.log('Listening on port:', port);
         });
