@@ -1,48 +1,54 @@
-var _ = require('lodash');
+import { Table, Model, Column, DataType, Default, ForeignKey, BeforeValidate } from 'sequelize-typescript';
 
-module.exports = function (sequelize, DataTypes) {
-  var Assignment = sequelize.define('Assignment', {
-    periods: {
-      type: DataTypes.ARRAY(DataTypes.INTEGER),
-      allowNull: false
-    },
-    offering_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false
-    },
-    registration_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false
-    },
-    completions: {
-      type: DataTypes.ARRAY(DataTypes.STRING),
-      allowNull: false,
-      defaultValue: []
-    }
-  }, {
+import { Offering, ClassSizeInformation } from '@models/offering';
+import { Registration } from '@models/registration';
+
+@Table({
     underscored: true
-  });
+})
+export class Assignment extends Model<Assignment> {
+    @Column({
+        allowNull: false,
+        type: DataType.ARRAY(DataType.INTEGER)
+    })
+    public periods!: number[];
 
-  Assignment.addHook('beforeValidate', 'ensureSizeLimit', function (assignment) {
-    if (!assignment.changed('periods')) {
-      return;
-    };
+    @Column({
+        allowNull: false,
+        type: DataType.ARRAY(DataType.STRING)
+    })
+    @Default([])
+    public completions: string[];
 
-    return sequelize.models.Offering.findById(assignment.offering_id)
-      .then(function (offering) {
-        return offering.getClassSizes()
-      })
-      .then(function (classSizes) {
-        _.forEach(assignment.periods, function (period) {
-          if (classSizes[period] >= classSizes.size_limit) {
-            throw new Error('Offering is at the size limit for period', period);
-          }
-        });
-      })
-      .catch(function (err) {
-        throw new Error('Offering is at the class limit for the given periods');
-      });
-  });
+    @ForeignKey(() => Offering)
+    @Column({
+        allowNull: false
+    })
+    public offering_id!: number;
 
-  return Assignment;
-};
+    @ForeignKey(() => Registration)
+    @Column({
+        allowNull: false
+    })
+    public registration_id!: number;
+
+    @BeforeValidate
+    public async ensureSizeLimit(assignment: Assignment): Promise<void> {
+        if (!assignment.changed('periods')) {
+            return;
+        }
+
+        try {
+            const offering: Offering = await Offering.findByPk(assignment.offering_id);
+            const sizes: ClassSizeInformation = await offering.getClassSizes();
+
+            assignment.periods.forEach((period: number) => {
+                if ((<any>sizes)[period] >= sizes.size_limit) {
+                    throw new Error(`Offering is at the size limit for period ${period}`);
+                }
+            });
+        } catch {
+            throw new Error('Offering is at the class limit for the given periods');
+        }
+    }
+}

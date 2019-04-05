@@ -1,7 +1,10 @@
 import { Table, Model, Column, Validate, DataType, HasMany, BelongsToMany } from 'sequelize-typescript';
-import { Purchasable } from './purchasable';
-import { Scout } from './scout';
-import { Registration } from './registration';
+
+import { Purchasable } from '@models/purchasable';
+import { Scout } from '@models/scout';
+import { Registration } from '@models/registration';
+import { Badge } from '@models/badge';
+import { Offering } from '@models/offering';
 
 export enum Semester {
     SPRING = 'Spring',
@@ -52,4 +55,7 @@ export class Event extends Model<Event> {
 
     @BelongsToMany(() => Scout, () => Registration)
     public attendees: Scout[];
+
+    @BelongsToMany(() => Badge, () => Offering)
+    public offerings: Offering[];
 }

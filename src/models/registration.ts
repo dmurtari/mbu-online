@@ -1,7 +1,12 @@
-import { Model, PrimaryKey, Column, AutoIncrement, ForeignKey, Table } from 'sequelize-typescript';
-import { Event } from './event';
-import { Scout } from './scout';
-import { Purchasable } from './purchasable';
+import { Model, PrimaryKey, Column, AutoIncrement, ForeignKey, Table, BelongsToMany, BelongsTo } from 'sequelize-typescript';
+
+import { Event } from '@models/event';
+import { Scout } from '@models/scout';
+import { Offering } from '@models/offering';
+import { Preference } from '@models/preference';
+import { Assignment } from '@models/assignment';
+import { Purchasable } from '@models/purchasable';
+import { Purchase } from '@models/purchase';
 
 var _ = require('lodash');
 
@@ -15,7 +20,7 @@ export class Registration extends Model<Registration> {
     public id: number;
 
     @ForeignKey(() => Event)
-    @Column({ 
+    @Column({
         allowNull: false,
         unique: 'event_registration'
     })
@@ -26,10 +31,22 @@ export class Registration extends Model<Registration> {
         allowNull: false,
         unique: 'event_registration'
     })
-    public scout_id!: number
+    public scout_id!: number;
 
     @Column
     public notes: string;
+
+    @BelongsTo(() => Scout)
+    public scout: Scout;
+
+    @BelongsToMany(() => Offering, () => Preference)
+    public preferences: Offering[];
+
+    @BelongsToMany(() => Offering, () => Assignment)
+    public assignments: Offering[];
+
+    @BelongsToMany(() => Purchasable, () => Purchase)
+    public purchases: Purchasable[];
 }
 
 

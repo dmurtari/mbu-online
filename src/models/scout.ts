@@ -1,9 +1,9 @@
 import { Model, Table, Column, Validator, ForeignKey, BelongsTo, BelongsToMany } from 'sequelize-typescript';
 import moment from 'moment';
 
-import { User } from './user';
-import { Registration } from './registration';
-import { Event } from './event';
+import { User } from '@models/user';
+import { Registration } from '@models/registration';
+import { Event } from '@models/event';
 
 @Table({
     underscored: true

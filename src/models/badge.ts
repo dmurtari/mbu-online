@@ -1,4 +1,6 @@
-import { Model, Table, Sequelize, Column, Unique, NotEmpty, DataType } from 'sequelize-typescript';
+import { Model, Table, Sequelize, Column, Unique, NotEmpty, DataType, BelongsToMany } from 'sequelize-typescript';
+import { Offering } from '@models/offering';
+import { Event } from '@models/event';
 
 @Table({
     underscored: true,
@@ -23,5 +25,8 @@ export class Badge extends Model<Badge> {
     public description: string;
 
     @Column
-    public notes: string;    
+    public notes: string;
+
+    @BelongsToMany(() => Event, () => Offering)
+    public availabilitiy: Event[];
 }

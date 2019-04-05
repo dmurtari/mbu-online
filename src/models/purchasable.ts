@@ -1,4 +1,6 @@
-import { Model, Column, Default, DataType, Table, Validator } from "sequelize-typescript";
+import { Model, Column, Default, DataType, Table, Validator, BelongsTo, HasMany, BelongsToMany } from 'sequelize-typescript';
+import { Purchase } from '@models/purchase';
+import { Registration } from '@models/registration';
 
 @Table({
     underscored: true
@@ -27,6 +29,12 @@ export class Purchasable extends Model<Purchasable> {
 
     @Column
     public minimum_age: number;
+
+    @HasMany(() => Purchase)
+    public sold: Purchase[];
+
+    @BelongsToMany(() => Registration, () => Purchase)
+    public buyers: Registration[];
 
     @Validator
     public maxGreaterThanMin(): void {

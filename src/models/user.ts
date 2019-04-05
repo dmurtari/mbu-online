@@ -2,17 +2,18 @@ import { Sequelize } from 'sequelize';
 import bcrypt from 'bcrypt';
 import { isEmpty, omit } from 'lodash';
 import {
-    Model, 
-    Table, 
-    Column, 
-    Default, 
-    DataType, 
-    Validator, 
-    BeforeCreate, 
+    Model,
+    Table,
+    Column,
+    Default,
+    DataType,
+    Validator,
+    BeforeCreate,
     BeforeUpdate,
     HasMany
 } from 'sequelize-typescript';
-import { Scout } from './scout';
+
+import { Scout } from '@models/scout';
 
 export enum UserRole {
     ADMIN = 'admin',

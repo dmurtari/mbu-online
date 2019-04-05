@@ -1,11 +1,27 @@
-import { Table, Model, PrimaryKey, Column, AutoIncrement, Validate, Min, Max, DataType, Default, ForeignKey, Unique, Validator, BeforeBulkCreate, BeforeValidate } from 'sequelize-typescript';
-import { Event } from './event';
-import { Badge } from './badge';
-import { Scout } from './scout';
-import { Registration } from './registration';
+import {
+    Table,
+    Model,
+    PrimaryKey,
+    Column,
+    AutoIncrement,
+    Min,
+    Max,
+    DataType,
+    Default,
+    ForeignKey,
+    Validator,
+    BeforeBulkCreate,
+    BeforeValidate,
+    BelongsTo,
+    BelongsToMany
+} from 'sequelize-typescript';
+import { without } from 'lodash';
 
-var validators = require('./validators');
-var _ = require('lodash');
+import { Event } from '@models/event';
+import { Badge } from '@models/badge';
+import { Registration } from '@models/registration';
+import { Assignment } from '@models/assignment';
+import { durationValidator } from '@models/validators';
 
 @Table({
     underscored: true
@@ -63,39 +79,49 @@ export class Offering extends Model<Offering> {
     @Min(0)
     public size_limit: number;
 
+    @BelongsTo(() => Badge)
+    public badge: Badge;
+
+    @BelongsToMany(() => Registration, () => Assignment)
+    public requesters: Registration[];
+
+    @BelongsToMany(() => Registration, () => Assignment)
+    public assignees: Registration[];
+
     @Validator
     public durationPeriodRelation(): void {
-        if (!validators.durationValidator(this.periods, this.duration)) {
+        if (!durationValidator(this.periods, this.duration)) {
           throw new Error('Duration validation failed');
         }
     }
 
     @BeforeBulkCreate
-    public removeAllNullPeriods(offerings: Offering[]) {
-        _.forEach(offerings, (offering: Offering) => {
+    public removeAllNullPeriods(offerings: Offering[]): void {
+        offerings.forEach((offering: Offering) => {
           this.removeNullPeriods(offering);
         });
     }
 
     @BeforeValidate
-    public removeNullPeriods(offering: Offering) {
-        offering.periods = _.without(offering.periods, null);
+    public removeNullPeriods(offering: Offering): void {
+        offering.periods = without(offering.periods, null);
     }
 
     public getClassSizes(): Promise<ClassSizeInformation> {
         const assignees: Registration[] = await this.$get('assignees') as Registration[];
 
-        // assignees.reduce((result: ClassSizeInterface, assignee: Registration) => {
-        //     assignee
-        // }, <ClassSizeInterface>{
-        //     size_limit: this.size_limit,
-        //     total: assignees.length,
-        //     1: 0,
-        //     2: 0,
-        //     3: 0
-        // });
+        assignees.reduce((result: ClassSizeInformation, assignee: Registration) => {
+            // const assignment = await Assignment.findByPk(assignee)
+            return result;
+        }, <ClassSizeInformation>{
+            size_limit: this.size_limit,
+            total: assignees.length,
+            1: 0,
+            2: 0,
+            3: 0
+        });
     }
-} 
+}
 
 export interface ClassSizeInformation {
     size_limit: number;
