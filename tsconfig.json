@@ -12,6 +12,9 @@
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
         "paths": {
+            "@models/*": [
+                "src/models/*"
+            ],
             "*": [
                 "node_modules/*"
             ]
