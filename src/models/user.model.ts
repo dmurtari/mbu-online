@@ -13,7 +13,7 @@ import {
     HasMany
 } from 'sequelize-typescript';
 
-import { Scout } from '@models/scout';
+import { Scout } from '@models/scout.model';
 
 export enum UserRole {
     ADMIN = 'admin',
@@ -71,6 +71,7 @@ export class User extends Model<User> {
     })
     public lastname!: string;
 
+    @Default(UserRole.ANONYMOUS)
     @Column({
         allowNull: false,
         defaultValue: UserRole.ANONYMOUS,
@@ -80,16 +81,18 @@ export class User extends Model<User> {
             ]
         }
     })
-    @Default(UserRole.ANONYMOUS)
     public role!: string;
 
-    @Column
     @Default(false)
+    @Column
     public approved!: boolean;
 
-    @Column(DataType.JSON)
     @Default({})
+    @Column(DataType.JSON)
     public details: Object;
+
+    @HasMany(() => Scout)
+    public scouts: Scout[]
 
     public get fullname(): string {
         return `${this.firstname.trim()} ${this.lastname.trim()}`;
@@ -130,6 +133,7 @@ export class User extends Model<User> {
         }
     }
 
-    @HasMany(() => Scout)
-    public scouts: Scout[]
+    public comparePassword(candidatePassword: string): Promise<boolean> {
+        return bcrypt.compare(candidatePassword, this.password);
+    }
 }

@@ -1,6 +1,6 @@
 import { Table, Model, ForeignKey, BelongsTo } from 'sequelize-typescript';
 
-import { Event } from '@models/event';
+import { Event } from '@models/event.model';
 
 @Table({
     underscored: true,

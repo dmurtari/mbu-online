@@ -1,6 +1,6 @@
 import { Model, Table, Sequelize, Column, Unique, NotEmpty, DataType, BelongsToMany } from 'sequelize-typescript';
-import { Offering } from '@models/offering';
-import { Event } from '@models/event';
+import { Offering } from '@models/offering.model';
+import { Event } from '@models/event.model';
 
 @Table({
     underscored: true,
@@ -12,11 +12,12 @@ import { Event } from '@models/event';
     ]
 })
 export class Badge extends Model<Badge> {
+
+    @NotEmpty
+    @Unique
     @Column({
         allowNull: false,
     })
-    @Unique
-    @NotEmpty
     public name!: string;
 
     @Column({

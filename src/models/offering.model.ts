@@ -17,10 +17,10 @@ import {
 } from 'sequelize-typescript';
 import { without } from 'lodash';
 
-import { Event } from '@models/event';
-import { Badge } from '@models/badge';
-import { Registration } from '@models/registration';
-import { Assignment } from '@models/assignment';
+import { Event } from '@models/event.model';
+import { Badge } from '@models/badge.model';
+import { Registration } from '@models/registration.model';
+import { Assignment } from '@models/assignment.model';
 import { durationValidator } from '@models/validators';
 
 @Table({
@@ -28,15 +28,15 @@ import { durationValidator } from '@models/validators';
 })
 export class Offering extends Model<Offering> {
     @PrimaryKey
-    @Column
     @AutoIncrement
+    @Column
     public id!: number;
 
+    @Min(1)
+    @Max(3)
     @Column({
         allowNull: false
     })
-    @Min(1)
-    @Max(3)
     public duration!: number;
 
     @Column({
@@ -45,18 +45,18 @@ export class Offering extends Model<Offering> {
     })
     public periods!: number[];
 
+    @Default(0.0)
     @Column({
         allowNull: false,
         type: DataType.DECIMAL(5, 2)
     })
-    @Default(0.0)
     public price!: number;
 
+    @Default([])
     @Column({
         type: DataType.ARRAY(DataType.STRING),
         allowNull: false
     })
-    @Default([])
     public requirements!: string[];
 
     @ForeignKey(() => Event)
@@ -73,10 +73,10 @@ export class Offering extends Model<Offering> {
     })
     public badge_id: number;
 
+    @Min(0)
     @Column({
         defaultValue: 20
     })
-    @Min(0)
     public size_limit: number;
 
     @BelongsTo(() => Badge)
@@ -96,22 +96,25 @@ export class Offering extends Model<Offering> {
     }
 
     @BeforeBulkCreate
-    public removeAllNullPeriods(offerings: Offering[]): void {
+    public static removeAllNullPeriods(offerings: Offering[]): void {
         offerings.forEach((offering: Offering) => {
-          this.removeNullPeriods(offering);
+          Offering.removeNullPeriods(offering);
         });
     }
 
     @BeforeValidate
-    public removeNullPeriods(offering: Offering): void {
+    public static removeNullPeriods(offering: Offering): void {
         offering.periods = without(offering.periods, null);
     }
 
-    public getClassSizes(): Promise<ClassSizeInformation> {
+    public async getClassSizes(): Promise<ClassSizeInformation> {
         const assignees: Registration[] = await this.$get('assignees') as Registration[];
+        const assignments: Assignment[] = await Assignment.findAll({ where: { offering_id: this.id }});
 
-        assignees.reduce((result: ClassSizeInformation, assignee: Registration) => {
-            // const assignment = await Assignment.findByPk(assignee)
+        return assignments.reduce((result: ClassSizeInformation, assignment: Assignment) => {
+            assignment.periods.forEach((period: number) => {
+                (<any>result)[period] += 1;
+            })
             return result;
         }, <ClassSizeInformation>{
             size_limit: this.size_limit,
@@ -130,28 +133,3 @@ export interface ClassSizeInformation {
     2: number;
     3: number;
 }
-
-
-  Offering.prototype.getClassSizes = function () {
-    var offering = this;
-
-    return this.getAssignees()
-      .then(function (assignees) {
-        return _.reduce(assignees, function (result, assignee) {
-          _.forEach(assignee.Assignment.periods, function (period) {
-            result[period] += 1
-          });
-
-          return result;
-        }, {
-          size_limit: offering.size_limit,
-          total: assignees.length,
-          1: 0,
-          2: 0,
-          3: 0
-        });
-      });
-  };
-
-  return Offering;
-};

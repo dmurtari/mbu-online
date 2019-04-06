@@ -1,7 +1,7 @@
 import { Table, Model, Column, DataType, Default, ForeignKey, BeforeValidate } from 'sequelize-typescript';
 
-import { Offering, ClassSizeInformation } from '@models/offering';
-import { Registration } from '@models/registration';
+import { Offering, ClassSizeInformation } from '@models/offering.model';
+import { Registration } from '@models/registration.model';
 
 @Table({
     underscored: true
@@ -13,11 +13,11 @@ export class Assignment extends Model<Assignment> {
     })
     public periods!: number[];
 
+    @Default([])
     @Column({
         allowNull: false,
         type: DataType.ARRAY(DataType.STRING)
     })
-    @Default([])
     public completions: string[];
 
     @ForeignKey(() => Offering)
@@ -33,7 +33,7 @@ export class Assignment extends Model<Assignment> {
     public registration_id!: number;
 
     @BeforeValidate
-    public async ensureSizeLimit(assignment: Assignment): Promise<void> {
+    public static async ensureSizeLimit(assignment: Assignment): Promise<void> {
         if (!assignment.changed('periods')) {
             return;
         }

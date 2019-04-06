@@ -1,6 +1,8 @@
-import { Model, Column, Default, DataType, Table, Validator, BelongsTo, HasMany, BelongsToMany } from 'sequelize-typescript';
-import { Purchase } from '@models/purchase';
-import { Registration } from '@models/registration';
+import { Model, Column, Default, DataType, Table, Validator, ForeignKey, HasMany, BelongsToMany } from 'sequelize-typescript';
+
+import { Purchase } from '@models/purchase.model';
+import { Registration } from '@models/registration.model';
+import { Event } from './event.model';
 
 @Table({
     underscored: true
@@ -14,8 +16,8 @@ export class Purchasable extends Model<Purchasable> {
     @Column
     public description: string;
 
-    @Column
     @Default(false)
+    @Column
     public has_size!: boolean;
 
     @Column({
@@ -35,6 +37,9 @@ export class Purchasable extends Model<Purchasable> {
 
     @BelongsToMany(() => Registration, () => Purchase)
     public buyers: Registration[];
+
+    @ForeignKey(() => Event)
+    public event_id: number;
 
     @Validator
     public maxGreaterThanMin(): void {

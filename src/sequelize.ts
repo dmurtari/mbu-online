@@ -13,7 +13,8 @@ export const sequelize = new Sequelize(dbUrl, {
     protocol: 'postgres',
     operatorsAliases: Op,
     logging: env === 'development',
-    models: [__dirname + '/models']
+    modelPaths: [`${__dirname}/models/**/*.model*`],
+    modelMatch: (filename: string, member: string) => filename.substring(0, filename.indexOf('.model')).toLowerCase() === member.toLowerCase()
 });
 
 sequelize.authenticate()

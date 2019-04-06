@@ -1,10 +1,10 @@
 import { Table, Model, Column, Validate, DataType, HasMany, BelongsToMany } from 'sequelize-typescript';
 
-import { Purchasable } from '@models/purchasable';
-import { Scout } from '@models/scout';
-import { Registration } from '@models/registration';
-import { Badge } from '@models/badge';
-import { Offering } from '@models/offering';
+import { Purchasable } from '@models/purchasable.model';
+import { Scout } from '@models/scout.model';
+import { Registration } from '@models/registration.model';
+import { Badge } from '@models/badge.model';
+import { Offering } from '@models/offering.model';
 
 export enum Semester {
     SPRING = 'Spring',
@@ -20,11 +20,11 @@ export class Event extends Model<Event> {
     })
     public year!: number;
 
-    @Column({
-        allowNull: false
-    })
     @Validate({
         isIn: [['Spring', 'Fall']]
+    })
+    @Column({
+        allowNull: false
     })
     public semester!: string;
 

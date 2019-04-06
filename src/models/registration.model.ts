@@ -1,12 +1,12 @@
 import { Model, PrimaryKey, Column, AutoIncrement, ForeignKey, Table, BelongsToMany, BelongsTo } from 'sequelize-typescript';
 
-import { Event } from '@models/event';
-import { Scout } from '@models/scout';
-import { Offering } from '@models/offering';
-import { Preference } from '@models/preference';
-import { Assignment } from '@models/assignment';
-import { Purchasable } from '@models/purchasable';
-import { Purchase } from '@models/purchase';
+import { Event } from '@models/event.model';
+import { Scout } from '@models/scout.model';
+import { Offering } from '@models/offering.model';
+import { Preference } from '@models/preference.model';
+import { Assignment } from '@models/assignment.model'
+import { Purchasable } from '@models/purchasable.model';
+import { Purchase } from '@models/purchase.model';
 
 var _ = require('lodash');
 
@@ -15,8 +15,8 @@ var _ = require('lodash');
 })
 export class Registration extends Model<Registration> {
     @PrimaryKey
-    @Column
     @AutoIncrement
+    @Column
     public id: number;
 
     @ForeignKey(() => Event)
@@ -47,6 +47,14 @@ export class Registration extends Model<Registration> {
 
     @BelongsToMany(() => Purchasable, () => Purchase)
     public purchases: Purchasable[];
+
+    public async projectedCost(): Promise<number> {
+        return 0;
+    }
+
+    public async actualCost(): Promise<number> {
+        return 0;
+    }
 }
 
 

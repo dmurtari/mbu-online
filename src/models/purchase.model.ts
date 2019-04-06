@@ -1,6 +1,7 @@
 import { Table, Model, Column, Default, Min, Max, ForeignKey } from 'sequelize-typescript';
-import { Purchasable } from '@models/purchasable';
-import { Registration } from '@models/registration';
+
+import { Purchasable } from '@models/purchasable.model';
+import { Registration } from '@models/registration.model';
 
 export enum ShirtSize {
     XS = 'xs',
@@ -15,12 +16,12 @@ export enum ShirtSize {
     underscored: true
 })
 export class Purchase extends Model<Purchase> {
-    @Column({
-        allowNull: false
-    })
     @Default(0)
     @Min(0)
     @Max(0)
+    @Column({
+        allowNull: false
+    })
     public quantity!: number;
 
     @Column({
