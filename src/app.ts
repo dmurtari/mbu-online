@@ -1,5 +1,7 @@
 /* eslint no-console: "off" */
 
+require('module-alias/register');
+
 import express from 'express';
 import bodyParser from 'body-parser';
 import morgan from 'morgan';
@@ -10,6 +12,7 @@ import helmet from 'helmet';
 import history from 'connect-history-api-fallback';
 
 import { sequelize } from './sequelize';
+import { indexRoutes } from '@routes/index'
 
 const app = express();
 const env = process.env.NODE_ENV || 'development';
@@ -50,16 +53,15 @@ app.use((_req, res, next) => {
     next();
 });
 
-// Passport configuration
-app.use(passport.initialize());
-require('./config/passport')(passport);
 
-app.use('/api', require('./routes/index'));
-app.use('/api', require('./routes/users'));
-app.use('/api', require('./routes/forgot'));
-app.use('/api/events', require('./routes/events'));
-app.use('/api/badges', require('./routes/badges'));
-app.use('/api/scouts', require('./routes/scouts'));
+app.use(passport.initialize());
+
+app.use('/api', indexRoutes);
+// app.use('/api', require('./routes/users'));
+// app.use('/api', require('./routes/forgot'));
+// app.use('/api/events', require('./routes/events'));
+// app.use('/api/badges', require('./routes/badges'));
+// app.use('/api/scouts', require('./routes/scouts'));
 
 app.use((_req, res, _next) => {
     res.status(404).send();
