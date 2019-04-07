@@ -5,7 +5,8 @@ import { Registration } from '@models/registration.model';
 import { Event } from './event.model';
 
 @Table({
-    underscored: true
+    underscored: true,
+    tableName: 'Purchasable'
 })
 export class Purchasable extends Model<Purchasable> {
     @Column({

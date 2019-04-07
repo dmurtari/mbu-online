@@ -9,7 +9,8 @@ import { Event } from '@models/event.model';
         unique: true,
         fields: [Sequelize.fn('lower', Sequelize.col('name')) as any]
       }
-    ]
+    ],
+    tableName: 'Badge'
 })
 export class Badge extends Model<Badge> {
 

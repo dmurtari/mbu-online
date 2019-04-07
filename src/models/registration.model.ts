@@ -11,7 +11,8 @@ import { Purchase } from '@models/purchase.model';
 var _ = require('lodash');
 
 @Table({
-    underscored: true
+    underscored: true,
+    tableName: 'Registration'
 })
 export class Registration extends Model<Registration> {
     @PrimaryKey

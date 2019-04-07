@@ -6,7 +6,8 @@ import { Registration } from '@models/registration.model';
 import { Event } from '@models/event.model';
 
 @Table({
-    underscored: true
+    underscored: true,
+    tableName: 'Scout'
 })
 export class Scout extends Model<Scout> {
     @Column({

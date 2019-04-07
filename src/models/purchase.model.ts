@@ -13,7 +13,8 @@ export enum ShirtSize {
 }
 
 @Table({
-    underscored: true
+    underscored: true,
+    tableName: 'Purchase'
 })
 export class Purchase extends Model<Purchase> {
     @Default(0)

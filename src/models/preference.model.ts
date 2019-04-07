@@ -4,7 +4,8 @@ import { Offering } from '@models/offering.model';
 import { Registration } from '@models/registration.model';
 
 @Table({
-    underscored: true
+    underscored: true,
+    tableName: 'Preference'
 })
 export class Preference extends Model<Preference> {
     @Min(1)

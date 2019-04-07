@@ -29,7 +29,8 @@ export enum UserRole {
             unique: true,
             fields: [Sequelize.fn('lower', Sequelize.col('email')) as any]
         }
-    ]
+    ],
+    tableName: 'User'
 })
 export class User extends Model<User> {
     static readonly SALT_FACTOR = process.env.NODE_ENV === 'test' ? 1 : 12;

@@ -12,7 +12,8 @@ export enum Semester {
 }
 
 @Table({
-    underscored: true
+    underscored: true,
+    tableName: 'Event'
 })
 export class Event extends Model<Event> {
     @Column({

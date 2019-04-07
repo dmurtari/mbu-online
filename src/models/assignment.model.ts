@@ -4,7 +4,8 @@ import { Offering, ClassSizeInformation } from '@models/offering.model';
 import { Registration } from '@models/registration.model';
 
 @Table({
-    underscored: true
+    underscored: true,
+    tableName: 'Assignment'
 })
 export class Assignment extends Model<Assignment> {
     @Column({

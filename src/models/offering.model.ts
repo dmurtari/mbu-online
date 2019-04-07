@@ -24,7 +24,8 @@ import { Assignment } from '@models/assignment.model';
 import { durationValidator } from '@models/validators';
 
 @Table({
-    underscored: true
+    underscored: true,
+    tableName: 'Offering'
 })
 export class Offering extends Model<Offering> {
     @PrimaryKey
