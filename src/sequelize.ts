@@ -12,7 +12,7 @@ export const sequelize: Sequelize = new Sequelize(dbUrl, {
     dialect: 'postgres',
     protocol: 'postgres',
     operatorsAliases: Op,
-    logging: env === 'development',
+    logging: env !== 'test',
     models: [`${__dirname}/models/**/*.model*`],
     modelMatch: (filename: string, member: string) => filename.substring(0, filename.indexOf('.model')).toLowerCase() === member.toLowerCase()
 });
