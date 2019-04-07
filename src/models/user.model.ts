@@ -92,7 +92,7 @@ export class User extends Model<User> {
     @Column(DataType.JSON)
     public details: Object;
 
-    @HasMany(() => Scout)
+    @HasMany(() => Scout, 'user_id')
     public scouts: Scout[]
 
     public get fullname(): string {

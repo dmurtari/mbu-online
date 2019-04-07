@@ -33,10 +33,10 @@ export class Purchasable extends Model<Purchasable> {
     @Column
     public minimum_age: number;
 
-    @HasMany(() => Purchase)
+    @HasMany(() => Purchase, 'purchasable_id')
     public sold: Purchase[];
 
-    @BelongsToMany(() => Registration, () => Purchase)
+    @BelongsToMany(() => Registration, () => Purchase, 'registration_id', 'purchasable_id')
     public buyers: Registration[];
 
     @ForeignKey(() => Event)

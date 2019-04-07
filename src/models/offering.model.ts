@@ -83,10 +83,10 @@ export class Offering extends Model<Offering> {
     @BelongsTo(() => Badge)
     public badge: Badge;
 
-    @BelongsToMany(() => Registration, () => Assignment)
+    @BelongsToMany(() => Registration, () => Assignment, 'registration_id', 'offering_id')
     public requesters: Registration[];
 
-    @BelongsToMany(() => Registration, () => Assignment)
+    @BelongsToMany(() => Registration, () => Assignment, 'registraton_id', 'offering_id')
     public assignees: Registration[];
 
     @Validator

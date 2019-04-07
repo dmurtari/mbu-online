@@ -55,7 +55,7 @@ export class Scout extends Model<Scout> {
     @BelongsTo(() => User)
     public user: User;
 
-    @BelongsToMany(() => Event, () => Registration)
+    @BelongsToMany(() => Event, () => Registration, 'event_id', 'scout_id')
     public registrations: Event[];
 
     @Validator

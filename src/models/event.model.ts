@@ -51,12 +51,12 @@ export class Event extends Model<Event> {
     })
     public price!: number;
 
-    @HasMany(() => Purchasable)
+    @HasMany(() => Purchasable, 'event_id')
     public purchasables: Purchasable[];
 
-    @BelongsToMany(() => Scout, () => Registration)
+    @BelongsToMany(() => Scout, () => Registration, 'scout_id', 'event_id')
     public attendees: Scout[];
 
-    @BelongsToMany(() => Badge, () => Offering)
+    @BelongsToMany(() => Badge, () => Offering, 'badge_id', 'event_id')
     public offerings: Offering[];
 }

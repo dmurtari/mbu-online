@@ -29,6 +29,6 @@ export class Badge extends Model<Badge> {
     @Column
     public notes: string;
 
-    @BelongsToMany(() => Event, () => Offering)
+    @BelongsToMany(() => Event, () => Offering, 'event_id', 'badge_id')
     public availabilitiy: Event[];
 }
