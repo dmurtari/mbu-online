@@ -72,4 +72,5 @@ export class Scout extends Model<Scout> {
     public get age(): number {
         return moment().diff(moment(this.birthday, 'years'));
     }
+
 }

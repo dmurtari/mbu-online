@@ -8,7 +8,7 @@ const localDbUrl = env === 'development' ?
 
 const dbUrl = process.env.DATABASE_URL ? process.env.DATABASE_URL : localDbUrl;
 
-export const sequelize = new Sequelize(dbUrl, {
+export const sequelize: Sequelize = new Sequelize(dbUrl, {
     dialect: 'postgres',
     protocol: 'postgres',
     operatorsAliases: Op,
