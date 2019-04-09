@@ -14,6 +14,7 @@ import {
 } from 'sequelize-typescript';
 
 import { Scout } from '@models/scout.model';
+import { UserInterface } from '@app/interfaces/user.interface';
 
 export enum UserRole {
     ADMIN = 'admin',
@@ -32,7 +33,7 @@ export enum UserRole {
     ],
     tableName: 'User'
 })
-export class User extends Model<User> {
+export class User extends Model<User> implements UserInterface{
     @BeforeCreate
     public static async hashPassword(user: User): Promise<void> {
         const salt = await bcrypt.genSalt(User.SALT_FACTOR);
