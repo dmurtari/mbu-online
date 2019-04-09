@@ -6,6 +6,10 @@
         "types": [
             "mocha"
         ],
+<<<<<<< HEAD
         "baseUrl": "../",
+=======
+        "baseUrl": "../"
+>>>>>>> 057b49a096c20908cfc1b7ade0d78bb632a41185
     }
 }

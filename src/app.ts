@@ -13,6 +13,7 @@ import history from 'connect-history-api-fallback';
 
 import { sequelize } from './sequelize';
 import { indexRoutes } from '@routes/index'
+import { userRoutes } from '@routes/users';
 
 const app = express();
 const env = process.env.NODE_ENV || 'development';
@@ -57,7 +58,7 @@ app.use((_req, res, next) => {
 app.use(passport.initialize());
 
 app.use('/api', indexRoutes);
-// app.use('/api', require('./routes/users'));
+app.use('/api', userRoutes);
 // app.use('/api', require('./routes/forgot'));
 // app.use('/api/events', require('./routes/events'));
 // app.use('/api/badges', require('./routes/badges'));
