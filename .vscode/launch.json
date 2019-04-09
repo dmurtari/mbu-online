@@ -5,18 +5,23 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "API Tests",
             "type": "node",
             "request": "launch",
-            "program": "${workspaceRoot}/node_modules/mocha/bin/_mocha",
-            "stopOnEntry": false,
+            "name": "API Tests",
+            "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+            "preLaunchTask": "build-ts",
             "args": [
                 "--no-timeouts",
                 "--colors",
-                "tests/server"
+                "--require",
+                "ts-node/register",
+                "--require",
+                "tsconfig-paths/register",
+                "tests/**/*.ts"
             ],
-            "cwd": "${workspaceRoot}",
-            "runtimeExecutable": null,
+            "console": "integratedTerminal",
+            "sourceMaps": true,
+            "internalConsoleOptions": "neverOpen",
             "env": {
                 "NODE_ENV": "test",
                 "SENDGRID_API_KEY": "sendme",
@@ -25,23 +30,25 @@
         },
         {
             "type": "node",
-            "request": "launch",
-            "name": "Run Server",
-            "args": [
-                "src/app.js"
-            ]
+            "request": "attach",
+            "name": "Attach by Process ID",
+            "processId": "${command:PickProcess}",
+            "protocol": "inspector"
         },
         {
             "type": "node",
             "request": "launch",
             "name": "Mocha Current File",
             "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+            "preLaunchTask": "build-ts",
             "args": [
                 "--no-timeouts",
                 "--colors",
                 "${file}",
                 "--require",
-                "ts-node/register"
+                "ts-node/register",
+                "--require",
+                "tsconfig-paths/register"
             ],
             "console": "integratedTerminal",
             "sourceMaps": true,

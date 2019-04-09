@@ -6,11 +6,13 @@
     "start": "npm run serve",
     "build": "npm run build-ts && npm run tslint",
     "serve": "node dist/app.js",
+    "dev-env": "cross-env NODE_ENV=development",
+    "test-env": "cross-env NODE_ENV=test",
     "watch-node": "nodemon dist/app.js",
     "watch": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold\" \"npm run watch-ts\" \"npm run watch-node\"",
-    "test": "mocha dist/tests/**/*Spec.js",
-    "watch-test": "npm run test -- --watch --watch-extensions ts",
-    "watch-test-ts": "tsc -w -p tests/tsconfig.spec.json",
+    "test": "npm run test-env && npm run build-ts && npm run api-test",
+    "api-test": "npm run test-env && cross-env TS_NODE_PROJECT=tests/tsconfig.json && mocha -r ts-node/register -r tsconfig-paths/register tests/**/*.ts",
+    "watch-test": "npm run test-env && concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold\" \"npm run watch-ts\" \"npm run api-test -- --watch --watch-extensions ts\"",
     "build-ts": "tsc",
     "watch-ts": "tsc -w",
     "tslint": "tslint -c tslint.json -p tsconfig.json",
@@ -99,9 +101,9 @@
     "sequelize-typescript": "1.0.0-alpha.9"
   },
   "_moduleAliases": {
-    "@models": "./dist/src/models",
-    "@config": "./dist/src/config",
-    "@routes": "./dist/src/routes",
-    "@app": "./dist/src"
+    "@models": "./dist/models",
+    "@config": "./dist/config",
+    "@routes": "./dist/routes",
+    "@app": "./dist"
   }
 }

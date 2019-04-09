@@ -1,16 +1,22 @@
 {
+    "include": [
+        "./**/*.ts"
+    ],
     "compilerOptions": {
         "module": "commonjs",
         "allowJs": false,
         "esModuleInterop": true,
         "target": "es6",
         "noImplicitAny": true,
-        "moduleResolution": "node",
         "sourceMap": true,
         "outDir": "dist",
-        "baseUrl": "./",
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
+        "types": [
+            "mocha"
+        ],
+        "baseUrl": "../",
+        "moduleResolution": "node",
         "paths": {
             "@models/*": [
                 "src/models/*"
@@ -21,18 +27,15 @@
             "@routes/*": [
                 "src/routes/*"
             ],
-            "@app/*": [
-                "src/*"
-            ],
             "@interfaces/*": [
                 "src/interfaces/*"
+            ],
+            "@app/*": [
+                "src/*"
             ],
             "*": [
                 "node_modules/*"
             ]
         }
-    },
-    "include": [
-        "src/**/*"
-    ]
+    }
 }
