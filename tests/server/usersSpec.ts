@@ -1,5 +1,5 @@
 import supertest from 'supertest';
-import * as async from 'async'
+import * as async from 'async';
 import status from 'http-status-codes';
 import { expect } from 'chai';
 
@@ -9,12 +9,12 @@ import TestUtils from './testUtils';
 const request = supertest(app);
 
 describe('users', () => {
-    beforeEach((done) => {
-        TestUtils.dropDb(done);
+    beforeEach(async () => {
+        await TestUtils.dropDb();
     });
 
-    after((done) => {
-        TestUtils.dropDb(done);
+    after(async () => {
+        await TestUtils.dropDb();
     });
 
     describe('user account creation', () => {
@@ -43,7 +43,7 @@ describe('users', () => {
                 .send(postData)
                 .expect(status.CREATED)
                 .end((err, res) => {
-                    if (err) return done(err);
+                    if (err) { done(err); }
                     expect(res.body.profile.email).to.equal(postData.email);
                     expect(res.body.profile.firstname).to.equal(postData.firstname);
                     expect(res.body.profile.lastname).to.equal(postData.lastname);
@@ -60,7 +60,7 @@ describe('users', () => {
              (cb) => {
                     request.post('/api/signup')
                         .send(postData)
-                        .expect(status.BAD_REQUEST, cb);
+                        .expect(status.BAD_REQUEST, cb)
                 }, (cb) => {
                     postData = {
                         email: 'test@test.com'
@@ -89,7 +89,7 @@ describe('users', () => {
         });
 
         it('checks for a valid email address', (done) => {
-            var postData: any;
+            let postData: any;
 
             async.series([
              (cb) => {
@@ -146,10 +146,10 @@ describe('users', () => {
                 request.get('/api/users/exists/Test@test.com')
                     .expect(status.OK)
                     .end((err, res) => {
-                        if (err) return done(err);
+                        if (err) { done(err); }
                         expect(res.body.exists).to.be.true;
                         done();
-                    })
+                    });
             });
 
             it('should not create a duplicate user', (done) => {
@@ -159,7 +159,7 @@ describe('users', () => {
             });
 
             it('should treat email as case insensitive', (done) => {
-                var uppercaseData: any = {
+                const uppercaseData: any = {
                     email: 'Test@Test.com',
                     password: 'password',
                     firstname: 'firstname',
@@ -251,7 +251,7 @@ describe('users', () => {
                 .send(postData)
                 .expect(status.CREATED)
                 .end((err, res) => {
-                    if (err) return done(err);
+                    if (err) { done(err); }
                     token = res.body.token;
                     done();
                 });
@@ -262,7 +262,7 @@ describe('users', () => {
                 .set('Authorization', token)
                 .expect(status.OK)
                 .end((err, res) => {
-                    if (err) return done(err);
+                    if (err) { done(err); }
                     expect(res.body.profile.email).to.equal('test@test.com');
                     expect(res.body.profile.firstname).to.equal('firstname');
                     expect(res.body.profile.lastname).to.equal('lastname');

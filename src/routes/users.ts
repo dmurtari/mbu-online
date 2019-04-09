@@ -1,7 +1,8 @@
 import { Router } from 'express';
 import passport from 'passport';
 
-import { signup } from './users/postUsers';
+import { signup, authenticate } from './users/postUsers';
+import { byEmail, fromToken } from './users/getUsers';
 // var getUsers = require('./users/getUsers');
 // var putUsers = require('./users/putUsers');
 // var deleteUsers = require('./users/deleteUsers');
@@ -16,13 +17,13 @@ export const userRoutes = Router();
 // router.param('scoutId', isOwner);
 
 userRoutes.post('/signup', signup);
-// userRoutes.post('/authenticate', postUsers.authenticate);
+userRoutes.post('/authenticate', authenticate);
 
-// router.get('/profile', passport.authenticate('jwt', { session: false }), postUsers.protected);
+userRoutes.get('/profile', passport.authenticate('jwt', { session: false }), fromToken);
 // router.get('/users/:userId?', isCurrentUser(['teacher']), getUsers.get(false));
 // router.put('/users/:userId', [isCurrentUser(['teacher']), canUpdateRole], putUsers.updateProfile);
 // router.delete('/users/:userId', isCurrentUser(), deleteUsers.deleteUser);
-// router.get('/users/exists/:email', getUsers.exists);
+userRoutes.get('/users/exists/:email', byEmail);
 
 // // Scouts
 // var scoutMiddleware = [isCurrentUser(['teacher']), isAuthorized(['teacher', 'coordinator'])];

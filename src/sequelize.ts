@@ -14,7 +14,9 @@ export const sequelize: Sequelize = new Sequelize(dbUrl, {
     operatorsAliases: Op,
     logging: env !== 'test',
     models: [`${__dirname}/models/**/*.model*`],
-    modelMatch: (filename: string, member: string) => filename.substring(0, filename.indexOf('.model')).toLowerCase() === member.toLowerCase()
+    modelMatch: (filename: string, member: string) => {
+        return filename.substring(0, filename.indexOf('.model')).toLowerCase() === member.toLowerCase();
+    }
 });
 
 sequelize.authenticate()

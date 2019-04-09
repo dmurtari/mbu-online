@@ -1,6 +1,7 @@
 /* eslint no-console: "off" */
 
-require('module-alias/register');
+import 'module-alias/register';
+import '@config/passport';
 
 import express from 'express';
 import bodyParser from 'body-parser';
@@ -12,7 +13,7 @@ import helmet from 'helmet';
 import history from 'connect-history-api-fallback';
 
 import { sequelize } from './sequelize';
-import { indexRoutes } from '@routes/index'
+import { indexRoutes } from '@routes/index';
 import { userRoutes } from '@routes/users';
 
 const app = express();

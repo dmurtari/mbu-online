@@ -1,9 +1,11 @@
 import supertest from 'supertest';
-import * as async from 'async'
+import { Sequelize } from 'sequelize';
+import * as async from 'async';
 import status from 'http-status-codes';
 import _ from 'lodash';
 
 import app from '@app/app';
+import { User } from '@models/user.model';
 import { sequelize } from '@app/sequelize';
 import testEvents from './testEvents';
 import testBadges from './testBadges';
@@ -11,29 +13,27 @@ import testPurchasables from './testPurchasables';
 
 const request = supertest(app);
 
+export interface TokenObject {
+    token: string;
+    profile: User;
+}
+
 export default class TestUtils {
 
     public static badId: string = '6575';
 
-    public static dropDb(done: Mocha.Done): void {
-        sequelize.sync({ force: true })
-            .then(() => done())
-            .catch((err: any) => done(err));
+    public static async dropDb(): Promise<Sequelize> {
+        return sequelize.sync({ force: true });
     }
 
-    // dropTable: function (tables, done) {
-    //     async.forEachOfSeries(tables, function (table, index, cb) {
-    //         sequelize.model(table).sync({ force: true })
-    //             .then(function () {
-    //                 cb();
-    //             })
-    //             .catch(function (err) {
-    //                 cb(err);
-    //             });
-    //     }, function (err) {
-    //         done(err);
-    //     });
-    // },
+    public static async generateTokens(roles: string[] = ['admin', 'teacher', 'coordinator']): Promise<TokenObject[]> {
+        return [];
+    }
+
+    public static async generateToken(name: string): Promise<TokenObject> {
+        return null;
+    }
+
     // generateTokens: function (roles, done) {
     //     _.defaults(roles, ['admin', 'teacher', 'coordinator']);
     //     var object = this;

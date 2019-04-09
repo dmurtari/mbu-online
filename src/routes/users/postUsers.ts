@@ -1,11 +1,12 @@
+import { Request, Response } from 'express';
+import { Op } from 'sequelize';
 import jwt from 'jsonwebtoken';
 import status from 'http-status-codes';
-import { Request, Response } from 'express';
 
 import config from '@config/secrets';
 import { User } from '@models/user.model';
 
-export let signup = async (req: Request, res: Response) => {
+export const signup = async (req: Request, res: Response) => {
     if (!req.body.email || !req.body.password || !req.body.firstname || !req.body.lastname) {
         return res.status(status.BAD_REQUEST).json({
             message: 'Email, password, firstname, lastname required'
@@ -16,12 +17,13 @@ export let signup = async (req: Request, res: Response) => {
     newUser.approved = false;
 
     try {
-        const user: User = await User.create(newUser)
+        const user: User = await User.create(newUser);
         await user.save();
         const token = jwt.sign(user.id, config.APP_SECRET);
+        user.set('password', null);
 
         return res.status(status.CREATED).json({
-            token: 'JWT ' + token,
+            token: `JWT ${token}`,
             profile: user
         });
     } catch (err) {
@@ -30,67 +32,41 @@ export let signup = async (req: Request, res: Response) => {
             error: err
         });
     }
-}
+};
 
-// module.exports = {
-//   signup: function (req, res) {
-//     if (!req.body.email || !req.body.password ||
-//       !req.body.firstname || !req.body.lastname) {
-//       res.status(status.BAD_REQUEST).json({
-//         message: 'Email, password, firstname, lastname required'
-//       });
-//     } else {
-//       var newUser = req.body;
-//       newUser.approved = false;
-//       Model.User.create(newUser)
-//         .then(function (user) {
-//           return user.save(); // Trigger save hook
-//         }).then(function (user) {
-//           var token = jwt.sign(user.dataValues.id, config.APP_SECRET);
-//           delete user.dataValues['password'];
-//           return res.status(status.CREATED).json({
-//             token: 'JWT ' + token,
-//             profile: user
-//           });
-//         })
-//         .catch(function (err) {
-//           return res.status(status.BAD_REQUEST).json({
-//             message: 'Failed to create user',
-//             error: err
-//           });
-//         });
-//     }
-//   },
-//   authenticate: function (req, res) {
-//     var user;
+export const authenticate = async (req: Request, res: Response) => {
+    try {
+        const user: User = await User.findOne({
+            where: {
+                email: {
+                    [Op.iLike]: req.body.email
+                }
+            }
+        });
 
-//     Model.User.findOne({ where: { email: { $ilike: req.body.email } } })
-//       .then(function (userFromDb) {
-//         if (!userFromDb) {
-//           throw new Error('No matching email found');
-//         }
-//         user = userFromDb;
-//         return userFromDb.comparePassword(req.body.password);
-//       })
-//       .then(function (equal) {
-//         if (!equal) {
-//           throw new Error('Passwords do not match');
-//         }
+        if (!user) {
+            throw new Error('No matching email found');
+        }
 
-//         var token = jwt.sign(user.dataValues.id, config.APP_SECRET);
-//         delete user.dataValues['password'];
-//         return res.status(status.OK).json({
-//           token: 'JWT ' + token,
-//           profile: user.dataValues
-//         });
-//       })
-//       .catch(function (err) {
-//         return res.status(status.UNAUTHORIZED).json({
-//           message: 'User authentication failed',
-//           error: err
-//         });
-//       });
-//   },
+        if (await user.comparePassword(req.body.password)) {
+            const token: string = jwt.sign(user.id, config.APP_SECRET);
+            user.set('password', null);
+
+            return res.status(status.OK).json({
+                token: `JWT ${token}`,
+                profile: user
+            });
+        } else {
+            throw new Error('Password do no match');
+        }
+    } catch (err) {
+        return res.status(status.UNAUTHORIZED).json({
+            message: 'User authentication failed',
+            error: err
+        });
+    }
+};
+
 //   protected: function (req, res) {
 //     res.status(status.OK).json({
 //       message: 'Successfully authenticated',

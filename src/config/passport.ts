@@ -13,7 +13,7 @@ passport.use(new JwtStrategy(options, async (jwtPayload, done) => {
     try {
         const user: User = await User.findByPk(jwtPayload);
         if (!!user) {
-            return done(null, (user as any).dataValues);
+            return done(null, user);
         } else {
             return done(null, false);
         }
