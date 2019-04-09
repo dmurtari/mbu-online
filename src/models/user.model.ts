@@ -33,7 +33,23 @@ export enum UserRole {
     tableName: 'User'
 })
 export class User extends Model<User> {
-    static readonly SALT_FACTOR = process.env.NODE_ENV === 'test' ? 1 : 12;
+    @BeforeCreate
+    public static async hashPassword(user: User): Promise<void> {
+        const salt = await bcrypt.genSalt(User.SALT_FACTOR);
+        const hashedPassword = await bcrypt.hash(user.password, salt);
+        user.password = hashedPassword;
+    }
+
+    @BeforeUpdate
+    public static async updateHashedPassword(user: User): Promise<void> {
+        if (user.changed('password')) {
+            const salt = await bcrypt.genSalt(User.SALT_FACTOR);
+            const hashedPassword = await bcrypt.hash(user.password, salt);
+            user.password = hashedPassword;
+        }
+    }
+
+    private static readonly SALT_FACTOR = process.env.NODE_ENV === 'test' ? 1 : 12;
 
     @Column({
         allowNull: false,
@@ -93,14 +109,14 @@ export class User extends Model<User> {
     public details: Object;
 
     @HasMany(() => Scout, 'user_id')
-    public scouts: Scout[]
+    public scouts: Scout[];
 
     public get fullname(): string {
         return `${this.firstname.trim()} ${this.lastname.trim()}`;
     }
 
     @Validator
-    public detailsValidator() {
+    public detailsValidator(): void {
         let allowedFields;
 
         if (this.role === UserRole.COORDINATOR) {
@@ -115,22 +131,6 @@ export class User extends Model<User> {
             if (!isEmpty(omit(this.details, allowedFields))) {
                 throw new Error('Invalid details for teacher');
             }
-        }
-    }
-
-    @BeforeCreate
-    public static async hashPassword(user: User) {
-        const salt = await bcrypt.genSalt(User.SALT_FACTOR);
-        const hashedPassword = await bcrypt.hash(user.password, salt);
-        user.password = hashedPassword;
-    }
-
-    @BeforeUpdate
-    public static async updateHashedPassword(user: User) {
-        if (user.changed('password')) {
-            const salt = await bcrypt.genSalt(User.SALT_FACTOR);
-            const hashedPassword = await bcrypt.hash(user.password, salt);
-            user.password = hashedPassword;
         }
     }
 

@@ -8,6 +8,26 @@ import { Registration } from '@models/registration.model';
     tableName: 'Assignment'
 })
 export class Assignment extends Model<Assignment> {
+    @BeforeValidate
+    public static async ensureSizeLimit(assignment: Assignment): Promise<void> {
+        if (!assignment.changed('periods')) {
+            return;
+        }
+
+        try {
+            const offering: Offering = await Offering.findByPk(assignment.offering_id);
+            const sizes: ClassSizeInformation = await offering.getClassSizes();
+
+            assignment.periods.forEach((period: number) => {
+                if ((<any>sizes)[period] >= sizes.size_limit) {
+                    throw new Error(`Offering is at the size limit for period ${period}`);
+                }
+            });
+        } catch {
+            throw new Error('Offering is at the class limit for the given periods');
+        }
+    }
+
     @Column({
         allowNull: false,
         type: DataType.ARRAY(DataType.INTEGER)
@@ -32,24 +52,4 @@ export class Assignment extends Model<Assignment> {
         allowNull: false
     })
     public registration_id!: number;
-
-    @BeforeValidate
-    public static async ensureSizeLimit(assignment: Assignment): Promise<void> {
-        if (!assignment.changed('periods')) {
-            return;
-        }
-
-        try {
-            const offering: Offering = await Offering.findByPk(assignment.offering_id);
-            const sizes: ClassSizeInformation = await offering.getClassSizes();
-
-            assignment.periods.forEach((period: number) => {
-                if ((<any>sizes)[period] >= sizes.size_limit) {
-                    throw new Error(`Offering is at the size limit for period ${period}`);
-                }
-            });
-        } catch {
-            throw new Error('Offering is at the class limit for the given periods');
-        }
-    }
 }

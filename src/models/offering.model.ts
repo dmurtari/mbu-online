@@ -28,6 +28,18 @@ import { durationValidator } from '@models/validators';
     tableName: 'Offering'
 })
 export class Offering extends Model<Offering> {
+    @BeforeBulkCreate
+    public static removeAllNullPeriods(offerings: Offering[]): void {
+        offerings.forEach((offering: Offering) => {
+          Offering.removeNullPeriods(offering);
+        });
+    }
+
+    @BeforeValidate
+    public static removeNullPeriods(offering: Offering): void {
+        offering.periods = without(offering.periods, null);
+    }
+
     @PrimaryKey
     @AutoIncrement
     @Column
@@ -86,7 +98,7 @@ export class Offering extends Model<Offering> {
     @BelongsToMany(() => Registration, () => Assignment, 'registration_id', 'offering_id')
     public requesters: Registration[];
 
-    @BelongsToMany(() => Registration, () => Assignment, 'registraton_id', 'offering_id')
+    @BelongsToMany(() => Registration, () => Assignment, 'registration_id', 'offering_id')
     public assignees: Registration[];
 
     @Validator
@@ -96,18 +108,6 @@ export class Offering extends Model<Offering> {
         }
     }
 
-    @BeforeBulkCreate
-    public static removeAllNullPeriods(offerings: Offering[]): void {
-        offerings.forEach((offering: Offering) => {
-          Offering.removeNullPeriods(offering);
-        });
-    }
-
-    @BeforeValidate
-    public static removeNullPeriods(offering: Offering): void {
-        offering.periods = without(offering.periods, null);
-    }
-
     public async getClassSizes(): Promise<ClassSizeInformation> {
         const assignees: Registration[] = await this.$get('assignees') as Registration[];
         const assignments: Assignment[] = await Assignment.findAll({ where: { offering_id: this.id }});
@@ -115,7 +115,7 @@ export class Offering extends Model<Offering> {
         return assignments.reduce((result: ClassSizeInformation, assignment: Assignment) => {
             assignment.periods.forEach((period: number) => {
                 (<any>result)[period] += 1;
-            })
+            });
             return result;
         }, <ClassSizeInformation>{
             size_limit: this.size_limit,

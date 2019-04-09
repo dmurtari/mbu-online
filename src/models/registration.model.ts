@@ -4,11 +4,9 @@ import { Event } from '@models/event.model';
 import { Scout } from '@models/scout.model';
 import { Offering } from '@models/offering.model';
 import { Preference } from '@models/preference.model';
-import { Assignment } from '@models/assignment.model'
+import { Assignment } from '@models/assignment.model';
 import { Purchasable } from '@models/purchasable.model';
 import { Purchase } from '@models/purchase.model';
-
-var _ = require('lodash');
 
 @Table({
     underscored: true,

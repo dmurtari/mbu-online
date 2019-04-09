@@ -7,15 +7,16 @@
     "build": "npm run build-ts && npm run tslint",
     "serve": "node dist/app.js",
     "watch-node": "nodemon dist/app.js",
-    "watch": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"npm run watch-ts\" \"npm run watch-node\"",
-    "test": "cross-env TS_NODE_PROJECT=tests/tsconfig.spec.json && mocha -r ts-node/register -r tsconfig-paths/register tests/**/*.ts",
+    "watch": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold\" \"npm run watch-ts\" \"npm run watch-node\"",
+    "test": "mocha dist/tests/**/*Spec.js",
     "watch-test": "npm run test -- --watch --watch-extensions ts",
+    "watch-test-ts": "tsc -w -p tests/tsconfig.spec.json",
     "build-ts": "tsc",
     "watch-ts": "tsc -w",
     "tslint": "tslint -c tslint.json -p tsconfig.json",
     "debug": "npm run build && npm run watch-debug",
     "serve-debug": "nodemon --inspect dist/app.js",
-    "watch-debug": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"npm run watch-ts\" \"npm run serve-debug\""
+    "watch-debug": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold\" \"npm run watch-ts\" \"npm run serve-debug\""
   },
   "repository": {
     "type": "git",
@@ -96,8 +97,9 @@
     "sequelize-typescript": "1.0.0-alpha.9"
   },
   "_moduleAliases": {
-    "@models": "./dist/models",
-    "@config": "./dist/config",
-    "@routes": "./dist/routes"
+    "@models": "./dist/src/models",
+    "@config": "./dist/src/config",
+    "@routes": "./dist/src/routes",
+    "@app": "./dist/src"
   }
 }
