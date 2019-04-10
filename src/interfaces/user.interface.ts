@@ -14,3 +14,10 @@ export interface UserInterface {
     scouts: Scout[];
     fullname: string;
 }
+
+export interface SignupRequestInterface {
+    email: string;
+    password: string;
+    firstname: string;
+    lastname: string;
+}

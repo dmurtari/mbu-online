@@ -5,6 +5,7 @@ import { expect } from 'chai';
 
 import app from '@app/app';
 import TestUtils from './testUtils';
+import { SignupRequestInterface } from '@interfaces/user.interface';
 
 const request = supertest(app);
 
@@ -19,7 +20,7 @@ describe('users', () => {
 
     describe('user account creation', () => {
         it('creates an account if all required info is supplied', (done) => {
-            const postData: any = {
+            const postData: SignupRequestInterface = {
                 email: 'test@test.com',
                 password: 'password',
                 firstname: 'firstname',
@@ -32,7 +33,7 @@ describe('users', () => {
         });
 
         it('should return a token and the profile', (done) => {
-            const postData: any = {
+            const postData: SignupRequestInterface = {
                 email: 'test@test.com',
                 password: 'password',
                 firstname: 'firstname',
@@ -89,7 +90,7 @@ describe('users', () => {
         });
 
         it('checks for a valid email address', (done) => {
-            let postData: any;
+            let postData: SignupRequestInterface;
 
             async.series([
              (cb) => {
@@ -127,7 +128,7 @@ describe('users', () => {
         });
 
         describe('when a user already exists', () => {
-            let postData: any;
+            let postData: SignupRequestInterface;
 
             beforeEach((done) => {
                 postData = {
@@ -159,7 +160,7 @@ describe('users', () => {
             });
 
             it('should treat email as case insensitive', (done) => {
-                const uppercaseData: any = {
+                const uppercaseData: SignupRequestInterface = {
                     email: 'Test@Test.com',
                     password: 'password',
                     firstname: 'firstname',
@@ -175,7 +176,7 @@ describe('users', () => {
 
     describe('account authentication', () => {
         beforeEach((done) => {
-            const postData: any = {
+            const postData: SignupRequestInterface = {
                 email: 'test@test.com',
                 password: 'password',
                 firstname: 'firstname',
@@ -210,7 +211,7 @@ describe('users', () => {
                 .expect(status.UNAUTHORIZED, done);
         });
 
-        it('should not find a nonexistant email', (done) => {
+        it('should not find a nonexistent email', (done) => {
             request.post('/api/authenticate')
                 .send({
                     email: 'dne'
@@ -240,7 +241,7 @@ describe('users', () => {
         let token: string = null;
 
         beforeEach((done) => {
-            const postData = {
+            const postData: SignupRequestInterface = {
                 email: 'test@test.com',
                 password: 'password',
                 firstname: 'firstname',
