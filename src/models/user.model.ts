@@ -33,7 +33,7 @@ export enum UserRole {
     ],
     tableName: 'User'
 })
-export class User extends Model<User> implements UserInterface{
+export class User extends Model<User> implements UserInterface {
     @BeforeCreate
     public static async hashPassword(user: User): Promise<void> {
         const salt = await bcrypt.genSalt(User.SALT_FACTOR);

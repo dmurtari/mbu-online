@@ -1,7 +1,7 @@
 import { Scout } from '@models/scout.model';
 
 export interface UserInterface {
-    id: number;
+    id?: number;
     email: string;
     password: string;
     reset_password_token: string;
