@@ -5,6 +5,8 @@ import status from 'http-status-codes';
 
 import config from '@config/secrets';
 import { User } from '@models/user.model';
+import { UserTokenResponseInterface } from '@interfaces/user.interface';
+import { ErrorResponseInterface } from '@interfaces/shared.interface';
 
 export const signup = async (req: Request, res: Response) => {
     if (!req.body.email || !req.body.password || !req.body.firstname || !req.body.lastname) {
@@ -22,12 +24,12 @@ export const signup = async (req: Request, res: Response) => {
         const token = jwt.sign(user.id, config.APP_SECRET);
         user.set('password', null);
 
-        return res.status(status.CREATED).json({
+        return res.status(status.CREATED).json(<UserTokenResponseInterface>{
             token: `JWT ${token}`,
             profile: user
         });
     } catch (err) {
-        return res.status(status.BAD_REQUEST).json({
+        return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
             message: 'Failed to create user',
             error: err
         });
@@ -52,7 +54,7 @@ export const authenticate = async (req: Request, res: Response) => {
             const token: string = jwt.sign(user.id, config.APP_SECRET);
             user.set('password', null);
 
-            return res.status(status.OK).json({
+            return res.status(status.OK).json(<UserTokenResponseInterface>{
                 token: `JWT ${token}`,
                 profile: user
             });
@@ -60,7 +62,7 @@ export const authenticate = async (req: Request, res: Response) => {
             throw new Error('Password do no match');
         }
     } catch (err) {
-        return res.status(status.UNAUTHORIZED).json({
+        return res.status(status.UNAUTHORIZED).json(<ErrorResponseInterface>{
             message: 'User authentication failed',
             error: err
         });

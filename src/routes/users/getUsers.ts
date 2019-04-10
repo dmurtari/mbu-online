@@ -4,6 +4,8 @@ import status from 'http-status-codes';
 
 import { User } from '@models/user.model';
 import { Op } from 'sequelize';
+import { ErrorResponseInterface } from '@interfaces/shared.interface';
+import { UserExistsResponseInterface, TokenAuthResponseInterface } from '@interfaces/user.interface';
 
 export const byEmail = async (req: Request, res: Response) => {
     try {
@@ -15,9 +17,9 @@ export const byEmail = async (req: Request, res: Response) => {
             }
         });
 
-        res.status(status.OK).json({ exists: users.length > 0 });
+        res.status(status.OK).json(<UserExistsResponseInterface>{ exists: users.length > 0 });
     } catch (err) {
-        res.status(status.BAD_REQUEST).json({
+        res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
             message: 'Failed to find users',
             error: err
         });
@@ -25,7 +27,7 @@ export const byEmail = async (req: Request, res: Response) => {
 };
 
 export const fromToken = async (req: Request, res: Response) => {
-    return res.status(status.OK).json({
+    return res.status(status.OK).json(<TokenAuthResponseInterface>{
         message: 'Successfully authenticated',
         profile: req.user
     });

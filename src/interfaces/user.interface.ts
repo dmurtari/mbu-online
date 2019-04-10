@@ -21,3 +21,17 @@ export interface SignupRequestInterface {
     firstname: string;
     lastname: string;
 }
+
+export interface UserTokenResponseInterface {
+    token: string;
+    profile: UserInterface
+}
+
+export interface UserExistsResponseInterface {
+    exists: boolean;
+}
+
+export interface TokenAuthResponseInterface {
+    message: string;
+    profile: UserInterface;
+}
