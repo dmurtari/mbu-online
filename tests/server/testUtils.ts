@@ -10,12 +10,17 @@ import { sequelize } from '@app/sequelize';
 import testEvents from './testEvents'
 import testBadges from './testBadges';
 import testPurchasables from './testPurchasables';
+import { UserInterface, SignupRequestInterface } from '@interfaces/user.interface';
 
 const request = supertest(app);
 
 export interface TokenObject {
     token: string;
-    profile: User;
+    profile: UserInterface;
+}
+
+export interface RoleTokenObjects {
+    [role: string]: TokenObject
 }
 
 export default class TestUtils {
@@ -26,12 +31,48 @@ export default class TestUtils {
         return sequelize.sync({ force: true });
     }
 
-    public static async generateTokens(roles: string[] = ['admin', 'teacher', 'coordinator']): Promise<TokenObject[]> {
-        return [];
+    public static async generateTokens(roles: string[] = ['admin', 'teacher', 'coordinator']): Promise<RoleTokenObjects> {
+        let tokens: RoleTokenObjects = {};
+
+        for await (const role of roles) {
+            const { token, profile } = await this.generateToken(role);
+            tokens[role] = { token, profile };
+        }
+
+        return tokens;
     }
 
     public static async generateToken(name: string): Promise<TokenObject> {
-        return null;
+        let token: string;
+        let profile: UserInterface
+
+        const roleSearchRegexp: RegExp = /(\D+)/;
+        const role = roleSearchRegexp.exec(name)[1];
+        const postData: SignupRequestInterface = {
+            email: name + '@test.com',
+            password: 'password',
+            firstname: 'firstname',
+            lastname: 'lastname',
+            role: role
+        };
+
+        await request.post('/api/signup')
+            .send(postData)
+            .expect(status.CREATED)
+            .end((_err, res) => {
+                profile = res.body.profile;
+                token = res.body.token;
+            });
+
+        const user: User = await User.findByPk(profile.id)
+
+        user.approved = true;
+        await user.save();
+
+        return {
+            token,
+            profile
+        }
     }
 
     // generateTokens: function (roles, done) {
