@@ -61,7 +61,7 @@ describe('users', () => {
              (cb) => {
                     request.post('/api/signup')
                         .send(postData)
-                        .expect(status.BAD_REQUEST, cb)
+                        .expect(status.BAD_REQUEST, cb);
                 }, (cb) => {
                     postData = {
                         email: 'test@test.com'

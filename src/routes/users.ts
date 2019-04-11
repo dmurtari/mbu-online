@@ -1,36 +1,34 @@
-import { Router } from 'express';
+import { Router, RequestHandler } from 'express';
 import passport from 'passport';
 
-import { signup, authenticate } from './users/postUsers';
-import { byEmail, fromToken } from './users/getUsers';
-// var getUsers = require('./users/getUsers');
-// var putUsers = require('./users/putUsers');
-// var deleteUsers = require('./users/deleteUsers');
-
-// var isAuthorized = require('../middleware/auth');
-// var isOwner = require('../middleware/owner');
-// var isCurrentUser = require('../middleware/currentUser');
-// var canUpdateRole = require('../middleware/userUpdatePermissions');
+import { signup, authenticate, addScout } from '@routes/users/postUsers';
+import { byEmail, fromToken, byId } from '@routes/users/getUsers';
+import { updateProfile, updateScout } from '@routes/users/putUsers';
+import { deleteUser } from '@routes/users/deleteUsers';
+import { currentUser } from '@middleware/currentUser';
+import { canUpdateRole } from '@middleware/canUpdateRole';
+import { isAuthorized } from '@middleware/isAuthorized';
+import { UserRole } from '@interfaces/user.interface';
 
 export const userRoutes = Router();
 
+const scoutMiddleware: RequestHandler[] = [currentUser([UserRole.TEACHER]), isAuthorized([UserRole.TEACHER, UserRole.COORDINATOR])];
 // router.param('scoutId', isOwner);
 
 userRoutes.post('/signup', signup);
 userRoutes.post('/authenticate', authenticate);
 
 userRoutes.get('/profile', passport.authenticate('jwt', { session: false }), fromToken);
-// router.get('/users/:userId?', isCurrentUser(['teacher']), getUsers.get(false));
-// router.put('/users/:userId', [isCurrentUser(['teacher']), canUpdateRole], putUsers.updateProfile);
-// router.delete('/users/:userId', isCurrentUser(), deleteUsers.deleteUser);
+userRoutes.get('/users/:userId?', currentUser([UserRole.TEACHER]), byId());
+userRoutes.put('/users/:userId', [currentUser([UserRole.TEACHER]), canUpdateRole], updateProfile);
+userRoutes.delete('/users/:userId', currentUser(), deleteUser);
 userRoutes.get('/users/exists/:email', byEmail);
 
 // // Scouts
-// var scoutMiddleware = [isCurrentUser(['teacher']), isAuthorized(['teacher', 'coordinator'])];
-// router.get('/users/:userId/scouts', scoutMiddleware, getUsers.get(true));
+userRoutes.get('/users/:userId/scouts', scoutMiddleware, byId(true));
 // router.get('/users/:userId/scouts/registrations', scoutMiddleware, getUsers.getScoutRegistrations);
-// router.put('/users/:userId/scouts/:scoutId', scoutMiddleware, putUsers.updateScout);
-// router.post('/users/:userId/scouts', scoutMiddleware, postUsers.createScout);
+userRoutes.put('/users/:userId/scouts/:scoutId', scoutMiddleware, updateScout);
+userRoutes.post('/users/:userId/scouts', scoutMiddleware, addScout);
 // router.delete('/users/:userId/scouts/:scoutId', scoutMiddleware, deleteUsers.deleteScout);
 
 // // Registrations

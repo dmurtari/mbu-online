@@ -3,16 +3,17 @@ import { Request, Response } from 'express';
 import status from 'http-status-codes';
 
 import { User } from '@models/user.model';
-import { Op } from 'sequelize';
+import { Op, WhereOptions, Includeable } from 'sequelize';
 import { ErrorResponseInterface } from '@interfaces/shared.interface';
 import { UserExistsResponseInterface, TokenAuthResponseInterface } from '@interfaces/user.interface';
+import { Scout } from '@models/scout.model';
 
 export const byEmail = async (req: Request, res: Response) => {
     try {
         const users: User[] = await User.findAll({
             where: {
                 email: {
-                    [Op.iLike]: req.params.email
+                    [ Op.iLike ]: req.params.email
                 }
             }
         });
@@ -33,23 +34,52 @@ export const fromToken = async (req: Request, res: Response) => {
     });
 };
 
-// module.exports = {
-//   exists: function (req, res) {
-//     return Models.User.findAll({
-//       where: {
-//         email: {
-//           ilike: req.params.email
-//         }
-//       }
-//     })
-//       .then(function (users) {
-//         var exists = users.length > 0;
+export const byId = (includeScouts: boolean = false) => async (req: Request, res: Response) => {
+    let query: WhereOptions;
+    const include: Includeable[] = [];
 
-//         res.status(status.OK).json({
-//           exists: exists
-//         })
-//       })
-//   },
+    if (req.params.userId) {
+        query = { id: req.params.userId };
+    } else if (req.params.id) {
+        query = { id: req.params.id };
+    } else if (!req.query) {
+        query = {};
+    } else {
+        return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+            message: 'Invalid query'
+        });
+    }
+
+    if (includeScouts) {
+        include.push({
+            model: Scout,
+            as: 'scouts'
+        });
+    }
+
+    try {
+        const users: User[] = await User.findAll({
+            where: query,
+            attributes: {
+                exclude: [ 'password' ]
+            },
+            include: include
+        });
+
+        if (users.length < 1)  {
+            throw new Error('User not found');
+        }
+
+        return res.status(status.OK).json(users);
+    } catch (err) {
+        return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+            error: err,
+            message: 'Error getting user'
+        });
+    }
+};
+
+// module.exports = {
 //   get: function (shouldIncludeScouts) {
 //     return function (req, res) {
 //       var query = {};

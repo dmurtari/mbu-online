@@ -5,8 +5,10 @@ import status from 'http-status-codes';
 
 import config from '@config/secrets';
 import { User } from '@models/user.model';
-import { UserTokenResponseInterface } from '@interfaces/user.interface';
+import { UserTokenResponseInterface, UserRole } from '@interfaces/user.interface';
 import { ErrorResponseInterface } from '@interfaces/shared.interface';
+import { Scout } from '@models/scout.model';
+import { Event } from '@models/event.model';
 
 export const signup = async (req: Request, res: Response) => {
     if (!req.body.email || !req.body.password || !req.body.firstname || !req.body.lastname) {
@@ -69,56 +71,34 @@ export const authenticate = async (req: Request, res: Response) => {
     }
 };
 
-//   protected: function (req, res) {
-//     res.status(status.OK).json({
-//       message: 'Successfully authenticated',
-//       profile: req.user
-//     });
-//   },
-//   createScout: function (req, res) {
-//     var userId = req.params.userId;
-//     var scoutCreate = req.body;
-//     var scout;
+export const addScout = async (req: Request, res: Response) => {
+    try {
+        const scout: Scout = await Scout.create(req.body);
+        const user: User = await User.findByPk(req.params.userId);
 
-//     Model.Scout.create(scoutCreate)
-//       .then(function (scoutFromDb) {
-//         scout = scoutFromDb;
-//         return Model.User.findById(userId, {
-//           include: [{
-//             model: Model.Scout,
-//             as: 'scouts'
-//           }]
-//         });
-//       })
-//       .then(function (user) {
-//         if (!user) {
-//           throw new Error('User not found');
-//         }
+        if (!user) {
+            throw new Error('User not found');
+        }
 
-//         if (user.role !== 'coordinator') {
-//           throw new Error('Can only add scouts to coordinators');
-//         }
-//         return user.addScouts(scout.id);
-//       })
-//       .then(function () {
-//         return Model.Scout.findById(scout.id, {
-//           include: [{
-//             model: Model.Event,
-//             as: 'registrations'
-//           }]
-//         });
-//       })
-//       .then(function (scout) {
-//         return res.status(status.CREATED).json({
-//           message: 'Scout successfully created',
-//           scout: scout
-//         });
-//       })
-//       .catch(function (err) {
-//         return res.status(status.BAD_REQUEST).json({
-//           message: 'Error creating scout',
-//           error: err
-//         });
-//       });
-//   }
-// };
+        if (user.role !== UserRole.COORDINATOR) {
+            throw new Error('Can only add scouts to coordinators');
+        }
+
+        await user.$add('scout', scout);
+
+        return res.status(status.CREATED).json({
+            message: 'Scout successfully created',
+            scout: await Scout.findByPk(scout.id, {
+                include: [{
+                    model: Event,
+                    as: 'registrations'
+                }]
+            })
+        });
+    } catch (err) {
+        return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+            message: 'Error creating scout',
+            error: err
+        });
+    }
+};

@@ -5,7 +5,8 @@ import { expect } from 'chai';
 
 import app from '@app/app';
 import TestUtils, { RoleTokenObjects } from './testUtils';
-import { SignupRequestInterface, UserInterface, EditUserInterface } from '@interfaces/user.interface';
+import { SignupRequestInterface, UserInterface, EditUserInterface, UserRole } from '@interfaces/user.interface';
+import { ScoutInterface } from '@interfaces/scout.interface';
 
 const request = supertest(app);
 
@@ -43,7 +44,7 @@ describe('user profiles', () => {
                 .send(postData)
                 .expect(status.CREATED)
                 .end((err, res) => {
-                    if (err) return done(err);
+                    if (err) { return done(err); }
                     expect(res.body.profile.email).to.equal(postData.email);
                     expect(res.body.profile.firstname).to.equal(postData.firstname);
                     expect(res.body.profile.lastname).to.equal(postData.lastname);
@@ -70,7 +71,7 @@ describe('user profiles', () => {
                 .send(postData)
                 .expect(status.CREATED)
                 .end((err, res) => {
-                    if (err) return done(err);
+                    if (err) { return done(err); }
                     expect(res.body.profile.email).to.equal(postData.email);
                     expect(res.body.profile.firstname).to.equal(postData.firstname);
                     expect(res.body.profile.lastname).to.equal(postData.lastname);
@@ -130,7 +131,7 @@ describe('user profiles', () => {
                 password: 'password',
                 firstname: 'firstname',
                 lastname: 'lastname',
-                role: 'coordinator',
+                role: UserRole.COORDINATOR,
                 details: {
                     troop: 1,
                     district: 'district',
@@ -143,7 +144,7 @@ describe('user profiles', () => {
                 password: 'password',
                 firstname: 'firstname',
                 lastname: 'lastname',
-                role: 'coordinator',
+                role: UserRole.COORDINATOR,
                 details: {
                     troop: 2,
                     district: 'district2',
@@ -157,7 +158,7 @@ describe('user profiles', () => {
                         .send(user1)
                         .expect(status.CREATED)
                         .end((err, res) => {
-                            if (err) return done(err);
+                            if (err) { return done(err); }
                             user1.id = res.body.profile.id;
                             user1Token = res.body.token;
                             return cb();
@@ -168,7 +169,7 @@ describe('user profiles', () => {
                         .send(user2)
                         .expect(status.CREATED)
                         .end((err, res) => {
-                            if (err) return done(err);
+                            if (err) { return done(err); }
                             user2.id = res.body.profile.id;
                             user2Token = res.body.token;
                             return cb();
@@ -182,7 +183,7 @@ describe('user profiles', () => {
                 .set('Authorization', user1Token)
                 .expect(status.OK)
                 .end((err, res) => {
-                    if (err) return done(err);
+                    if (err) { return done(err); }
                     expect(res.body.password).to.not.exist;
                     return done();
                 });
@@ -193,9 +194,9 @@ describe('user profiles', () => {
                 .set('Authorization', user1Token)
                 .expect(status.OK)
                 .end((err, res) => {
-                    if (err) return done(err);
-                    expect(res.body[ 0 ].id).to.equal(user1.id);
-                    expect(res.body[ 0 ].details).to.deep.equal(user1.details);
+                    if (err) { return done(err); }
+                    expect(res.body[0].id).to.equal(user1.id);
+                    expect(res.body[0].details).to.deep.equal(user1.details);
                     return done();
                 });
         });
@@ -205,9 +206,9 @@ describe('user profiles', () => {
                 .set('Authorization', generatedUsers.admin.token)
                 .expect(status.OK)
                 .end((err, res) => {
-                    if (err) return done(err);
-                    expect(res.body[ 0 ].id).to.equal(user1.id);
-                    expect(res.body[ 0 ].details).to.deep.equal(user1.details);
+                    if (err) { return done(err); }
+                    expect(res.body[0].id).to.equal(user1.id);
+                    expect(res.body[0].details).to.deep.equal(user1.details);
                     return done();
                 });
         });
@@ -217,9 +218,9 @@ describe('user profiles', () => {
                 .set('Authorization', generatedUsers.teacher.token)
                 .expect(status.OK)
                 .end((err, res) => {
-                    if (err) return done(err);
-                    expect(res.body[ 0 ].id).to.equal(user1.id);
-                    expect(res.body[ 0 ].details).to.deep.equal(user1.details);
+                    if (err) { return done(err); }
+                    expect(res.body[0].id).to.equal(user1.id);
+                    expect(res.body[0].details).to.deep.equal(user1.details);
                     return done();
                 });
         });
@@ -255,7 +256,7 @@ describe('user profiles', () => {
                 password: 'password',
                 firstname: 'firstname',
                 lastname: 'lastname',
-                role: 'coordinator',
+                role: UserRole.COORDINATOR,
                 details: {
                     troop: 1,
                     district: 'district',
@@ -268,7 +269,7 @@ describe('user profiles', () => {
                 password: 'password',
                 firstname: 'firstname',
                 lastname: 'lastname',
-                role: 'teacher',
+                role: UserRole.TEACHER,
                 details: {
                     chapter: 'Book'
                 }
@@ -280,7 +281,7 @@ describe('user profiles', () => {
                         .send(user1)
                         .expect(status.CREATED)
                         .end((err, res) => {
-                            if (err) return done(err);
+                            if (err) { return done(err); }
                             user1.id = res.body.profile.id;
                             user1Token = res.body.token;
                             return cb();
@@ -291,7 +292,7 @@ describe('user profiles', () => {
                         .send(user2)
                         .expect(status.CREATED)
                         .end((err, res) => {
-                            if (err) return done(err);
+                            if (err) { return done(err); }
                             user2.id = res.body.profile.id;
                             user2Token = res.body.token;
                             return cb();
@@ -301,7 +302,7 @@ describe('user profiles', () => {
         });
 
         it('should edit a profile', (done) => {
-            var edited = {
+            const edited: EditUserInterface = {
                 firstname: 'changed',
                 details: {
                     troop: 1000
@@ -313,7 +314,7 @@ describe('user profiles', () => {
                 .send(edited)
                 .expect(status.OK)
                 .end((err, res) => {
-                    if (err) return done(err);
+                    if (err) { return done(err); }
                     expect(res.body.profile.id).to.equal(user1.id);
                     expect(res.body.profile.firstname).to.equal(edited.firstname);
                     expect(res.body.profile.lastname).to.equal(user1.lastname);
@@ -338,7 +339,7 @@ describe('user profiles', () => {
                         .send({ firstname: 'New' })
                         .expect(status.OK)
                         .end((err) => {
-                            if (err) return done(err);
+                            if (err) { return done(err); }
                             cb();
                         });
                 },
@@ -359,7 +360,7 @@ describe('user profiles', () => {
                 .send({ firstname: 'New' })
                 .expect(status.OK)
                 .end((err, res) => {
-                    if (err) return done(err);
+                    if (err) { return done(err); }
                     expect(res.body.token).to.not.exist;
                     return done();
                 });
@@ -399,8 +400,8 @@ describe('user profiles', () => {
         });
 
         it('should change a password', (done) => {
-            let newToken: string;;
-            let edit: EditUserInterface = {
+            let newToken: string;
+            const edit: EditUserInterface = {
                 password: 'edited'
             };
 
@@ -419,7 +420,7 @@ describe('user profiles', () => {
                         .send(edit)
                         .expect(status.OK)
                         .end((err, res) => {
-                            if (err) return done(err);
+                            if (err) { return done(err); }
                             newToken = res.body.token;
                             cb();
                         });
@@ -437,7 +438,7 @@ describe('user profiles', () => {
                         .set('Authorization', newToken)
                         .expect(status.OK)
                         .end((err, res) => {
-                            if (err) return done(err);
+                            if (err) { return done(err); }
                             expect(res.body.profile.email).to.equal(user2.email);
                             expect(res.body.profile.details).to.deep.equal(user2.details);
                             return cb();
@@ -466,7 +467,7 @@ describe('user profiles', () => {
                         })
                         .expect(status.OK)
                         .end((err, res) => {
-                            if (err) return done(err);
+                            if (err) { return done(err); }
                             newToken = res.body.token;
                             cb();
                         });
@@ -484,7 +485,7 @@ describe('user profiles', () => {
                         .set('Authorization', newToken)
                         .expect(status.OK)
                         .end((err, res) => {
-                            if (err) return done(err);
+                            if (err) { return done(err); }
                             expect(res.body.profile.email).to.equal(user2.email);
                             expect(res.body.profile.details).to.deep.equal(user2.details);
                             return cb();
@@ -506,9 +507,9 @@ describe('user profiles', () => {
                         .set('Authorization', user2Token)
                         .expect(status.OK)
                         .end((err, res) => {
-                            if (err) return done(err);
-                            expect(res.body[ 0 ].id).to.equal(user2.id);
-                            expect(res.body[ 0 ].role).to.equal('admin');
+                            if (err) { return done(err); }
+                            expect(res.body[0].id).to.equal(user2.id);
+                            expect(res.body[0].role).to.equal('admin');
                             return cb();
                         });
                 }
@@ -556,7 +557,7 @@ describe('user profiles', () => {
                 .send({ password: 'new' })
                 .expect(status.OK)
                 .end((err, res) => {
-                    if (err) return done(err);
+                    if (err) { return done(err); }
                     expect(res.body.token).to.exist;
                     done();
                 });
@@ -575,7 +576,7 @@ describe('user profiles', () => {
                 password: 'password',
                 firstname: 'firstname',
                 lastname: 'lastname',
-                role: 'coordinator',
+                role: UserRole.COORDINATOR,
                 details: {
                     troop: 1,
                     district: 'district',
@@ -588,7 +589,7 @@ describe('user profiles', () => {
                 password: 'password',
                 firstname: 'firstname',
                 lastname: 'lastname',
-                role: 'teacher',
+                role: UserRole.TEACHER,
                 details: {
                     chapter: 'Book'
                 }
@@ -600,7 +601,7 @@ describe('user profiles', () => {
                         .send(coordinator)
                         .expect(status.CREATED)
                         .end((err, res) => {
-                            if (err) return done(err);
+                            if (err) { return done(err); }
                             coordinator.id = res.body.profile.id;
                             coordinatorToken = res.body.token;
                             return cb();
@@ -611,7 +612,7 @@ describe('user profiles', () => {
                         .send(teacher)
                         .expect(status.CREATED)
                         .end((err, res) => {
-                            if (err) return done(err);
+                            if (err) { return done(err); }
                             teacher.id = res.body.profile.id;
                             teacherToken = res.body.token;
                             return cb();
@@ -627,8 +628,8 @@ describe('user profiles', () => {
                         .set('Authorization', coordinatorToken)
                         .expect(status.OK)
                         .end((err, res) => {
-                            if (err) return done(err);
-                            expect(res.body[ 0 ].id).to.equal(coordinator.id);
+                            if (err) { return done(err); }
+                            expect(res.body[0].id).to.equal(coordinator.id);
                             cb();
                         });
                 },
@@ -688,7 +689,7 @@ describe('user profiles', () => {
                 .send(postData)
                 .expect(status.CREATED)
                 .end((err, res) => {
-                    if (err) return done(err);
+                    if (err) { return done(err); }
                     expect(res.body.profile.approved).to.be.false;
                     return done();
                 });
@@ -707,7 +708,7 @@ describe('user profiles', () => {
                 .send(postData)
                 .expect(status.CREATED)
                 .end((err, res) => {
-                    if (err) return done(err);
+                    if (err) { return done(err); }
                     expect(res.body.profile.approved).to.be.false;
                     return done();
                 });
@@ -718,7 +719,7 @@ describe('user profiles', () => {
 
             async.series([
                 (cb) => {
-                    var postData = {
+                    const postData: SignupRequestInterface = {
                         email: 'test@test.com',
                         password: 'helloworld',
                         firstname: 'firstname',
@@ -729,7 +730,7 @@ describe('user profiles', () => {
                         .send(postData)
                         .expect(status.CREATED)
                         .end((err, res) => {
-                            if (err) return done(err);
+                            if (err) { return done(err); }
                             expect(res.body.profile.approved).to.be.false;
                             accountId = res.body.profile.id;
                             return cb();
@@ -741,7 +742,7 @@ describe('user profiles', () => {
                         .send({ approved: true })
                         .expect(status.OK)
                         .end((err, res) => {
-                            if (err) return done(err);
+                            if (err) { return done(err); }
                             expect(res.body.profile.approved).to.be.true;
                             expect(res.body.profile.id).to.equal(accountId);
                             return cb();
@@ -755,7 +756,7 @@ describe('user profiles', () => {
 
             async.series([
                 (cb) => {
-                    var postData = {
+                    const postData: SignupRequestInterface = {
                         email: 'test@test.com',
                         password: 'helloworld',
                         firstname: 'firstname',
@@ -766,7 +767,7 @@ describe('user profiles', () => {
                         .send(postData)
                         .expect(status.CREATED)
                         .end((err, res) => {
-                            if (err) return done(err);
+                            if (err) { return done(err); }
                             expect(res.body.profile.approved).to.be.false;
                             accountId = res.body.profile.id;
                             return cb();
@@ -786,7 +787,7 @@ describe('user profiles', () => {
 
             async.series([
                 (cb) => {
-                    var postData = {
+                    const postData: SignupRequestInterface = {
                         email: 'test@test.com',
                         password: 'helloworld',
                         firstname: 'firstname',
@@ -797,7 +798,7 @@ describe('user profiles', () => {
                         .send(postData)
                         .expect(status.CREATED)
                         .end((err, res) => {
-                            if (err) return done(err);
+                            if (err) { return done(err); }
                             expect(res.body.profile.approved).to.be.false;
                             accountId = res.body.profile.id;
                             return cb();
@@ -815,7 +816,7 @@ describe('user profiles', () => {
         it('should require approval for protected routes', (done) => {
             let token: string;
             let accountId: string;
-            let exampleScout: any = {
+            const exampleScout: ScoutInterface = {
                 firstname: 'Scouty',
                 lastname: 'McScoutFace',
                 birthday: new Date(1999, 1, 1),
@@ -828,7 +829,7 @@ describe('user profiles', () => {
 
             async.series([
                 (cb) => {
-                    var postData = {
+                    const postData: SignupRequestInterface = {
                         email: 'test@test.com',
                         password: 'helloworld',
                         firstname: 'firstname',
@@ -845,7 +846,7 @@ describe('user profiles', () => {
                         .send(postData)
                         .expect(status.CREATED)
                         .end((err, res) => {
-                            if (err) return done(err);
+                            if (err) { return done(err); }
                             expect(res.body.profile.approved).to.be.false;
                             accountId = res.body.profile.id;
                             token = res.body.token;
@@ -864,7 +865,7 @@ describe('user profiles', () => {
         it('should allow changes once an account is approved', (done) => {
             let token: string;
             let accountId: string;
-            let exampleScout: any = {
+            const exampleScout: ScoutInterface = {
                 firstname: 'Scouty',
                 lastname: 'McScoutFace',
                 birthday: new Date(1999, 1, 1),
@@ -877,7 +878,7 @@ describe('user profiles', () => {
 
             async.series([
                 (cb) => {
-                    var postData = {
+                    const postData: SignupRequestInterface = {
                         email: 'test@test.com',
                         password: 'helloworld',
                         firstname: 'firstname',
@@ -894,7 +895,7 @@ describe('user profiles', () => {
                         .send(postData)
                         .expect(status.CREATED)
                         .end((err, res) => {
-                            if (err) return done(err);
+                            if (err) { return done(err); }
                             expect(res.body.profile.approved).to.be.false;
                             accountId = res.body.profile.id;
                             token = res.body.token;
@@ -913,7 +914,7 @@ describe('user profiles', () => {
                         .send({ approved: true })
                         .expect(status.OK)
                         .end((err, res) => {
-                            if (err) return done(err);
+                            if (err) { return done(err); }
                             expect(res.body.profile.approved).to.be.true;
                             expect(res.body.profile.id).to.equal(accountId);
                             return cb();
