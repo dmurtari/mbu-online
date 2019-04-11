@@ -21,6 +21,9 @@
             "@routes/*": [
                 "src/routes/*"
             ],
+            "@middleware/*": [
+                "src/middleware/*"
+            ],
             "@app/*": [
                 "src/*"
             ],
