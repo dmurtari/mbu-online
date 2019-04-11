@@ -1,5 +1,12 @@
 import { Scout } from '@models/scout.model';
 
+export enum UserRole {
+    ADMIN = 'admin',
+    COORDINATOR = 'coordinator',
+    TEACHER = 'teacher',
+    ANONYMOUS = 'anonymous'
+}
+
 export interface UserInterface {
     id?: number;
     email: string;
@@ -8,7 +15,7 @@ export interface UserInterface {
     reset_token_expires?: Date;
     firstname: string;
     lastname: string;
-    role: string;
+    role: UserRole;
     approved?: boolean;
     details?: UserDetailsInterface;
     scouts?: Scout[];
@@ -38,9 +45,15 @@ export interface EditUserInterface {
     details?: UserDetailsInterface;
 }
 
+export interface EditUserResponseInterface {
+    message: string;
+    profile: UserInterface;
+    token?: string;
+}
+
 export interface UserTokenResponseInterface {
     token: string;
-    profile: UserInterface
+    profile: UserInterface;
 }
 
 export interface UserExistsResponseInterface {

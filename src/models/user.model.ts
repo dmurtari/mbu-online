@@ -14,14 +14,7 @@ import {
 } from 'sequelize-typescript';
 
 import { Scout } from '@models/scout.model';
-import { UserInterface } from '@app/interfaces/user.interface';
-
-export enum UserRole {
-    ADMIN = 'admin',
-    COORDINATOR = 'coordinator',
-    TEACHER = 'teacher',
-    ANONYMOUS = 'anonymous'
-}
+import { UserInterface, UserRole } from '@app/interfaces/user.interface';
 
 @Table({
     underscored: true,
@@ -93,13 +86,14 @@ export class User extends Model<User> implements UserInterface {
     @Column({
         allowNull: false,
         defaultValue: UserRole.ANONYMOUS,
+        type: DataType.STRING,
         validate: {
             isIn: [
                 ['admin', 'coordinator', 'teacher', 'anonymous']
             ]
         }
     })
-    public role!: string;
+    public role!: UserRole;
 
     @Default(false)
     @Column

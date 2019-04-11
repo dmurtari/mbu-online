@@ -5,17 +5,13 @@ import { Scout } from '@models/scout.model';
 import { Registration } from '@models/registration.model';
 import { Badge } from '@models/badge.model';
 import { Offering } from '@models/offering.model';
-
-export enum Semester {
-    SPRING = 'Spring',
-    FALL = 'Fall'
-}
+import { Semester, EventInterface } from '@interfaces/event.interface';
 
 @Table({
     underscored: true,
     tableName: 'Event'
 })
-export class Event extends Model<Event> {
+export class Event extends Model<Event> implements EventInterface {
     @Column({
         allowNull: false
     })
@@ -25,9 +21,10 @@ export class Event extends Model<Event> {
         isIn: [['Spring', 'Fall']]
     })
     @Column({
-        allowNull: false
+        allowNull: false,
+        type: DataType.STRING
     })
-    public semester!: string;
+    public semester!: Semester;
 
     @Column({
         allowNull: false,

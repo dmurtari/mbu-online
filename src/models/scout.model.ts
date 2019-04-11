@@ -4,12 +4,13 @@ import moment from 'moment';
 import { User } from '@models/user.model';
 import { Registration } from '@models/registration.model';
 import { Event } from '@models/event.model';
+import { ScoutInterface } from '@interfaces/scout.interface';
 
 @Table({
     underscored: true,
     tableName: 'Scout'
 })
-export class Scout extends Model<Scout> {
+export class Scout extends Model<Scout> implements ScoutInterface{
     @Column({
         allowNull: false
     })
