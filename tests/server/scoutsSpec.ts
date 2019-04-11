@@ -11,7 +11,7 @@ import { UserRole } from '@interfaces/user.interface';
 
 const request = supertest(app);
 
-describe.only('scouts', () => {
+describe('scouts', () => {
     let generatedUsers: RoleTokenObjects;
     let exampleScout: ScoutInterface;
     const badId = TestUtils.badId;
