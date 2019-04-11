@@ -16,5 +16,4 @@ export default [
         price: 10,
         current: false
     }
-]
-
+];

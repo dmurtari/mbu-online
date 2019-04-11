@@ -7,10 +7,13 @@ import _ from 'lodash';
 import app from '@app/app';
 import { User } from '@models/user.model';
 import { sequelize } from '@app/sequelize';
-import testEvents from './testEvents'
+import testEvents from './testEvents';
 import testBadges from './testBadges';
 import testPurchasables from './testPurchasables';
-import { UserInterface, SignupRequestInterface } from '@interfaces/user.interface';
+import { UserInterface, SignupRequestInterface, UserRole } from '@interfaces/user.interface';
+import { Model } from 'sequelize-typescript';
+import { ScoutInterface } from '@interfaces/scout.interface';
+import { Scout } from '@models/scout.model';
 
 const request = supertest(app);
 
@@ -20,7 +23,7 @@ export interface TokenObject {
 }
 
 export interface RoleTokenObjects {
-    [role: string]: TokenObject
+    [role: string]: TokenObject;
 }
 
 export default class TestUtils {
@@ -31,8 +34,16 @@ export default class TestUtils {
         return sequelize.sync({ force: true });
     }
 
-    public static async generateTokens(roles: string[] = ['admin', 'teacher', 'coordinator']): Promise<RoleTokenObjects> {
-        let tokens: RoleTokenObjects = {};
+    public static async dropTable(models: typeof Model[]): Promise<any> {
+        return Promise.all(
+            models.map(model => model.sync({ force: true }))
+        );
+    }
+
+    public static async generateTokens(
+        roles: UserRole[] = [UserRole.ADMIN, UserRole.TEACHER, UserRole.COORDINATOR]
+    ): Promise<RoleTokenObjects> {
+        const tokens: RoleTokenObjects = {};
 
         for await (const role of roles) {
             const { token, profile } = await this.generateToken(role);
@@ -44,7 +55,7 @@ export default class TestUtils {
 
     public static async generateToken(name: string): Promise<TokenObject> {
         let token: string;
-        let profile: UserInterface
+        let profile: UserInterface;
 
         const roleSearchRegexp: RegExp = /(\D+)/;
         const role = roleSearchRegexp.exec(name)[1];
@@ -57,14 +68,14 @@ export default class TestUtils {
         };
 
         await request.post('/api/signup')
-            .send(postData)
-            .expect(status.CREATED)
-            .end((_err, res) => {
-                profile = res.body.profile;
+        .send(postData)
+        .expect(status.CREATED)
+        .expect((res) => {
+            profile = res.body.profile;
                 token = res.body.token;
             });
 
-        const user: User = await User.findByPk(profile.id)
+        const user: User = await User.findByPk(profile.id);
 
         user.approved = true;
         await user.save();
@@ -72,66 +83,58 @@ export default class TestUtils {
         return {
             token,
             profile
-        }
+        };
     }
 
-    // generateTokens: function (roles, done) {
-    //     _.defaults(roles, ['admin', 'teacher', 'coordinator']);
-    //     var object = this;
-    //     var tokens = {};
-    //     async.forEachOfSeries(roles, function (role, index, cb) {
-    //         object.generateToken(role, function (err, token, profile) {
-    //             if (err) return done(err);
-    //             tokens[role] = {
-    //                 'token': token,
-    //                 'profile': profile
-    //             };
-    //             return cb();
-    //         });
-    //     }, function (err) {
-    //         done(err, tokens);
-    //     });
-    // },
-    // generateToken: function (name, done) {
-    //     var token, profile;
+    public static async removeScoutsForUser(generatedUser: TokenObject): Promise<unknown> {
+        const user: User = await User.findByPk(generatedUser.profile.id);
+        return user.$set('scouts', []);
+    }
 
-    //     // Allow creation of multiple user of same role with form admin1, admin2
-    //     var roleSearchRegexp = /(\D+)/;
-    //     var role = roleSearchRegexp.exec(name)[1];
-    //     var postData = {
-    //         email: name + '@test.com',
-    //         password: 'password',
-    //         firstname: 'firstname',
-    //         lastname: 'lastname',
-    //         role: role
-    //     };
+    public static async createScoutsForUser(generatedUser: TokenObject, scouts: ScoutInterface[]): Promise<Scout[]> {
+        const user: User = await User.findByPk(generatedUser.profile.id);
+        const createdScouts: Scout[] = [];
 
-    //     async.series([
-    //         function (cb) {
-    //             request.post('/api/signup')
-    //                 .send(postData)
-    //                 .expect(status.CREATED)
-    //                 .end(function (err, res) {
-    //                     if (err) return done(err);
-    //                     profile = res.body.profile;
-    //                     token = res.body.token;
-    //                     return cb();
-    //                 });
-    //         },
-    //         function (cb) {
-    //             Models.User.findById(profile.id)
-    //                 .then(function (user) {
-    //                     user.approved = true;
-    //                     user.save();
+        await Promise.all(scouts.map(async (scout) => {
+            const createdScout: Scout = await Scout.create(scout);
+            createdScouts.push(createdScout);
+            return user.$add('scout', createdScout);
+        }));
+
+        return createdScouts;
+    }
+
+    // createScoutsForUser: function (user, scouts, token, done) {
+    //     var createdScouts = [];
+    //     Models.User.findById(user.profile.id)
+    //         .then(function (userFromDb) {
+    //             async.forEachOfSeries(scouts, function (scout, index, cb) {
+    //                 Models.Scout.create(scout)
+    //                     .then(function (scout) {
+    //                         return userFromDb.addScouts(scout.id);
+    //                     })
+    //                     .then(function () {
+    //                         return cb();
+    //                     })
+    //                     .catch(function (err) {
+    //                         throw new Error('Unable to create scout', err);
+    //                     });
+    //             }, function (err) {
+    //                 if (err) return done(err);
+    //                 return Models.User.findById(user.profile.id, {
+    //                     include: [{
+    //                         model: Models.Scout,
+    //                         as: 'scouts'
+    //                     }]
     //                 })
-    //                 .then(function () {
-    //                     return cb();
-    //                 });
-    //         }
-    //     ], function () {
-    //         return done(null, token, profile);
-    //     });
-
+    //                     .then(function (userFromDb) {
+    //                         _.forEach(userFromDb.scouts, function (scout) {
+    //                             createdScouts.push(scout.toJSON());
+    //                         });
+    //                         return done(null, createdScouts);
+    //                     });
+    //             });
+    //         });
     // },
     // createBadges: function (token, done) {
     //     var badges = [];
@@ -229,38 +232,7 @@ export default class TestUtils {
     //             });
     //     });
     // },
-    // createScoutsForUser: function (user, scouts, token, done) {
-    //     var createdScouts = [];
-    //     Models.User.findById(user.profile.id)
-    //         .then(function (userFromDb) {
-    //             async.forEachOfSeries(scouts, function (scout, index, cb) {
-    //                 Models.Scout.create(scout)
-    //                     .then(function (scout) {
-    //                         return userFromDb.addScouts(scout.id);
-    //                     })
-    //                     .then(function () {
-    //                         return cb();
-    //                     })
-    //                     .catch(function (err) {
-    //                         throw new Error('Unable to create scout', err);
-    //                     });
-    //             }, function (err) {
-    //                 if (err) return done(err);
-    //                 return Models.User.findById(user.profile.id, {
-    //                     include: [{
-    //                         model: Models.Scout,
-    //                         as: 'scouts'
-    //                     }]
-    //                 })
-    //                     .then(function (userFromDb) {
-    //                         _.forEach(userFromDb.scouts, function (scout) {
-    //                             createdScouts.push(scout.toJSON());
-    //                         });
-    //                         return done(null, createdScouts);
-    //                     });
-    //             });
-    //         });
-    // },
+
     // registerScoutsForEvent: function (eventId, scoutIds, token, done) {
     //     var registrationIds = [];
     //     async.forEachOfSeries(scoutIds, function (scoutId, index, cb) {
@@ -279,16 +251,5 @@ export default class TestUtils {
     //         done(err, registrationIds);
     //     });
     // },
-    // removeScoutsForUser: function (user, done) {
-    //     Models.User.findById(user.profile.id)
-    //         .then(function (user) {
-    //             return user.setScouts([]);
-    //         })
-    //         .then(function () {
-    //             done();
-    //         })
-    //         .catch(function (err) {
-    //             done(err);
-    //         });
     // }
 }

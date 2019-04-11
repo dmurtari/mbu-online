@@ -19,5 +19,4 @@ export default [
         description: 'Commemerative badge',
         price: '3.00'
     }
-]
-
+];
