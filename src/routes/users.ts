@@ -4,7 +4,7 @@ import passport from 'passport';
 import { signup, authenticate, addScout } from '@routes/users/postUsers';
 import { byEmail, fromToken, byId } from '@routes/users/getUsers';
 import { updateProfile, updateScout } from '@routes/users/putUsers';
-import { deleteUser } from '@routes/users/deleteUsers';
+import { deleteUser, deleteScout } from '@routes/users/deleteUsers';
 import { currentUser } from '@middleware/currentUser';
 import { canUpdateRole } from '@middleware/canUpdateRole';
 import { isAuthorized } from '@middleware/isAuthorized';
@@ -29,7 +29,7 @@ userRoutes.get('/users/:userId/scouts', scoutMiddleware, byId(true));
 // router.get('/users/:userId/scouts/registrations', scoutMiddleware, getUsers.getScoutRegistrations);
 userRoutes.put('/users/:userId/scouts/:scoutId', scoutMiddleware, updateScout);
 userRoutes.post('/users/:userId/scouts', scoutMiddleware, addScout);
-// router.delete('/users/:userId/scouts/:scoutId', scoutMiddleware, deleteUsers.deleteScout);
+userRoutes.delete('/users/:userId/scouts/:scoutId', scoutMiddleware, deleteScout);
 
 // // Registrations
 // router.get('/users/:userId/events/:eventId/registrations', scoutMiddleware, getUsers.getEventRegistrations);

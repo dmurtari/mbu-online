@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 
 import { User } from '@models/user.model';
 import config from '@config/secrets';
+
 import { EditUserResponseInterface } from '@app/interfaces/user.interface';
 import { ErrorResponseInterface } from '@app/interfaces/shared.interface';
 import { Scout } from '@models/scout.model';

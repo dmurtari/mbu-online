@@ -184,7 +184,7 @@ describe.only('scouts', () => {
             });
         });
 
-        describe.only('updating registered scouts', () => {
+        describe('updating registered scouts', () => {
             let scoutUpdate: ScoutInterface;
 
             beforeEach(() => {

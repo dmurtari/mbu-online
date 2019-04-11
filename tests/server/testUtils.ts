@@ -97,7 +97,7 @@ export default class TestUtils {
 
         await Promise.all(scouts.map(async (scout) => {
             const createdScout: Scout = await Scout.create(scout);
-            createdScouts.push(createdScout);
+            createdScouts.push(createdScout.toJSON() as Scout);
             return user.$add('scout', createdScout);
         }));
 
