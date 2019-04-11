@@ -17,6 +17,10 @@ describe('events', () => {
     const badId = TestUtils.badId;
 
     before(async () => {
+        await TestUtils.dropDb();
+    });
+
+    before(async () => {
         const generatedTokens = await TestUtils.generateTokens([UserRole.COORDINATOR, UserRole.ADMIN]);
         coordinatorToken = generatedTokens[UserRole.COORDINATOR].token;
         adminToken = generatedTokens[UserRole.ADMIN].token;
