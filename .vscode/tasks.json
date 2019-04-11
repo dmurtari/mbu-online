@@ -10,6 +10,12 @@
             "group": {
                 "kind": "build",
                 "isDefault": true
+            },
+            "options": {
+                "executable": "C:\\Windows\\sysnative\\bash.exe",
+                "args": [
+                    "-c"
+                ]
             }
         }
     ]

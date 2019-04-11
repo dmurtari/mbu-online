@@ -28,6 +28,33 @@
                 "APP_SECRET": "testsecret"
             }
         },
+         {
+            "type": "node",
+            "request": "launch",
+            "name": "API Tests (WSL)",
+            "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+            // "preLaunchTask": "build-ts",
+            "useWSL": true,
+            "localRoot": "${workspaceFolder}",
+            "remoteRoot": "${command:extension.vscode-wsl-workspaceFolder}",
+            "args": [
+                "--no-timeouts",
+                "--colors",
+                "--require",
+                "ts-node/register",
+                "--require",
+                "tsconfig-paths/register",
+                "${command:extension.vscode-wsl-workspaceFolder}/tests/**/*.ts"
+            ],
+            "sourceMaps": true,
+            "internalConsoleOptions": "neverOpen",
+            "env": {
+                "NODE_ENV": "test",
+                "SENDGRID_API_KEY": "sendme",
+                "APP_SECRET": "testsecret",
+                "WSLENV": "NODE_ENV:SENDGRID_API_KEY:APP_SECRET"
+            }
+        },
         {
             "type": "node",
             "request": "attach",
