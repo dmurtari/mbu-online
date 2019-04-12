@@ -16,6 +16,7 @@ import { sequelize } from './sequelize';
 import { indexRoutes } from '@routes/index';
 import { userRoutes } from '@routes/users';
 import { eventRoutes } from '@routes/events';
+import { badgeRoutes } from '@routes/badges';
 
 const app = express();
 const env = process.env.NODE_ENV || 'development';
@@ -63,6 +64,7 @@ app.use('/api', indexRoutes);
 app.use('/api', userRoutes);
 // app.use('/api', require('./routes/forgot'));
 app.use('/api/events', eventRoutes);
+app.use('/api/badges', badgeRoutes);
 // app.use('/api/badges', require('./routes/badges'));
 // app.use('/api/scouts', require('./routes/scouts'));
 

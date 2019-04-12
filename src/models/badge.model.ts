@@ -1,6 +1,8 @@
 import { Model, Table, Sequelize, Column, Unique, NotEmpty, DataType, BelongsToMany } from 'sequelize-typescript';
+
 import { Offering } from '@models/offering.model';
 import { Event } from '@models/event.model';
+import { BadgeInterface } from '@interfaces/badge.interface';
 
 @Table({
     underscored: true,
@@ -12,7 +14,7 @@ import { Event } from '@models/event.model';
     ],
     tableName: 'Badge'
 })
-export class Badge extends Model<Badge> {
+export class Badge extends Model<Badge> implements BadgeInterface {
 
     @NotEmpty
     @Unique
@@ -30,5 +32,5 @@ export class Badge extends Model<Badge> {
     public notes: string;
 
     @BelongsToMany(() => Event, () => Offering, 'event_id', 'badge_id')
-    public availabilitiy: Event[];
+    public availability: Event[];
 }
