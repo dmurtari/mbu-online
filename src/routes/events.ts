@@ -2,7 +2,7 @@ import { Router } from 'express';
 
 import { isAuthorized } from '@middleware/isAuthorized';
 import { UserRole } from '@app/interfaces/user.interface';
-import { createEvent, setCurrentEvent } from '@routes/events/postEvents';
+import { createEvent, setCurrentEvent, createOffering } from '@routes/events/postEvents';
 import { getCurrentEvent, getEvent } from '@routes/events/getEvents';
 import { deleteEvent } from '@routes/events/deleteEvents';
 import { updateEvent } from '@routes/events/updateEvents';
@@ -23,7 +23,7 @@ eventRoutes.get('/current', getCurrentEvent);
 // // Routes for Current Event
 
 // // Routes for Event/Badge association CRUD
-// router.post('/:id/badges', isAuthorized(['admin']), postEvents.createOffering);
+eventRoutes.post('/:id/badges', isAuthorized([UserRole.ADMIN]), createOffering);
 // router.put('/:eventId/badges/:badgeId', isAuthorized(['admin']), updateEvents.updateOffering);
 // router.delete('/:eventId/badges/:badgeId', isAuthorized(['admin']), deleteEvents.deleteOffering);
 // router.get('/:eventId/badges/:badgeId/limits', isAuthorized(['admin', 'teacher']), getEvents.classSize);

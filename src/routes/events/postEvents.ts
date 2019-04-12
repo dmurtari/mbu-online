@@ -5,6 +5,8 @@ import { Event } from '@models/event.model';
 import { EventResponseInterface, CurrentEventResponseInterface } from '@app/interfaces/event.interface';
 import { ErrorResponseInterface } from '@app/interfaces/shared.interface';
 import { CurrentEvent } from '@models/currentEvent.model';
+import { Offering } from '@models/offering.model';
+import { Badge } from '@models/badge.model';
 
 export const createEvent = async (req: Request, res: Response) => {
     try {
@@ -53,70 +55,39 @@ export const setCurrentEvent = async (req: Request, res: Response) => {
     }
 };
 
-// setCurrentEvent: function (req, res) {
-//     var eventId = req.body.id;
-//     var event;
+export const createOffering = async (req: Request, res: Response) => {
+    try {
+        let event: Event = await Event.findByPk(req.params.id);
 
-//     Model.Event.findById(eventId)
-//       .then(function (eventFromDb) {
-//         if (!eventFromDb) {
-//           throw new Error('Event to set as current not found');
-//         }
+        if (!event) {
+            throw new Error('Event to add offering to not found');
+        }
 
-//         event = eventFromDb;
-//         return Model.CurrentEvent.findOne();
-//       })
-//       .then(function (currentEvent) {
-//         if (!currentEvent) {
-//           return Model.CurrentEvent.create({});
-//         }
-//         return currentEvent;
-//       })
-//       .then(function (currentEvent) {
-//         return currentEvent.setEvent(event, {
-//           include: [{
-//             model: Model.Event
-//           }]
-//         });
-//       })
-//       .then(function (currentEvent) {
-//         return Model.Event.findById(currentEvent.event_id);
-//       })
-//       .then(function (event) {
-//         res.status(status.OK).json({
-//           message: 'Current event set',
-//           currentEvent: event
-//         });
-//       })
-//       .catch(function (err) {
-//         res.status(status.BAD_REQUEST).json({
-//           message: 'Setting current event failed',
-//           error: err
-//         });
-//       });
-//   }
+        const offering: Offering = await event.$add('offering', req.body.badge_id, { through: req.body.offering }) as Offering;
 
-// var status = require('http-status-codes');
+        if (!offering) {
+            throw new Error('Could not create offering');
+        }
 
-// var Model = require('../../models');
+        event = await Event.findByPk(req.params.id, {
+            include: [{
+                model: Badge,
+                as: 'offerings'
+            }]
+        });
 
-// module.exports = {
-//   create: function (req, res) {
-//     var newEvent = req.body;
-//     Model.Event.create(newEvent)
-//       .then(function (event) {
-//         return res.status(status.CREATED).json({
-//           message: 'Event successfully created',
-//           event: event
-//         });
-//       })
-//       .catch(function (err) {
-//         return res.status(status.BAD_REQUEST).json({
-//           message: 'Event creation failed',
-//           error: err
-//         });
-//       });
-//   },
+        return res.status(status.CREATED).json(<EventResponseInterface>{
+            message: 'Offering created successfully',
+            event: event
+        });
+    } catch (err) {
+        return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+            message: 'Failed to create offering',
+            error: err
+        });
+    }
+};
+
 //   createOffering: function (req, res) {
 //     var eventId = req.params.id;
 

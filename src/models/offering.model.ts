@@ -21,13 +21,14 @@ import { Event } from '@models/event.model';
 import { Badge } from '@models/badge.model';
 import { Registration } from '@models/registration.model';
 import { Assignment } from '@models/assignment.model';
-import { durationValidator } from '@models/validators';
+import { durationValidator } from '@models/validators'
+import { OfferingInterface } from '@interfaces/offering.interface';
 
 @Table({
     underscored: true,
     tableName: 'Offering'
 })
-export class Offering extends Model<Offering> {
+export class Offering extends Model<Offering> implements OfferingInterface {
     @BeforeBulkCreate
     public static removeAllNullPeriods(offerings: Offering[]): void {
         offerings.forEach((offering: Offering) => {

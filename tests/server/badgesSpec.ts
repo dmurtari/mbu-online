@@ -12,7 +12,7 @@ import { BadgeInterface } from '@interfaces/badge.interface';
 
 const request = supertest(app);
 
-describe.only('merit badges', () => {
+describe('merit badges', () => {
     let token: string;
 
     before(async () => {

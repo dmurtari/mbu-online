@@ -1,3 +1,5 @@
+import { BadgeInterface } from '@interfaces/badge.interface';
+
 export enum Semester {
     SPRING = 'Spring',
     FALL = 'Fall'
@@ -10,6 +12,7 @@ export interface EventInterface {
     registration_open?: Date;
     registration_close?: Date;
     price?: number;
+    offerings?: BadgeInterface[];
 }
 
 export interface CurrentEventInterface {

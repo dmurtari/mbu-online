@@ -14,6 +14,12 @@ import { UserInterface, SignupRequestInterface, UserRole } from '@interfaces/use
 import { Model } from 'sequelize-typescript';
 import { ScoutInterface } from '@interfaces/scout.interface';
 import { Scout } from '@models/scout.model';
+import { BadgeInterface } from '@interfaces/badge.interface';
+import { Badge } from '@models/badge.model';
+import { EventInterface } from '@interfaces/event.interface';
+import { Event } from '@models/event.model';
+import { Offering } from '@models/offering.model';
+import { OfferingInterface } from '@interfaces/offering.interface';
 
 const request = supertest(app);
 
@@ -35,9 +41,9 @@ export default class TestUtils {
     }
 
     public static async dropTable(models: typeof Model[]): Promise<any> {
-        return Promise.all(
-            models.map(model => model.sync({ force: true }))
-        );
+        for await (const model of models) {
+            await model.sync({ force: true });
+        }
     }
 
     public static async generateTokens(
@@ -104,76 +110,32 @@ export default class TestUtils {
         return createdScouts;
     }
 
-    // createScoutsForUser: function (user, scouts, token, done) {
-    //     var createdScouts = [];
-    //     Models.User.findById(user.profile.id)
-    //         .then(function (userFromDb) {
-    //             async.forEachOfSeries(scouts, function (scout, index, cb) {
-    //                 Models.Scout.create(scout)
-    //                     .then(function (scout) {
-    //                         return userFromDb.addScouts(scout.id);
-    //                     })
-    //                     .then(function () {
-    //                         return cb();
-    //                     })
-    //                     .catch(function (err) {
-    //                         throw new Error('Unable to create scout', err);
-    //                     });
-    //             }, function (err) {
-    //                 if (err) return done(err);
-    //                 return Models.User.findById(user.profile.id, {
-    //                     include: [{
-    //                         model: Models.Scout,
-    //                         as: 'scouts'
-    //                     }]
-    //                 })
-    //                     .then(function (userFromDb) {
-    //                         _.forEach(userFromDb.scouts, function (scout) {
-    //                             createdScouts.push(scout.toJSON());
-    //                         });
-    //                         return done(null, createdScouts);
-    //                     });
-    //             });
-    //         });
-    // },
-    // createBadges: function (token, done) {
-    //     var badges = [];
-    //     async.forEachOfSeries(testBadges, function (item, index, cb) {
-    //         request.post('/api/badges')
-    //             .set('Authorization', token)
-    //             .send(item)
-    //             .expect(status.CREATED)
-    //             .end(function (err, res) {
-    //                 if (err) return done(err);
-    //                 badges.push({
-    //                     id: res.body.badge.id,
-    //                     badge: item
-    //                 });
-    //                 return cb();
-    //             });
-    //     }, function (err) {
-    //         done(err, badges);
-    //     });
-    // },
-    // createEvents: function (token, done) {
-    //     var events = [];
-    //     async.forEachOfSeries(testEvents, function (item, index, cb) {
-    //         request.post('/api/events')
-    //             .set('Authorization', token)
-    //             .send(item)
-    //             .expect(status.CREATED)
-    //             .end(function (err, res) {
-    //                 if (err) return done(err);
-    //                 events.push({
-    //                     id: res.body.event.id,
-    //                     event: item
-    //                 });
-    //                 return cb();
-    //             });
-    //     }, function (err) {
-    //         done(err, events);
-    //     });
-    // },
+    public static async createBadges(badges: BadgeInterface[] = testBadges): Promise<Badge[]> {
+        const createdBadges: Badge[] = [];
+
+        await Promise.all(badges.map(async (badge) => {
+            const createdBadge: Badge = await Badge.create(badge);
+            createdBadges.push(createdBadge);
+        }));
+
+        return createdBadges;
+    }
+
+    public static async createEvents(events: EventInterface[] = testEvents): Promise<Event[]> {
+        const createdEvents: Event[] = [];
+
+        await Promise.all(events.map(async (event) => {
+            const createdEvent: Event = await Event.create(event);
+            createdEvents.push(createdEvent);
+        }));
+
+        return createdEvents;
+    }
+
+    public static async createOfferingsForEvent(event: Event, badges: Badge[], offering: OfferingInterface): Promise<Offering[]> {
+        return [];
+    }
+
     // createOfferingsForEvent: function (event, badges, offering, token, done) {
     //     var offerings = [];
     //     async.forEachOfSeries(badges, function (item, index, cb) {
