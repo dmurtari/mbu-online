@@ -5,7 +5,7 @@ import { UserRole } from '@app/interfaces/user.interface';
 import { createEvent, setCurrentEvent, createOffering } from '@routes/events/postEvents';
 import { getCurrentEvent, getEvent } from '@routes/events/getEvents';
 import { deleteEvent } from '@routes/events/deleteEvents';
-import { updateEvent } from '@routes/events/updateEvents';
+import { updateEvent, updateOffering } from '@routes/events/updateEvents';
 
 export const eventRoutes = Router();
 
@@ -24,7 +24,7 @@ eventRoutes.get('/current', getCurrentEvent);
 
 // // Routes for Event/Badge association CRUD
 eventRoutes.post('/:id/badges', isAuthorized([UserRole.ADMIN]), createOffering);
-// router.put('/:eventId/badges/:badgeId', isAuthorized(['admin']), updateEvents.updateOffering);
+eventRoutes.put('/:eventId/badges/:badgeId', isAuthorized([UserRole.ADMIN]), updateOffering);
 // router.delete('/:eventId/badges/:badgeId', isAuthorized(['admin']), deleteEvents.deleteOffering);
 // router.get('/:eventId/badges/:badgeId/limits', isAuthorized(['admin', 'teacher']), getEvents.classSize);
 

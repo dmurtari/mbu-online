@@ -4,6 +4,9 @@ import status from 'http-status-codes';
 import { Event } from '@models/event.model';
 import { EventResponseInterface } from '@app/interfaces/event.interface';
 import { ErrorResponseInterface } from '@app/interfaces/shared.interface';
+import { Badge } from '@models/badge.model';
+import { Offering } from '@models/offering.model';
+import { OfferingResponseInterface } from '@interfaces/offering.interface';
 
 export const updateEvent = async (req: Request, res: Response) => {
     try {
@@ -27,41 +30,41 @@ export const updateEvent = async (req: Request, res: Response) => {
     }
 };
 
-// var status = require('http-status-codes');
+export const updateOffering = async (req: Request, res: Response) => {
+    try {
+        console.log('Yo', req.params.badgeId, req.params.eventId);
 
-// var Model = require('../../models');
+        let offering: Offering = await Offering.findOne({
+            where: {
+                badge_id: req.params.badgeId,
+                event_id: req.params.eventId
+            }
+        });
 
-// module.exports = {
-//   update: function (req, res) {
-//     Model.Event.findById(req.params.id, {
-//       include: [{
-//         model: Model.Badge,
-//         as: 'offerings',
-//         through: {
-//           as: 'details'
-//         }
-//       }]
-//     })
-//       .then(function (event) {
-//         if (!event) {
-//           throw new Error('Event to update not found');
-//         }
+        if (!offering) {
+            console.log('OOPS');
+            throw new Error('Offering to update not found');
+        }
 
-//         return event.update(req.body);
-//       })
-//       .then(function (event) {
-//         return res.status(status.OK).json({
-//           message: 'Event updated successfully',
-//           event: event.dataValues
-//         });
-//       })
-//       .catch(function (err) {
-//         return res.status(status.BAD_REQUEST).json({
-//           message: 'Error updating event',
-//           error: err
-//         });
-//       });
-//   },
+        console.log('Before update', offering);
+
+        offering = await offering.update(req.body);
+
+        console.log('After update', offering);
+
+        return res.status(status.OK).json(<OfferingResponseInterface> {
+            message: 'Offering updated successfully',
+            offering: offering
+        });
+    } catch (err) {
+        // console.log(err);
+        return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+            message: 'Error updating offering' ,
+            error: err
+        });
+    }
+};
+
 //   updateOffering: function (req, res) {
 //     var offeringUpdate = req.body;
 //     var eventId = req.params.eventId;

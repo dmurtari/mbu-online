@@ -7,6 +7,7 @@ import { Event } from '@models/event.model';
 import { ErrorResponseInterface } from '@app/interfaces/shared.interface';
 import { Badge } from '@models/badge.model';
 import { Purchasable } from '@models/purchasable.model';
+import { EventInterface } from '@interfaces/event.interface';
 
 export const getEvent = async (req: Request, res: Response) => {
     try {
@@ -19,11 +20,14 @@ export const getEvent = async (req: Request, res: Response) => {
             return _query;
         }, {});
 
-        const events: Event[] = await Event.findAll({
+        const events: EventInterface[] = await Event.findAll({
             where: query,
             include: [{
                 model: Badge,
-                as: 'offerings'
+                as: 'offerings',
+                through: <any> {
+                    as: 'details'
+                }
             }, {
                 model: Purchasable,
                 as: 'purchasables'

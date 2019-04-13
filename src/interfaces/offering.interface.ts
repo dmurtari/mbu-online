@@ -12,3 +12,8 @@ export interface CreateOfferingInterface {
     badge_id: number;
     offering: OfferingInterface;
 }
+
+export interface OfferingResponseInterface {
+    message: string;
+    offering: OfferingInterface;
+}

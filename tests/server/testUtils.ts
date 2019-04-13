@@ -74,12 +74,12 @@ export default class TestUtils {
         };
 
         await request.post('/api/signup')
-        .send(postData)
-        .expect(status.CREATED)
-        .expect((res) => {
-            profile = res.body.profile;
-                token = res.body.token;
-            });
+            .send(postData)
+            .expect(status.CREATED)
+            .expect((res) => {
+                profile = res.body.profile;
+                    token = res.body.token;
+                });
 
         const user: User = await User.findByPk(profile.id);
 
@@ -133,7 +133,14 @@ export default class TestUtils {
     }
 
     public static async createOfferingsForEvent(event: Event, badges: Badge[], offering: OfferingInterface): Promise<Offering[]> {
-        return [];
+        const offerings: Offering[] = [];
+
+        for await (const badge of badges) {
+            const createdOffering = await event.$add('offering', badge.id, { through: offering }) as Offering[];
+            offerings.push(createdOffering[0]);
+        }
+
+        return offerings;
     }
 
     // createOfferingsForEvent: function (event, badges, offering, token, done) {

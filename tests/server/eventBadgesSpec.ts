@@ -42,7 +42,7 @@ describe.only('event badge association', () => {
         await TestUtils.dropDb();
     });
 
-    describe.only('when offerings do not exist', () => {
+    describe('when offerings do not exist', () => {
         it('should create a badge offering', (done) => {
             const postData: CreateOfferingInterface = {
                 badge_id: badges[1].id,
@@ -296,8 +296,8 @@ describe.only('event badge association', () => {
             });
         });
 
-        describe('updating offerings', () => {
-            it('should be able to update without specifying a badge', (done) => {
+        describe.only('updating offerings', () => {
+            it.only('should be able to update without specifying a badge', (done) => {
                 const offeringUpdate: OfferingInterface = {
                     duration: 1,
                     periods: [1, 2],
