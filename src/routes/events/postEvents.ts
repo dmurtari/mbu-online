@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import status from 'http-status-codes';
 
 import { Event } from '@models/event.model';
-import { EventResponseInterface, CurrentEventResponseInterface } from '@app/interfaces/event.interface';
+import { EventResponseInterface, CurrentEventResponseInterface, EventOfferingInterface } from '@app/interfaces/event.interface';
 import { ErrorResponseInterface } from '@app/interfaces/shared.interface';
 import { CurrentEvent } from '@models/currentEvent.model';
 import { Offering } from '@models/offering.model';
@@ -57,10 +57,15 @@ export const setCurrentEvent = async (req: Request, res: Response) => {
 
 export const createOffering = async (req: Request, res: Response) => {
     try {
-        let event: Event = await Event.findByPk(req.params.id);
+        const event: Event = await Event.findByPk(req.params.id);
+        const badge: Badge = await Badge.findByPk(req.body.badge_id);
 
         if (!event) {
             throw new Error('Event to add offering to not found');
+        }
+
+        if (!badge) {
+            throw new Error('Badge does not exist');
         }
 
         const offering: Offering = await event.$add('offering', req.body.badge_id, { through: req.body.offering }) as Offering;
@@ -69,16 +74,19 @@ export const createOffering = async (req: Request, res: Response) => {
             throw new Error('Could not create offering');
         }
 
-        event = await Event.findByPk(req.params.id, {
+        const eventWithOffering: EventOfferingInterface = await Event.findByPk(req.params.id, {
             include: [{
                 model: Badge,
-                as: 'offerings'
+                as: 'offerings',
+                through: <any>{
+                    as: 'details'
+                }
             }]
         });
 
         return res.status(status.CREATED).json(<EventResponseInterface>{
             message: 'Offering created successfully',
-            event: event
+            event: eventWithOffering
         });
     } catch (err) {
         return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{

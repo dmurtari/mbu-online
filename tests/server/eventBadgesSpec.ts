@@ -1,4 +1,4 @@
-import supertest from 'supertest';
+import supertest, { Response } from 'supertest';
 import * as async from 'async';
 import status from 'http-status-codes';
 import { expect } from 'chai';
@@ -10,7 +10,7 @@ import { Event } from '@models/event.model';
 import { UserRole } from '@interfaces/user.interface';
 import { Offering } from '@models/offering.model';
 import { CreateOfferingInterface, OfferingInterface } from '@interfaces/offering.interface';
-import { EventInterface, Semester } from '@interfaces/event.interface';
+import { EventInterface, Semester, EventOfferingInterface } from '@interfaces/event.interface';
 
 const request = supertest(app);
 
@@ -108,7 +108,7 @@ describe.only('event badge association', () => {
                 .expect(status.CREATED)
                 .end((err, res) => {
                     if (err) { return done(err); }
-                    const event = res.body.event;
+                    const event = res.body.event as EventOfferingInterface;
                     expect(event.offerings).to.have.lengthOf(1);
                     expect(event.offerings[0].details.price).to.equal(postData.offering.price);
                     expect(event.offerings[0].details.requirements).to.deep.equal([]);
