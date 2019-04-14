@@ -64,7 +64,7 @@ describe.only('event badge association', () => {
                     expect(event.offerings).to.have.lengthOf(1);
                     expect(event.offerings[0].details.price).to.equal(postData.offering.price);
                     expect(event.offerings[0].details.requirements).to.deep.equal(postData.offering.requirements);
-                    expect(event.offerings[0].id).to.equal(badges[1].id);
+                    expect(event.offerings[0].badge_id).to.equal(badges[1].id);
                     return done();
                 });
         });
@@ -87,7 +87,7 @@ describe.only('event badge association', () => {
                     const event = res.body.event;
                     expect(event.offerings).to.have.lengthOf(1);
                     expect(event.offerings[0].details.price).to.equal('0.00');
-                    expect(event.offerings[0].id).to.equal(badges[0].id);
+                    expect(event.offerings[0].badge_id).to.equal(badges[0].id);
                     return done();
                 });
         });
@@ -137,7 +137,7 @@ describe.only('event badge association', () => {
                     expect(event.offerings).to.have.lengthOf(1);
                     expect(event.offerings[0].details.price).to.equal(postData.offering.price);
                     expect(event.offerings[0].details.periods).to.deep.equal([1, 2]);
-                    expect(event.offerings[0].id).to.equal(badges[1].id);
+                    expect(event.offerings[0].badge_id).to.equal(badges[1].id);
                     return done();
                 });
         });
@@ -165,7 +165,7 @@ describe.only('event badge association', () => {
                             expect(event.offerings[0].details.price).to.equal('10.00');
                             expect(event.offerings[0].details.duration).to.equal(1);
                             expect(event.offerings[0].details.periods).to.eql([1, 2, 3]);
-                            expect(event.offerings[0].id).to.equal(badges[0].id);
+                            expect(event.offerings[0].badge_id).to.equal(badges[0].id);
                             return cb();
                         });
                 },
@@ -288,16 +288,16 @@ describe.only('event badge association', () => {
                         if (err) { return done(err); }
                         const event = res.body[0];
                         expect(event.offerings.length).to.equal(3);
-                        expect(event.offerings[0].id).to.equal(badges[0].id);
-                        expect(event.offerings[1].id).to.equal(badges[1].id);
-                        expect(event.offerings[2].id).to.equal(badges[2].id);
+                        expect(event.offerings[0].badge_id).to.equal(badges[0].id);
+                        expect(event.offerings[1].badge_id).to.equal(badges[1].id);
+                        expect(event.offerings[2].badge_id).to.equal(badges[2].id);
                         return done();
                     });
             });
         });
 
         describe.only('updating offerings', () => {
-            it.only('should be able to update without specifying a badge', (done) => {
+            it('should be able to update without specifying a badge', (done) => {
                 const offeringUpdate: OfferingInterface = {
                     duration: 1,
                     periods: [1, 2],
@@ -305,7 +305,7 @@ describe.only('event badge association', () => {
                     requirements: ['1', '2b']
                 };
 
-                request.put('/api/events/' + events[0].id + '/badges/' + offerings[0].id)
+                request.put('/api/events/' + events[0].id + '/badges/' + offerings[0].badge_id)
                     .set('Authorization', adminToken)
                     .send(offeringUpdate)
                     .end((err, res) => {
@@ -326,7 +326,7 @@ describe.only('event badge association', () => {
                     periods: [1, 2]
                 };
 
-                request.put('/api/events/' + events[0].id + '/badges/' + offerings[0].id)
+                request.put('/api/events/' + events[0].id + '/badges/' + offerings[0].badge_id)
                     .set('Authorization', adminToken)
                     .send(offeringUpdate)
                     .end((err, res) => {
@@ -346,7 +346,7 @@ describe.only('event badge association', () => {
                     periods: [1, 2, null]
                 };
 
-                request.put('/api/events/' + events[0].id + '/badges/' + offerings[0].id)
+                request.put('/api/events/' + events[0].id + '/badges/' + offerings[0].badge_id)
                     .set('Authorization', adminToken)
                     .send(offeringUpdate)
                     .end((err, res) => {
@@ -391,7 +391,7 @@ describe.only('event badge association', () => {
                     periods: [1]
                 };
 
-                request.put('/api/events/' + events[0].id + '/badges/' + offerings[0].id)
+                request.put('/api/events/' + events[0].id + '/badges/' + offerings[0].badge_id)
                     .set('Authorization', adminToken)
                     .send(offeringUpdate)
                     .expect(status.BAD_REQUEST, done);
@@ -405,7 +405,7 @@ describe.only('event badge association', () => {
                     extra: true
                 };
 
-                request.put('/api/events/' + events[0].id + '/badges/' + offerings[0].id)
+                request.put('/api/events/' + events[0].id + '/badges/' + offerings[0].badge_id)
                     .set('Authorization', adminToken)
                     .send(offeringUpdate)
                     .end((err, res) => {
@@ -424,7 +424,7 @@ describe.only('event badge association', () => {
                 const offeringUpdate: OfferingInterface = {
                     duration: 1
                 };
-                request.put('/api/events/' + events[0].id + '/badges/' + offerings[0].id)
+                request.put('/api/events/' + events[0].id + '/badges/' + offerings[0].badge_id)
                     .set('Authorization', adminToken)
                     .send(offeringUpdate)
                     .expect(status.OK)
@@ -447,7 +447,7 @@ describe.only('event badge association', () => {
                     price: 5
                 };
 
-                request.put('/api/events/' + badId + '/badges/' + offerings[0].id)
+                request.put('/api/events/' + badId + '/badges/' + offerings[0].badge_id)
                     .set('Authorization', adminToken)
                     .send(offeringUpdate)
                     .expect(status.BAD_REQUEST, done);
@@ -481,7 +481,7 @@ describe.only('event badge association', () => {
                             });
                     },
                     (cb) => {
-                        request.del('/api/events/' + events[0].id + '/badges/' + offerings[1].id)
+                        request.del('/api/events/' + events[0].id + '/badges/' + offerings[1].badge_id)
                             .set('Authorization', adminToken)
                             .expect(status.OK, cb);
                     },
@@ -499,12 +499,12 @@ describe.only('event badge association', () => {
             });
 
             it('should require authorization', (done) => {
-                request.del('/api/events/' + events[0].id + '/badges/' + offerings[0].id)
+                request.del('/api/events/' + events[0].id + '/badges/' + offerings[0].badge_id)
                     .expect(status.UNAUTHORIZED, done);
             });
 
             it('should not delete from a nonexistant event', (done) => {
-                request.del('/api/events/' + badId + '/badges/' + offerings[0].id)
+                request.del('/api/events/' + badId + '/badges/' + offerings[0].badge_id)
                     .set('Authorization', adminToken)
                     .expect(status.BAD_REQUEST, done);
             });

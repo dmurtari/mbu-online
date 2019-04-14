@@ -5,6 +5,7 @@ export interface OfferingInterface {
     price?: number|string;
     requirements?: string[];
     event_id?: number;
+    badge_id?: number;
     size_limit?: number;
 }
 

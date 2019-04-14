@@ -32,8 +32,6 @@ export const updateEvent = async (req: Request, res: Response) => {
 
 export const updateOffering = async (req: Request, res: Response) => {
     try {
-        console.log('Yo', req.params.badgeId, req.params.eventId);
-
         let offering: Offering = await Offering.findOne({
             where: {
                 badge_id: req.params.badgeId,
@@ -42,22 +40,16 @@ export const updateOffering = async (req: Request, res: Response) => {
         });
 
         if (!offering) {
-            console.log('OOPS');
             throw new Error('Offering to update not found');
         }
 
-        console.log('Before update', offering);
-
         offering = await offering.update(req.body);
-
-        console.log('After update', offering);
 
         return res.status(status.OK).json(<OfferingResponseInterface> {
             message: 'Offering updated successfully',
             offering: offering
         });
     } catch (err) {
-        // console.log(err);
         return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
             message: 'Error updating offering' ,
             error: err

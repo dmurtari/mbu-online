@@ -1,6 +1,6 @@
 import { BadgeInterface } from '@interfaces/badge.interface';
-import { Offering } from '@models/offering.model';
 import { Purchasable } from '@models/purchasable.model';
+import { OfferingInterface } from '@interfaces/offering.interface';
 
 export enum Semester {
     SPRING = 'Spring',
@@ -19,7 +19,7 @@ export interface EventInterface {
 }
 
 export interface EventOfferingInterface extends EventInterface {
-    offerings?: BadgeInterface<Offering>[];
+    offerings?: BadgeInterface<OfferingInterface>[];
 }
 
 export interface CurrentEventInterface {
