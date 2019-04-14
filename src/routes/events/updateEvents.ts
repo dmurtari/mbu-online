@@ -10,7 +10,15 @@ import { OfferingResponseInterface } from '@interfaces/offering.interface';
 
 export const updateEvent = async (req: Request, res: Response) => {
     try {
-        const event: Event = await Event.findByPk(req.params.id);
+        const event: Event = await Event.findByPk(req.params.id, {
+            include: [{
+                model: Badge,
+                as: 'offerings',
+                through: <any> {
+                    as: 'details'
+                }
+            }]
+        });
 
         if (!event) {
             throw new Error('Event to update not found');

@@ -31,6 +31,6 @@ export class Badge extends Model<Badge> implements BadgeInterface {
     @Column
     public notes: string;
 
-    @BelongsToMany(() => Event, () => Offering, 'event_id', 'badge_id')
+    @BelongsToMany(() => Event, () => Offering, 'badge_id', 'event_id')
     public availability: Event[];
 }

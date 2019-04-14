@@ -54,6 +54,6 @@ export class Event extends Model<Event> implements EventInterface {
     @BelongsToMany(() => Scout, () => Registration, 'scout_id', 'event_id')
     public attendees: Scout[];
 
-    @BelongsToMany(() => Badge, () => Offering, 'badge_id', 'event_id')
+    @BelongsToMany(() => Badge, () => Offering, 'event_id', 'badge_id')
     public offerings: Badge[];
 }

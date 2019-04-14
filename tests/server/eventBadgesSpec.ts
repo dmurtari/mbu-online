@@ -39,7 +39,7 @@ describe.only('event badge association', () => {
     });
 
     after(async () => {
-        await TestUtils.dropDb();
+        // await TestUtils.dropDb();
     });
 
     describe('when offerings do not exist', () => {
@@ -64,7 +64,7 @@ describe.only('event badge association', () => {
                     expect(event.offerings).to.have.lengthOf(1);
                     expect(event.offerings[0].details.price).to.equal(postData.offering.price);
                     expect(event.offerings[0].details.requirements).to.deep.equal(postData.offering.requirements);
-                    expect(event.offerings[0].badge_id).to.equal(badges[1].id);
+                    expect(event.offerings[0].id).to.equal(badges[1].id);
                     return done();
                 });
         });
@@ -87,7 +87,7 @@ describe.only('event badge association', () => {
                     const event = res.body.event;
                     expect(event.offerings).to.have.lengthOf(1);
                     expect(event.offerings[0].details.price).to.equal('0.00');
-                    expect(event.offerings[0].badge_id).to.equal(badges[0].id);
+                    expect(event.offerings[0].id).to.equal(badges[0].id);
                     return done();
                 });
         });
@@ -137,7 +137,7 @@ describe.only('event badge association', () => {
                     expect(event.offerings).to.have.lengthOf(1);
                     expect(event.offerings[0].details.price).to.equal(postData.offering.price);
                     expect(event.offerings[0].details.periods).to.deep.equal([1, 2]);
-                    expect(event.offerings[0].badge_id).to.equal(badges[1].id);
+                    expect(event.offerings[0].id).to.equal(badges[1].id);
                     return done();
                 });
         });
@@ -165,7 +165,7 @@ describe.only('event badge association', () => {
                             expect(event.offerings[0].details.price).to.equal('10.00');
                             expect(event.offerings[0].details.duration).to.equal(1);
                             expect(event.offerings[0].details.periods).to.eql([1, 2, 3]);
-                            expect(event.offerings[0].badge_id).to.equal(badges[0].id);
+                            expect(event.offerings[0].id).to.equal(badges[0].id);
                             return cb();
                         });
                 },
@@ -288,9 +288,9 @@ describe.only('event badge association', () => {
                         if (err) { return done(err); }
                         const event = res.body[0];
                         expect(event.offerings.length).to.equal(3);
-                        expect(event.offerings[0].badge_id).to.equal(badges[0].id);
-                        expect(event.offerings[1].badge_id).to.equal(badges[1].id);
-                        expect(event.offerings[2].badge_id).to.equal(badges[2].id);
+                        expect(event.offerings[0].id).to.equal(badges[0].id);
+                        expect(event.offerings[1].id).to.equal(badges[1].id);
+                        expect(event.offerings[2].id).to.equal(badges[2].id);
                         return done();
                     });
             });
@@ -433,9 +433,9 @@ describe.only('event badge association', () => {
                         const offering = res.body.offering;
                         expect(offering.badge_id).to.equal(badges[0].id);
                         expect(offering.duration).to.equal(offeringUpdate.duration);
-                        // expect(offering.periods).to.deep.equal(offerings[0].offering.periods);
-                        // expect(offering.price).to.equal(offerings[0].offering.price);
-                        // expect(offering.requirements).to.deep.equal(offerings[0].offering.requirements);
+                        expect(offering.periods).to.deep.equal(offerings[0].periods);
+                        expect(Number(offering.price)).to.equal(offerings[0].price);
+                        expect(offering.requirements).to.deep.equal(offerings[0].requirements);
                         return done();
                     });
             });

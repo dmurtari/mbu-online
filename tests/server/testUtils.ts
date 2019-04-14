@@ -143,30 +143,6 @@ export default class TestUtils {
         return offerings;
     }
 
-    // createOfferingsForEvent: function (event, badges, offering, token, done) {
-    //     var offerings = [];
-    //     async.forEachOfSeries(badges, function (item, index, cb) {
-    //         var postData = {};
-    //         postData.badge_id = item.id;
-    //         postData.offering = offering;
-    //         request.post('/api/events/' + event.id + '/badges')
-    //             .set('Authorization', token)
-    //             .send(postData)
-    //             .expect(status.CREATED)
-    //             .end(function (err, res) {
-    //                 if (err) return done(err);
-    //                 offerings = _.map(res.body.event.offerings, function (offering) {
-    //                     return {
-    //                         id: offering.details.id,
-    //                         offering: offering.details
-    //                     };
-    //                 });
-    //                 return cb();
-    //             });
-    //     }, function (err) {
-    //         done(err, offerings);
-    //     });
-    // },
     // createPurchasablesForEvent: function (eventId, done) {
     //     var purchasables = [];
     //     async.forEachOfSeries(testPurchasables, function (item, index, cb) {
