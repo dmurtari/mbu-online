@@ -33,10 +33,7 @@
             "request": "launch",
             "name": "API Tests (WSL)",
             "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
-            // "preLaunchTask": "build-ts",
             "useWSL": true,
-            "localRoot": "${workspaceFolder}",
-            "remoteRoot": "${command:extension.vscode-wsl-workspaceFolder}",
             "args": [
                 "--no-timeouts",
                 "--colors",
@@ -44,7 +41,7 @@
                 "ts-node/register",
                 "--require",
                 "tsconfig-paths/register",
-                "${command:extension.vscode-wsl-workspaceFolder}/tests/**/*.ts"
+                "tests/**/*.ts"
             ],
             "sourceMaps": true,
             "internalConsoleOptions": "neverOpen",
