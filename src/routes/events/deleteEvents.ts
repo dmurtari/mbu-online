@@ -3,6 +3,7 @@ import status from 'http-status-codes';
 
 import { Event } from '@models/event.model';
 import { ErrorResponseInterface } from '@app/interfaces/shared.interface';
+import { Badge } from '@models/badge.model';
 
 export const deleteEvent = async (req: Request, res: Response) => {
     try {
@@ -13,6 +14,26 @@ export const deleteEvent = async (req: Request, res: Response) => {
     } catch (err) {
         return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
             message: 'Failed to delete event',
+            error: err
+        });
+    }
+};
+
+export const deleteOffering = async (req: Request, res: Response) => {
+    try {
+        const event: Event = await Event.findByPk(req.params.eventId);
+        const badge: Badge = await Badge.findByPk(req.params.badgeId);
+
+        if (!badge) {
+            throw new Error('Badge to remove as offering does not exist');
+        }
+
+        await event.$remove('offerings', req.params.badgeId);
+
+        return res.status(status.OK).end();
+    } catch (err) {
+        return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+            message: 'Failed to delete offering',
             error: err
         });
     }

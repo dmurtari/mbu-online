@@ -14,7 +14,7 @@ import { EventInterface, Semester, EventOfferingInterface } from '@interfaces/ev
 
 const request = supertest(app);
 
-describe.only('event badge association', () => {
+describe('event badge association', () => {
     let adminToken: string;
     let badges: Badge[];
     let events: Event[];
@@ -39,7 +39,7 @@ describe.only('event badge association', () => {
     });
 
     after(async () => {
-        // await TestUtils.dropDb();
+        await TestUtils.dropDb();
     });
 
     describe('when offerings do not exist', () => {
@@ -286,17 +286,15 @@ describe.only('event badge association', () => {
                     .expect(status.OK)
                     .end((err, res) => {
                         if (err) { return done(err); }
-                        const event = res.body[0];
+                        const event: EventInterface = res.body[0];
                         expect(event.offerings.length).to.equal(3);
-                        expect(event.offerings[0].id).to.equal(badges[0].id);
-                        expect(event.offerings[1].id).to.equal(badges[1].id);
-                        expect(event.offerings[2].id).to.equal(badges[2].id);
+                        expect(event.offerings.map(offering => offering.id)).to.deep.equal(badges.map(badge => badge.id));
                         return done();
                     });
             });
         });
 
-        describe.only('updating offerings', () => {
+        describe('updating offerings', () => {
             it('should be able to update without specifying a badge', (done) => {
                 const offeringUpdate: OfferingInterface = {
                     duration: 1,
