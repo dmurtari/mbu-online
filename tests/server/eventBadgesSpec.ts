@@ -160,12 +160,13 @@ describe('event badge association', () => {
                         .expect(status.CREATED)
                         .end((err, res) => {
                             if (err) { return done(err); }
-                            const event = res.body.event;
+                            const event: EventInterface = res.body.event;
                             expect(event.offerings).to.have.lengthOf(1);
-                            expect(event.offerings[0].details.price).to.equal('10.00');
-                            expect(event.offerings[0].details.duration).to.equal(1);
-                            expect(event.offerings[0].details.periods).to.eql([1, 2, 3]);
-                            expect(event.offerings[0].id).to.equal(badges[0].id);
+                            const offering = event.offerings.find(_offering => _offering.id === badges[0].id);
+                            expect(offering.details.price).to.equal('10.00');
+                            expect(offering.details.duration).to.equal(1);
+                            expect(offering.details.periods).to.eql([1, 2, 3]);
+                            expect(offering.id).to.equal(badges[0].id);
                             return cb();
                         });
                 },
@@ -183,12 +184,13 @@ describe('event badge association', () => {
                         .expect(status.CREATED)
                         .end((err, res) => {
                             if (err) { return done(err); }
-                            const event = res.body.event;
+                            const event: EventInterface = res.body.event;
                             expect(event.offerings).to.have.lengthOf(2);
-                            expect(event.offerings[1].details.price).to.equal('0.00');
-                            expect(event.offerings[1].details.duration).to.equal(2);
-                            expect(event.offerings[1].details.periods).to.eql([2, 3]);
-                            expect(event.offerings[1].id).to.equal(badges[1].id);
+                            const offering = event.offerings.find(_offering => _offering.id === badges[1].id);
+                            expect(offering.details.price).to.equal('0.00');
+                            expect(offering.details.duration).to.equal(2);
+                            expect(offering.details.periods).to.eql([2, 3]);
+                            expect(offering.id).to.equal(badges[1].id);
                             return cb();
                         });
                 }
@@ -288,7 +290,7 @@ describe('event badge association', () => {
                         if (err) { return done(err); }
                         const event: EventInterface = res.body[0];
                         expect(event.offerings.length).to.equal(3);
-                        expect(event.offerings.map(offering => offering.id)).to.deep.equal(badges.map(badge => badge.id));
+                        expect(event.offerings.map(offering => offering.id)).to.have.same.members(badges.map(badge => badge.id));
                         return done();
                     });
             });
