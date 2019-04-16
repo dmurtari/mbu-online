@@ -66,7 +66,7 @@ export class Scout extends Model<Scout> implements ScoutInterface{
         }
     }
 
-    public get fullName(): string {
+    public get fullname(): string {
         return `${this.firstname.trim()} ${this.lastname.trim()}`;
     }
 
