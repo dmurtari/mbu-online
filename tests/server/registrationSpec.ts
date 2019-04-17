@@ -198,7 +198,7 @@ describe.only('registration', () => {
             ], done);
         });
 
-        describe('getting a scouts registrations', () => {
+        describe.only('getting a scouts registrations', () => {
             it('should get all associated registrations', (done) => {
                 request.get('/api/scouts/' + scoutId + '/registrations')
                     .set('Authorization', generatedUsers.coordinator.token)

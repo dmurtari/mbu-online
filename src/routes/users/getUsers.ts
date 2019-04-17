@@ -1,9 +1,9 @@
 
 import { Request, Response } from 'express';
 import status from 'http-status-codes';
+import { Op, WhereOptions, Includeable } from 'sequelize';
 
 import { User } from '@models/user.model';
-import { Op, WhereOptions, Includeable } from 'sequelize';
 import { ErrorResponseInterface } from '@interfaces/shared.interface';
 import { UserExistsResponseInterface, TokenAuthResponseInterface } from '@interfaces/user.interface';
 import { Scout } from '@models/scout.model';

@@ -5,6 +5,7 @@ import { isOwner } from '@middleware/isOwner';
 import { UserRole } from '@interfaces/user.interface';
 
 import { createRegistration } from '@routes/scouts/postScouts';
+import { getRegistrations } from '@routes/scouts/getScouts';
 
 export const scoutRoutes = Router();
 
@@ -15,7 +16,7 @@ scoutRoutes.param('scoutId', isOwner);
 
 // // Registration
 scoutRoutes.post('/:scoutId/registrations', isAuthorized([UserRole.TEACHER, UserRole.COORDINATOR]), createRegistration);
-// router.get('/:scoutId/registrations', isAuthorized(['teacher', 'coordinator']), getScouts.getRegistrations);
+scoutRoutes.get('/:scoutId/registrations', isAuthorized([UserRole.TEACHER, UserRole.COORDINATOR]), getRegistrations);
 // router.delete('/:scoutId/registrations/:eventId', isAuthorized(['teacher', 'coordinator']), deleteScouts.deleteRegistration);
 
 // // Preferences

@@ -1,14 +1,46 @@
 import { Request, Response } from 'express';
 import status from 'http-status-codes';
+import { cloneDeep } from 'lodash';
+
+import { ErrorResponseInterface } from '@interfaces/shared.interface';
+import registrationInformation from '@models/queries/registrationInformation';
+import { Registration } from '@models/registration.model';
 
 export const getRegistrations = async (req: Request, res: Response) => {
     try {
+        const query = cloneDeep(registrationInformation);
+        query.where = {
+            scout_id: req.params.scoutId
+        };
 
+        const registrations: Registration[] = await Registration.findAll(query);
+
+        return res.status(status.OK).json(registrations);
     } catch (err) {
-
+        res.status(status.BAD_REQUEST).send(<ErrorResponseInterface>{
+            message: 'Could not get registration',
+            error: err
+        });
     }
 };
 
+//     var query = _.cloneDeep(registrationInformation);
+//     var scoutId = req.params.scoutId;
+
+//     query.where = {
+//       scout_id: scoutId
+//     };
+
+//     Models.Registration.findAll(query)
+//       .then(function (registrations) {
+//         res.status(status.OK).json(registrations);
+//       })
+//       .catch(function (err) {
+//         res.status(status.BAD_REQUEST).json({
+//           message: 'Could not get registration for scout ' + scoutId,
+//           error: err
+//         });
+//       });
 // var status = require('http-status-codes');
 // var _ = require('lodash');
 
