@@ -6,6 +6,7 @@ import { UserRole } from '@interfaces/user.interface';
 
 import { createRegistration } from '@routes/scouts/postScouts';
 import { getRegistrations } from '@routes/scouts/getScouts';
+import { deleteRegistration } from '@routes/scouts/deleteScouts';
 
 export const scoutRoutes = Router();
 
@@ -17,7 +18,7 @@ scoutRoutes.param('scoutId', isOwner);
 // // Registration
 scoutRoutes.post('/:scoutId/registrations', isAuthorized([UserRole.TEACHER, UserRole.COORDINATOR]), createRegistration);
 scoutRoutes.get('/:scoutId/registrations', isAuthorized([UserRole.TEACHER, UserRole.COORDINATOR]), getRegistrations);
-// router.delete('/:scoutId/registrations/:eventId', isAuthorized(['teacher', 'coordinator']), deleteScouts.deleteRegistration);
+scoutRoutes.delete('/:scoutId/registrations/:eventId', isAuthorized([UserRole.TEACHER, UserRole.COORDINATOR]), deleteRegistration);
 
 // // Preferences
 // router.post('/:scoutId/registrations/:registrationId/preferences', isAuthorized(['teacher', 'coordinator']), postScouts.createPreference);

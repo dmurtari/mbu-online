@@ -198,7 +198,7 @@ describe.only('registration', () => {
             ], done);
         });
 
-        describe.only('getting a scouts registrations', () => {
+        describe('getting a scouts registrations', () => {
             it('should get all associated registrations', (done) => {
                 request.get('/api/scouts/' + scoutId + '/registrations')
                     .set('Authorization', generatedUsers.coordinator.token)
@@ -221,7 +221,8 @@ describe.only('registration', () => {
             });
         });
 
-        describe('deleting a registation', () => {
+        describe.only('deleting a registration', () => {
+
             it('should delete a single registration', (done) => {
                 async.series([
                     (cb) => {

@@ -24,23 +24,6 @@ export const getRegistrations = async (req: Request, res: Response) => {
     }
 };
 
-//     var query = _.cloneDeep(registrationInformation);
-//     var scoutId = req.params.scoutId;
-
-//     query.where = {
-//       scout_id: scoutId
-//     };
-
-//     Models.Registration.findAll(query)
-//       .then(function (registrations) {
-//         res.status(status.OK).json(registrations);
-//       })
-//       .catch(function (err) {
-//         res.status(status.BAD_REQUEST).json({
-//           message: 'Could not get registration for scout ' + scoutId,
-//           error: err
-//         });
-//       });
 // var status = require('http-status-codes');
 // var _ = require('lodash');
 
@@ -95,25 +78,6 @@ export const getRegistrations = async (req: Request, res: Response) => {
 //       })
 //       .catch(function (err) {
 //         res.status(status.BAD_REQUEST).json(err);
-//       });
-//   },
-//   getRegistrations: function (req, res) {
-//     var query = _.cloneDeep(registrationInformation);
-//     var scoutId = req.params.scoutId;
-
-//     query.where = {
-//       scout_id: scoutId
-//     };
-
-//     Models.Registration.findAll(query)
-//       .then(function (registrations) {
-//         res.status(status.OK).json(registrations);
-//       })
-//       .catch(function (err) {
-//         res.status(status.BAD_REQUEST).json({
-//           message: 'Could not get registration for scout ' + scoutId,
-//           error: err
-//         });
 //       });
 //   },
 //   getPreferences: function (req, res) {
