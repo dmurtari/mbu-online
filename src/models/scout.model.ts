@@ -56,7 +56,7 @@ export class Scout extends Model<Scout> implements ScoutInterface{
     @BelongsTo(() => User)
     public user: User;
 
-    @BelongsToMany(() => Event, () => Registration, 'event_id', 'scout_id')
+    @BelongsToMany(() => Event, () => Registration, 'scout_id', 'event_id')
     public registrations: Event[];
 
     @Validator

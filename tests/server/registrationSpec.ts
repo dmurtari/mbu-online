@@ -10,6 +10,7 @@ import { Scout } from '@models/scout.model';
 import { UserRole } from '@interfaces/user.interface';
 import { Registration } from '@models/registration.model';
 import testScouts from './testScouts';
+import { RegistrationRequestInterface } from '@interfaces/registration.interface';
 
 const request = supertest(app);
 
@@ -34,7 +35,7 @@ describe.only('registration', () => {
     });
 
     beforeEach(async () => {
-        await TestUtils.dropTable([Registration, Scout]);
+        await TestUtils.dropTable([Registration, Event, Scout]);
 
         events = await TestUtils.createEvents();
         generatedScouts = await TestUtils.createScoutsForUser(generatedUsers.coordinator, testScouts(5));
@@ -48,7 +49,7 @@ describe.only('registration', () => {
         it('should create the registration', (done) => {
             request.post('/api/scouts/' + generatedScouts[3].id + '/registrations')
                 .set('Authorization', generatedUsers.coordinator.token)
-                .send({
+                .send(<RegistrationRequestInterface>{
                     event_id: events[0].id
                 })
                 .expect(status.CREATED)
@@ -66,7 +67,7 @@ describe.only('registration', () => {
 
             request.post('/api/scouts/' + generatedScouts[3].id + '/registrations')
                 .set('Authorization', generatedUsers.coordinator.token)
-                .send({
+                .send(<RegistrationRequestInterface>{
                     event_id: events[0].id,
                     notes: note
                 })

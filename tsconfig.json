@@ -24,11 +24,11 @@
             "@middleware/*": [
                 "src/middleware/*"
             ],
-            "@app/*": [
-                "src/*"
-            ],
             "@interfaces/*": [
                 "src/interfaces/*"
+            ],
+            "@app/*": [
+                "src/*"
             ],
             "*": [
                 "node_modules/*"

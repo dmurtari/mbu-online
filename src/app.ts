@@ -17,6 +17,7 @@ import { indexRoutes } from '@routes/index';
 import { userRoutes } from '@routes/users';
 import { eventRoutes } from '@routes/events';
 import { badgeRoutes } from '@routes/badges';
+import { scoutRoutes } from '@routes/scouts';
 
 const app = express();
 const env = process.env.NODE_ENV || 'development';
@@ -66,7 +67,7 @@ app.use('/api', userRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/badges', badgeRoutes);
 // app.use('/api/badges', require('./routes/badges'));
-// app.use('/api/scouts', require('./routes/scouts'));
+app.use('/api/scouts', scoutRoutes);
 
 app.use((_req, res, _next) => {
     res.status(404).send();
