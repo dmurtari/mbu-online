@@ -14,7 +14,7 @@ import { RegistrationRequestInterface } from '@interfaces/registration.interface
 
 const request = supertest(app);
 
-describe.only('registration', () => {
+describe('registration', () => {
     let events: Event[];
     let generatedUsers: RoleTokenObjects;
     let generatedScouts: Scout[];
@@ -221,7 +221,7 @@ describe.only('registration', () => {
             });
         });
 
-        describe.only('deleting a registration', () => {
+        describe('deleting a registration', () => {
 
             it('should delete a single registration', (done) => {
                 async.series([

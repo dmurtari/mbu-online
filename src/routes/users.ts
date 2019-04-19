@@ -2,18 +2,20 @@ import { Router, RequestHandler } from 'express';
 import passport from 'passport';
 
 import { signup, authenticate, addScout } from '@routes/users/postUsers';
-import { byEmail, fromToken, byId } from '@routes/users/getUsers';
+import { byEmail, fromToken, byId, getEventRegistrations, getScoutRegistrations } from '@routes/users/getUsers';
 import { updateProfile, updateScout } from '@routes/users/putUsers';
 import { deleteUser, deleteScout } from '@routes/users/deleteUsers';
 import { currentUser } from '@middleware/currentUser';
 import { canUpdateRole } from '@middleware/canUpdateRole';
 import { isAuthorized } from '@middleware/isAuthorized';
 import { UserRole } from '@interfaces/user.interface';
+import { isOwner } from '@middleware/isOwner';
 
 export const userRoutes = Router();
 
 const scoutMiddleware: RequestHandler[] = [currentUser([UserRole.TEACHER]), isAuthorized([UserRole.TEACHER, UserRole.COORDINATOR])];
-// router.param('scoutId', isOwner);
+
+userRoutes.param('scoutId', isOwner);
 
 userRoutes.post('/signup', signup);
 userRoutes.post('/authenticate', authenticate);
@@ -26,13 +28,13 @@ userRoutes.get('/users/exists/:email', byEmail);
 
 // // Scouts
 userRoutes.get('/users/:userId/scouts', scoutMiddleware, byId(true));
-// router.get('/users/:userId/scouts/registrations', scoutMiddleware, getUsers.getScoutRegistrations);
+userRoutes.get('/users/:userId/scouts/registrations', scoutMiddleware, getScoutRegistrations);
 userRoutes.put('/users/:userId/scouts/:scoutId', scoutMiddleware, updateScout);
 userRoutes.post('/users/:userId/scouts', scoutMiddleware, addScout);
 userRoutes.delete('/users/:userId/scouts/:scoutId', scoutMiddleware, deleteScout);
 
 // // Registrations
-// router.get('/users/:userId/events/:eventId/registrations', scoutMiddleware, getUsers.getEventRegistrations);
+userRoutes.get('/users/:userId/events/:eventId/registrations', scoutMiddleware, getEventRegistrations);
 
 // // Payments
 // router.get('/users/:userId/events/:eventId/projectedCost', isCurrentUser(), getUsers.getProjectedCost);

@@ -101,11 +101,11 @@ export default class TestUtils {
         const user: User = await User.findByPk(generatedUser.profile.id);
         const createdScouts: Scout[] = [];
 
-        await Promise.all(scouts.map(async (scout) => {
+        for await (const scout of scouts) {
             const createdScout: Scout = await Scout.create(scout);
             createdScouts.push(createdScout.toJSON() as Scout);
-            return user.$add('scout', createdScout);
-        }));
+            await user.$add('scout', createdScout);
+        }
 
         return createdScouts;
     }
