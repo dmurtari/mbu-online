@@ -1,10 +1,12 @@
+// tslint:disable: max-line-length
+
 import { Router } from 'express';
 
 import { isAuthorized } from '@middleware/isAuthorized';
 import { isOwner } from '@middleware/isOwner';
 import { UserRole } from '@interfaces/user.interface';
 
-import { createRegistration } from '@routes/scouts/postScouts';
+import { createRegistration, createPreference } from '@routes/scouts/postScouts';
 import { getRegistrations } from '@routes/scouts/getScouts';
 import { deleteRegistration } from '@routes/scouts/deleteScouts';
 
@@ -21,7 +23,7 @@ scoutRoutes.get('/:scoutId/registrations', isAuthorized([UserRole.TEACHER, UserR
 scoutRoutes.delete('/:scoutId/registrations/:eventId', isAuthorized([UserRole.TEACHER, UserRole.COORDINATOR]), deleteRegistration);
 
 // // Preferences
-// router.post('/:scoutId/registrations/:registrationId/preferences', isAuthorized(['teacher', 'coordinator']), postScouts.createPreference);
+scoutRoutes.post('/:scoutId/registrations/:registrationId/preferences', isAuthorized([UserRole.TEACHER, UserRole.COORDINATOR]), createPreference);
 // router.get('/:scoutId/registrations/:registrationId/preferences', isAuthorized(['teacher', 'coordinator']), getScouts.getPreferences);
 // router.put('/:scoutId/registrations/:registrationId/preferences/:offeringId', isAuthorized(['teacher', 'coordinator']), updateScouts.updatePreference);
 // router.delete('/:scoutId/registrations/:registrationId/preferences/:offeringId', isAuthorized(['teacher', 'coordinator']), deleteScouts.deletePreference);
