@@ -2,13 +2,14 @@ import { Model, Column, Default, DataType, Table, Validator, ForeignKey, HasMany
 
 import { Purchase } from '@models/purchase.model';
 import { Registration } from '@models/registration.model';
-import { Event } from './event.model';
+import { Event } from '@models/event.model';
+import { PurchasableInterface } from '@interfaces/purchasable.interface';
 
 @Table({
     underscored: true,
     tableName: 'Purchasable'
 })
-export class Purchasable extends Model<Purchasable> {
+export class Purchasable extends Model<Purchasable> implements PurchasableInterface {
     @Column({
         allowNull: false
     })

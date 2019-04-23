@@ -57,40 +57,21 @@ export const getCurrentEvent = async (_req: Request, res: Response) => {
         });
     }
 };
-// var registrationInformation = require('../../models/queries/registrationInformation');
 
-// module.exports = {
-//   get: function (req, res) {
-//     var queryableFields = ['id', 'year', 'semester'];
-//     var query = {};
+export const getPurchasables = async (req: Request, res: Response) => {
+    try {
+        const event: Event = await Event.findByPk(req.params.id);
+        const purchasables: Purchasable[] = await event.$get('purchasables') as Purchasable[];
 
-//     _.forEach(queryableFields, function (field) {
-//       if (req.query[field]) query[field] = req.query[field];
-//     });
+        return res.status(status.OK).json(purchasables);
+    } catch (err) {
+        res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+            message: 'Failed to get purchasables',
+            error: err
+        });
+    }
+};
 
-//     Model.Event.findAll({
-//       where: query,
-//       include: [{
-//         model: Model.Badge,
-//         as: 'offerings',
-//         through: {
-//           as: 'details'
-//         }
-//       }, {
-//         model: Model.Purchasable,
-//         as: 'purchasables'
-//       }]
-//     })
-//       .then(function (events) {
-//         return res.status(status.OK).json(events);
-//       })
-//       .catch(function (err) {
-//         return res.status(status.INTERNAL_SERVER_ERROR).json({
-//           message: 'Error getting events',
-//           error: err
-//         });
-//       });
-//   },
 //   getAssignees: function (req, res) {
 //     var eventId = req.params.id;
 
@@ -127,20 +108,6 @@ export const getCurrentEvent = async (_req: Request, res: Response) => {
 //       .catch(function (err) {
 //         res.status(status.BAD_REQUEST).end();
 //       })
-//   },
-//   getPurchasables: function (req, res) {
-//     var eventId = req.params.id;
-
-//     Model.Event.findById(eventId)
-//       .then(function (event) {
-//         return event.getPurchasables();
-//       })
-//       .then(function (purchasables) {
-//         res.status(status.OK).json(purchasables);
-//       })
-//       .catch(function () {
-//         res.status(status.BAD_REQUEST).end();
-//       });
 //   },
 //   getRegistrations: function (req, res) {
 //     var eventId = req.params.id;

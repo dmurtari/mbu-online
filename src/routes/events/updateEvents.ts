@@ -7,6 +7,8 @@ import { ErrorResponseInterface } from '@app/interfaces/shared.interface';
 import { Badge } from '@models/badge.model';
 import { Offering } from '@models/offering.model';
 import { OfferingResponseInterface } from '@interfaces/offering.interface';
+import { Purchasable } from '@models/purchasable.model';
+import { PurchasableResponseInterface } from '@interfaces/purchasable.interface';
 
 export const updateEvent = async (req: Request, res: Response) => {
     try {
@@ -40,7 +42,7 @@ export const updateEvent = async (req: Request, res: Response) => {
 
 export const updateOffering = async (req: Request, res: Response) => {
     try {
-        let offering: Offering = await Offering.findOne({
+        const offering: Offering = await Offering.findOne({
             where: {
                 badge_id: req.params.badgeId,
                 event_id: req.params.eventId
@@ -51,7 +53,7 @@ export const updateOffering = async (req: Request, res: Response) => {
             throw new Error('Offering to update not found');
         }
 
-        offering = await offering.update(req.body);
+        await offering.update(req.body);
 
         return res.status(status.OK).json(<OfferingResponseInterface> {
             message: 'Offering updated successfully',
@@ -65,77 +67,29 @@ export const updateOffering = async (req: Request, res: Response) => {
     }
 };
 
-//   updateOffering: function (req, res) {
-//     var offeringUpdate = req.body;
-//     var eventId = req.params.eventId;
-//     var badgeId = req.params.badgeId;
+export const updatePurchasable = async (req: Request, res: Response) => {
+    try {
+        const purchasable: Purchasable = await Purchasable.findOne({
+            where: {
+                event_id: req.params.eventId,
+                id: req.params.purchasableId
+            }
+        });
 
-//     Model.Event.findById(eventId, {
-//       include: [{
-//         model: Model.Badge,
-//         as: 'offerings'
-//       }]
-//     })
-//       .then(function (event) {
-//         if (!event) {
-//           throw new Error('Event to update not found');
-//         }
+        if (!purchasable) {
+            throw new Error('Purchasable to update not found');
+        }
 
-//         return event.getOfferings({
-//           where: {
-//             id: badgeId
-//           }
-//         });
-//       })
-//       .then(function (offerings) {
-//         var offering = offerings[0];
-//         return offering.Offering.update(offeringUpdate);
-//       })
-//       .then(function (offering) {
-//         res.status(status.OK).json({
-//           message: 'Offering updated successfully',
-//           offering: offering
-//         });
-//       })
-//       .catch(function (err) {
-//         res.status(status.BAD_REQUEST).json({
-//           message: 'Error updating offering',
-//           error: err
-//         });
-//       });
-//   },
-//   updatePurchasable: function (req, res) {
-//     var purchasableUpdate = req.body;
-//     var purchasableId = req.params.purchasableId;
-//     var eventId = req.params.eventId;
+        await purchasable.update(req.body);
 
-//     Model.Event.findById(eventId)
-//       .then(function (event) {
-//         if (!event) {
-//           throw new Error('event to update not found');
-//         }
-
-//         return event.getPurchasables({
-//           where: {
-//             id: purchasableId
-//           }
-//         });
-//       })
-//       .then(function (purchasables) {
-//         var purchasable = purchasables[0];
-//         return purchasable.update(purchasableUpdate);
-//       })
-//       .then(function (purchasable) {
-//         res.status(status.OK).json({
-//           message: 'Purchasable updated successfully',
-//           purchasable: purchasable
-//         });
-//       })
-//       .catch(function (err) {
-//         res.status(status.BAD_REQUEST).json({
-//           message: 'Error updating purchasable',
-//           error: err
-//         });
-//       });
-//   }
-// };
+        return res.status(status.OK).json(<PurchasableResponseInterface>{
+            message: 'Purchasable updated successfully',
+            purchasable: purchasable
+        });
+    } catch (err) {
+        return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+            message: 'Error updating purchasable',
+            error: err
+        });
+    }
+};

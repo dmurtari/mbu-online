@@ -2,11 +2,13 @@ import { Request, Response } from 'express';
 import status from 'http-status-codes';
 
 import { Event } from '@models/event.model';
-import { EventResponseInterface, CurrentEventResponseInterface, EventOfferingInterface } from '@app/interfaces/event.interface';
+import { EventResponseInterface, CurrentEventResponseInterface, EventOfferingInterface } from '@interfaces/event.interface';
 import { ErrorResponseInterface } from '@app/interfaces/shared.interface';
 import { CurrentEvent } from '@models/currentEvent.model';
 import { Offering } from '@models/offering.model';
 import { Badge } from '@models/badge.model';
+import { Purchasable } from '@models/purchasable.model';
+import { PurchasablesResponseInterface } from '@interfaces/purchasable.interface';
 
 export const createEvent = async (req: Request, res: Response) => {
     try {
@@ -96,118 +98,28 @@ export const createOffering = async (req: Request, res: Response) => {
     }
 };
 
-//   createOffering: function (req, res) {
-//     var eventId = req.params.id;
+export const createPurchasable = async (req: Request, res: Response) => {
+    try {
+        const purchasable: Purchasable = await Purchasable.create(req.body);
+        let event: Event = await Event.findByPk(req.params.id);
 
-//     Model.Event.findById(eventId)
-//       .then(function (event) {
-//         return event.addOffering(req.body.badge_id, { through: req.body.offering });
-//       })
-//       .then(function (offering) {
-//         if (!offering) {
-//           throw new Error('Could not create offering');
-//         }
+        await event.$add('purchasable', purchasable);
 
-//         return Model.Event.findById(eventId, {
-//           include: [{
-//             model: Model.Badge,
-//             as: 'offerings',
-//             through: {
-//               as: 'details'
-//             }
-//           }]
-//         });
-//       })
-//       .then(function (event) {
-//         res.status(status.CREATED).json({
-//           message: 'Offering successfully created',
-//           event: event
-//         });
-//       })
-//       .catch(function (err) {
-//         res.status(status.BAD_REQUEST).json({
-//           message: 'Offering creation failed',
-//           error: err
-//         });
-//       });
-//   },
-//   createPurchasable: function (req, res) {
-//     var eventId = req.params.id;
-//     var purchasable;
+        event = await Event.findByPk(req.params.id, {
+            include: [{
+                model: Purchasable,
+                as: 'purchasables'
+            }]
+        });
 
-//     Model.Purchasable.create(req.body)
-//       .then(function (createdPurchasable) {
-//         purchasable = createdPurchasable;
-//         return Model.Event.findById(eventId);
-//       })
-//       .then(function (event) {
-//         return event.addPurchasable(purchasable);
-//       })
-//       .then(function (event) {
-//         if (!event) {
-//           throw new Error('Could not create purchasable');
-//         }
-
-//         return Model.Event.findById(eventId, {
-//           include: [{
-//             model: Model.Purchasable,
-//             as: 'purchasables'
-//           }]
-//         });
-//       })
-//       .then(function (event) {
-//         res.status(status.CREATED).json({
-//           message: 'Purchasable successfully created',
-//           purchasables: event.purchasables
-//         });
-//       })
-//       .catch(function (err) {
-//         res.status(status.BAD_REQUEST).json({
-//           message: 'Purchasable creation failed',
-//           error: err
-//         });
-//       });
-//   },
-//   setCurrentEvent: function (req, res) {
-//     var eventId = req.body.id;
-//     var event;
-
-//     Model.Event.findById(eventId)
-//       .then(function (eventFromDb) {
-//         if (!eventFromDb) {
-//           throw new Error('Event to set as current not found');
-//         }
-
-//         event = eventFromDb;
-//         return Model.CurrentEvent.findOne();
-//       })
-//       .then(function (currentEvent) {
-//         if (!currentEvent) {
-//           return Model.CurrentEvent.create({});
-//         }
-//         return currentEvent;
-//       })
-//       .then(function (currentEvent) {
-//         return currentEvent.setEvent(event, {
-//           include: [{
-//             model: Model.Event
-//           }]
-//         });
-//       })
-//       .then(function (currentEvent) {
-//         return Model.Event.findById(currentEvent.event_id);
-//       })
-//       .then(function (event) {
-//         res.status(status.OK).json({
-//           message: 'Current event set',
-//           currentEvent: event
-//         });
-//       })
-//       .catch(function (err) {
-//         res.status(status.BAD_REQUEST).json({
-//           message: 'Setting current event failed',
-//           error: err
-//         });
-//       });
-//   }
-// };
+        return res.status(status.CREATED).json(<PurchasablesResponseInterface>{
+            message: 'Purchasable successfully created',
+            purchasables: event.purchasables
+        });
+    } catch (err) {
+        return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+            message: 'Failed to create purchasable',
+            error: err
+        });
+    }
+};
