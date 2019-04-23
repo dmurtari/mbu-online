@@ -1,3 +1,4 @@
+import { Model, FindAttributeOptions } from 'sequelize';
 import { Request, Response } from 'express';
 import status from 'http-status-codes';
 import { cloneDeep } from 'lodash';
@@ -5,6 +6,8 @@ import { cloneDeep } from 'lodash';
 import { ErrorResponseInterface } from '@interfaces/shared.interface';
 import registrationInformation from '@models/queries/registrationInformation';
 import { Registration } from '@models/registration.model';
+import { Offering } from '@models/offering.model';
+import { Purchasable } from '@models/purchasable.model';
 
 export const getRegistrations = async (req: Request, res: Response) => {
     try {
@@ -24,11 +27,60 @@ export const getRegistrations = async (req: Request, res: Response) => {
     }
 };
 
-// var status = require('http-status-codes');
-// var _ = require('lodash');
+export const getPreferences = async (req: Request, res: Response) => {
+    getRegistrationDetails(req, res, 'preferences');
+};
 
-// var Models = require('../../models');
-// var registrationInformation = require('../../models/queries/registrationInformation');
+interface QueryDetailInterface {
+    model: typeof Model;
+    modelAttributes?: FindAttributeOptions;
+    joinAttributes: FindAttributeOptions;
+}
+
+async function getRegistrationDetails(req: Request, res: Response, target: 'preferences'|'assignments'|'purchases'): Promise<Response> {
+    const detailQueryMap: { [key: string]: QueryDetailInterface } = {
+        preferences: {
+            model: Offering,
+            modelAttributes: ['badge_id', ['id', 'offering_id']],
+            joinAttributes: ['rank']
+        },
+        assignments: {
+            model: Offering,
+            modelAttributes: ['badge_id', ['id', 'offering_id']],
+            joinAttributes: ['periods', 'completions']
+        },
+        purchases: {
+            model: Purchasable,
+            joinAttributes: ['quantity', 'size']
+        }
+    };
+
+    try {
+        const registration: Registration = await Registration.findOne({
+            where: {
+                id: req.params.registrationId,
+                scout_id: req.params.scoutId
+            },
+            include: [{
+                model: detailQueryMap[target].model,
+                as: target,
+                attributes: detailQueryMap[target].modelAttributes,
+                through: {
+                    as: 'details',
+                    attributes: detailQueryMap[target].joinAttributes
+                }
+            }]
+        });
+
+        return res.status(status.OK).send(registration[target]);
+    } catch (err) {
+        return res.status(status.BAD_REQUEST).send(<ErrorResponseInterface>{
+            message: `Failed to get ${target}`,
+            error: err
+        });
+    }
+}
+
 
 // module.exports = {
 //   getAll: function (req, res) {
@@ -97,53 +149,7 @@ export const getRegistrations = async (req: Request, res: Response) => {
 //   }
 // };
 
-// function getRegistrationDetails(req, res, object) {
-//   var scoutId = req.params.scoutId;
-//   var registrationId = req.params.registrationId;
 
-//   var possibleQueries = {
-//     'preferences': {
-//       model: Models.Offering,
-//       modelAttributes: ['badge_id', ['id', 'offering_id']],
-//       joinAttributes: ['rank']
-//     },
-//     'assignments': {
-//       model: Models.Offering,
-//       modelAttributes: ['badge_id', ['id', 'offering_id']],
-//       joinAttributes: ['periods', 'completions']
-//     },
-//     'purchases': {
-//       model: Models.Purchasable,
-//       joinAttributes: ['quantity', 'size']
-//     }
-//   };
-
-//   if (object in possibleQueries) {
-//     return Models.Registration.find({
-//       where: {
-//         id: registrationId,
-//         scout_id: scoutId
-//       },
-//       include: [{
-//         model: possibleQueries[object].model,
-//         as: object,
-//         attributes: possibleQueries[object].modelAttributes,
-//         through: {
-//           as: 'details',
-//           attributes: possibleQueries[object].joinAttributes
-//         }
-//       }]
-//     })
-//       .then(function (registration) {
-//         res.status(status.OK).json(registration[object]);
-//       })
-//       .catch(function () {
-//         res.status(status.BAD_REQUEST).end();
-//       });
-//   } else {
-//     return res.status(status.INTERNAL_SERVER_ERROR);
-//   }
-// }
 
 // function getCost(req, res, type) {
 //   var scoutId = req.params.scoutId;

@@ -59,8 +59,10 @@ export const setCurrentEvent = async (req: Request, res: Response) => {
 
 export const createOffering = async (req: Request, res: Response) => {
     try {
-        const event: Event = await Event.findByPk(req.params.id);
-        const badge: Badge = await Badge.findByPk(req.body.badge_id);
+        const [event, badge] = await Promise.all([
+            Event.findByPk(req.params.id),
+            Badge.findByPk(req.body.badge_id)
+        ]);
 
         if (!event) {
             throw new Error('Event to add offering to not found');

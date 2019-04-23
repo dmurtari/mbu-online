@@ -29,6 +29,9 @@ describe.only('preferences', () => {
 
     const badId = TestUtils.badId;
 
+    before(async () => {
+        await TestUtils.dropDb();
+    });
 
     before(async () => {
         generatedUsers = await TestUtils.generateTokens([UserRole.ADMIN, UserRole.TEACHER, UserRole.COORDINATOR, 'coordinator2' as any]);
@@ -86,7 +89,7 @@ describe.only('preferences', () => {
         await TestUtils.dropDb();
     });
 
-    describe.only('when preferences do not exist', () => {
+    describe('when preferences do not exist', () => {
         it('should be able to be generated', (done) => {
             const postData: PreferenceRequestInterface = {
                 offering: generatedOfferings[0].id,
@@ -432,8 +435,7 @@ describe.only('preferences', () => {
                 rank: 2
             }];
 
-            request.post('/api/scouts/' + generatedScouts[0].id + '/registrations/' +
-                registrationIds[0] + '/preferences')
+            request.post('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/preferences')
                 .set('Authorization', generatedUsers.coordinator.token)
                 .send(postData)
                 .expect(status.CREATED)
@@ -463,8 +465,7 @@ describe.only('preferences', () => {
                         rank: 2
                     }];
 
-                    request.post('/api/scouts/' + generatedScouts[0].id + '/registrations/' +
-                        registrationIds[0] + '/preferences')
+                    request.post('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/preferences')
                         .set('Authorization', generatedUsers.coordinator.token)
                         .send(postData)
                         .expect(status.CREATED)
@@ -488,8 +489,7 @@ describe.only('preferences', () => {
                         rank: 1
                     }];
 
-                    request.post('/api/scouts/' + generatedScouts[0].id + '/registrations/' +
-                        registrationIds[0] + '/preferences')
+                    request.post('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/preferences')
                         .set('Authorization', generatedUsers.coordinator.token)
                         .send(postData)
                         .expect(status.CREATED)
@@ -513,8 +513,7 @@ describe.only('preferences', () => {
                 rank: 1
             }];
 
-            request.post('/api/scouts/' + generatedScouts[0].id + '/registrations/' +
-                registrationIds[0] + '/preferences')
+            request.post('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/preferences')
                 .set('Authorization', generatedUsers.coordinator.token)
                 .send(postData)
                 .expect(status.BAD_REQUEST, done);
@@ -526,8 +525,7 @@ describe.only('preferences', () => {
                 rank: 30
             }];
 
-            request.post('/api/scouts/' + generatedScouts[0].id + '/registrations/' +
-                registrationIds[0] + '/preferences')
+            request.post('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/preferences')
                 .set('Authorization', generatedUsers.coordinator.token)
                 .send(postData)
                 .expect(status.BAD_REQUEST, done);

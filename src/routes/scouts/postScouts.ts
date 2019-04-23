@@ -48,13 +48,6 @@ export const createPreference = async (req: Request, res: Response) => {
         const scoutId = req.params.scoutId;
         const registrationId = req.params.registrationId;
 
-        const registration: Registration = await Registration.findOne({
-            where: {
-                id: registrationId,
-                scout_id: scoutId
-            }
-        });
-
         if (Array.isArray(req.body)) {
             await Preference.destroy({
                 where: {
@@ -73,6 +66,13 @@ export const createPreference = async (req: Request, res: Response) => {
                 individualHooks: true
             });
         } else {
+            const registration: Registration = await Registration.findOne({
+                where: {
+                    id: registrationId,
+                    scout_id: scoutId
+                }
+            });
+
             await registration.$add('preference', req.body.offering, {
                 through: {
                     rank: req.body.rank

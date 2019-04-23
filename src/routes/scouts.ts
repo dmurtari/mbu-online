@@ -7,8 +7,9 @@ import { isOwner } from '@middleware/isOwner';
 import { UserRole } from '@interfaces/user.interface';
 
 import { createRegistration, createPreference } from '@routes/scouts/postScouts';
-import { getRegistrations } from '@routes/scouts/getScouts';
-import { deleteRegistration } from '@routes/scouts/deleteScouts';
+import { getRegistrations, getPreferences } from '@routes/scouts/getScouts';
+import { deleteRegistration, deletePreference } from '@routes/scouts/deleteScouts';
+import { updatePreference } from '@routes/scouts/updateScouts';
 
 export const scoutRoutes = Router();
 
@@ -24,9 +25,9 @@ scoutRoutes.delete('/:scoutId/registrations/:eventId', isAuthorized([UserRole.TE
 
 // // Preferences
 scoutRoutes.post('/:scoutId/registrations/:registrationId/preferences', isAuthorized([UserRole.TEACHER, UserRole.COORDINATOR]), createPreference);
-// router.get('/:scoutId/registrations/:registrationId/preferences', isAuthorized(['teacher', 'coordinator']), getScouts.getPreferences);
-// router.put('/:scoutId/registrations/:registrationId/preferences/:offeringId', isAuthorized(['teacher', 'coordinator']), updateScouts.updatePreference);
-// router.delete('/:scoutId/registrations/:registrationId/preferences/:offeringId', isAuthorized(['teacher', 'coordinator']), deleteScouts.deletePreference);
+scoutRoutes.get('/:scoutId/registrations/:registrationId/preferences', isAuthorized([UserRole.TEACHER, UserRole.COORDINATOR]), getPreferences);
+scoutRoutes.put('/:scoutId/registrations/:registrationId/preferences/:offeringId', isAuthorized([UserRole.TEACHER, UserRole.COORDINATOR]), updatePreference);
+scoutRoutes.delete('/:scoutId/registrations/:registrationId/preferences/:offeringId', isAuthorized([UserRole.TEACHER, UserRole.COORDINATOR]), deletePreference);
 
 // // Assignments
 // router.post('/:scoutId/registrations/:registrationId/assignments', isAuthorized(['teacher']), postScouts.createAssignment);

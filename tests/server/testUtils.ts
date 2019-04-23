@@ -133,14 +133,11 @@ export default class TestUtils {
     }
 
     public static async createOfferingsForEvent(event: Event, badges: Badge[], offering: OfferingInterface): Promise<Offering[]> {
-        const offerings: Offering[] = [];
-
         for await (const badge of badges) {
-            const createdOffering = await event.$add('offering', badge.id, { through: offering }) as Offering[];
-            offerings.push(createdOffering[0]);
+             await event.$add('offering', badge.id, { through: offering }) as Offering[];
         }
 
-        return offerings;
+        return await Offering.findAll({ where: { event_id: event.id }});
     }
 
     // createPurchasablesForEvent: function (eventId, done) {

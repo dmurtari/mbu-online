@@ -4,6 +4,8 @@ import status from 'http-status-codes';
 import { ErrorResponseInterface } from '@interfaces/shared.interface';
 import { Scout } from '@models/scout.model';
 import { Event } from '@models/event.model';
+import { Registration } from '@models/registration.model';
+import { Preference } from '@models/preference.model';
 
 export const deleteRegistration = async (req: Request, res: Response) => {
     try {
@@ -28,34 +30,43 @@ export const deleteRegistration = async (req: Request, res: Response) => {
     }
 };
 
+export const deletePreference = async (req: Request, res: Response) => {
+    try {
+        const [registration, preference]: [Registration, Preference] = await Promise.all([
+            Registration.findOne({
+                where: {
+                    id: req.params.registrationId,
+                    scout_id: req.params.scoutId
+                }
+            }),
+            Preference.findOne({
+                where: {
+                    offering_id: req.params.offeringId,
+                    registration_id: req.params.registrationId
+                }
+            })
+        ]);
 
-// var status = require('http-status-codes');
+        if (!registration) {
+            throw new Error('No registration to delete from');
+        }
 
-// var Models = require('../../models');
+        if (!preference) {
+            throw new Error('Preference to delete not found');
+        }
 
-// module.exports = {
-//   deleteRegistration: function (req, res) {
-//     var scoutId = req.params.scoutId;
-//     var eventId = req.params.eventId;
+        await registration.$remove('preference', req.params.offeringId);
 
-//     return Models.Scout.findById(scoutId)
-//       .then(function (scout) {
-//         return scout.removeRegistration(eventId);
-//       })
-//       .then(function (deleted) {
-//         if (!deleted) {
-//           throw new Error('No registration to delete');
-//         }
+        return res.status(status.OK).end();
+    } catch (err) {
+        return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+            message: `Could not remove preference ${req.params.offeringId} for registration ${req.params.registrationId}`,
+            error: err
+        });
+    }
+};
 
-//         res.status(status.OK).end();
-//       })
-//       .catch(function (err) {
-//         res.status(status.BAD_REQUEST).json({
-//           message: 'Could not unregister ' + eventId + ' from scout ' + scoutId,
-//           error: err
-//         });
-//       });
-//   },
+
 //   deletePreference: function (req, res) {
 //     var scoutId = req.params.scoutId;
 //     var registrationId = req.params.registrationId;
