@@ -1,12 +1,17 @@
 
 import { Request, Response } from 'express';
 import status from 'http-status-codes';
+import { Op, WhereOptions, Includeable } from 'sequelize';
+
 
 import { User } from '@models/user.model';
-import { Op, WhereOptions, Includeable } from 'sequelize';
 import { ErrorResponseInterface } from '@interfaces/shared.interface';
 import { UserExistsResponseInterface, TokenAuthResponseInterface } from '@interfaces/user.interface';
 import { Scout } from '@models/scout.model';
+import registrationInformation from '@models/queries/registrationInformation';
+import { cloneDeep } from 'lodash';
+import { Registration } from '@models/registration.model';
+import { Event } from '@models/event.model';
 
 export const byEmail = async (req: Request, res: Response) => {
     try {
@@ -79,76 +84,55 @@ export const byId = (includeScouts: boolean = false) => async (req: Request, res
     }
 };
 
-// module.exports = {
-//   get: function (shouldIncludeScouts) {
-//     return function (req, res) {
-//       var query = {};
+export const getEventRegistrations = async (req: Request, res: Response) => {
+    try {
+        const query = cloneDeep(registrationInformation);
 
-//       if (req.params.userId) {
-//         query.id = req.params.userId;
-//       } else if (req.query.id) {
-//         query.id = req.query.id;
-//       } else if (_.isEmpty(req.query)) {
-//         query = {};
-//       } else {
-//         return res.status(status.BAD_REQUEST).json({
-//           message: 'Invalid query'
-//         });
-//       }
+        query.where = {
+            event_id: req.params.eventId
+        };
 
-//       var modelsToInclude = [];
+        (<any>query.include[0]).where = {
+            user_id: req.params.userId
+        };
 
-//       if (shouldIncludeScouts) {
-//         modelsToInclude = [{
-//           model: Models.Scout,
-//           as: 'scouts'
-//         }];
-//       }
+        const registrations: Registration[] = await Registration.findAll(query);
 
-//       return Models.User.findAll({
-//         where: query,
-//         attributes: {
-//           exclude: ['password'],
-//         },
-//         include: modelsToInclude
-//       })
-//         .then(function (users) {
-//           if (users.length < 1) {
-//             throw new Error('User not found');
-//           }
+        return res.status(status.OK).json(registrations);
 
-//           return res.status(status.OK).json(users);
-//         })
-//         .catch(function (err) {
-//           return res.status(status.BAD_REQUEST).json({
-//             error: err,
-//             message: 'Error getting user'
-//           });
-//         });
-//     };
-//   },
-//   getEventRegistrations: function (req, res) {
-//     var query = _.cloneDeep(registrationInformation);
+    } catch (err) {
+        return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+            error: err,
+            message: 'Could not get registrations for event'
+        });
+    }
+};
 
-//     query.where = {
-//       event_id: req.params.eventId
-//     };
+export const getScoutRegistrations = async (req: Request, res: Response) => {
+    try {
+        const scouts: Scout[] = await Scout.findAll({
+            where: {
+                user_id: req.params.userId
+            },
+            include: [{
+                model: Event,
+                as: 'registrations',
+                through: <any>{
+                    as: 'details'
+                },
+                attributes: [['id', 'event_id']]
+            }]
+        });
 
-//     query.include[0].where = {
-//       user_id: req.params.userId
-//     }
+        res.status(status.OK).json(scouts);
+    } catch (err) {
+        return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+            error: err,
+            message: 'Could not get registration for scout'
+        });
+    }
+};
 
-//     Models.Registration.findAll(query)
-//       .then(function (registrations) {
-//         res.status(status.OK).json(registrations);
-//       })
-//       .catch(function (err) {
-//         res.status(status.BAD_REQUEST).json({
-//           message: 'Could not get registration for scout ' + scoutId,
-//           error: err
-//         });
-//       });
-//   },
 //   getScoutRegistrations: function (req, res) {
 //     return Models.Scout.findAll({
 //       where: {

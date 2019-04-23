@@ -1,8 +1,11 @@
+import { OfferingInterface } from '@interfaces/offering.interface';
+
 export interface RegistrationInterface {
     id?: number;
     event_id?: number;
     scout_id?: number;
     notes?: string;
+    preferences?: OfferingInterface[];
 }
 
 export interface RegistrationResponseInterface {

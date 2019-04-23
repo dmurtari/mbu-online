@@ -4,8 +4,11 @@ import status from 'http-status-codes';
 import { Scout } from '@models/scout.model';
 import { Registration } from '@models/registration.model';
 import { ErrorResponseInterface } from '@interfaces/shared.interface';
-import { RegistrationInterface } from '@interfaces/registration.interface';
+import { RegistrationInterface, RegistrationResponseInterface } from '@interfaces/registration.interface';
 import { Event } from '@models/event.model';
+import { Preference } from '@models/preference.model';
+import { PreferenceRequestInterface, PreferenceInterface } from '@interfaces/preference.interface';
+import { Offering } from '@models/offering.model';
 
 export const createRegistration = async (req: Request, res: Response) => {
     try {
@@ -35,6 +38,67 @@ export const createRegistration = async (req: Request, res: Response) => {
     } catch (err) {
         return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
             message: 'Registration could not be created',
+            error: 'err'
+        });
+    }
+};
+
+export const createPreference = async (req: Request, res: Response) => {
+    try {
+        const scoutId = req.params.scoutId;
+        const registrationId = req.params.registrationId;
+
+        const registration: Registration = await Registration.findOne({
+            where: {
+                id: registrationId,
+                scout_id: scoutId
+            }
+        });
+
+        if (Array.isArray(req.body)) {
+            await Preference.destroy({
+                where: {
+                    registration_id: registrationId
+                }
+            });
+
+            const preferences: PreferenceInterface[] = req.body.map((preference: PreferenceRequestInterface) => ({
+                registration_id: registrationId,
+                offering_id: preference.offering,
+                rank: preference.rank
+            }));
+
+            await Preference.bulkCreate(preferences, {
+                validate: true,
+                individualHooks: true
+            });
+        } else {
+            await registration.$add('preference', req.body.offering, {
+                through: {
+                    rank: req.body.rank
+                }
+            });
+        }
+
+        const createdRegistration: Registration = await Registration.findByPk(registrationId, {
+            include: [{
+                model: Offering,
+                as: 'preferences',
+                attributes: ['badge_id', ['id', 'offering_id']],
+                through: {
+                    as: 'details',
+                    attributes: ['rank']
+                }
+            }]
+        });
+
+        return res.status(status.CREATED).json(<RegistrationResponseInterface>{
+            message: 'Preference created',
+            registration: createdRegistration
+        });
+    } catch (err) {
+        return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+            message: 'Preference could not be created',
             error: 'err'
         });
     }

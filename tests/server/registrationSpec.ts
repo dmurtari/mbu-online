@@ -1,3 +1,4 @@
+
 import supertest from 'supertest';
 import * as async from 'async';
 import status from 'http-status-codes';
@@ -221,7 +222,8 @@ describe('registration', () => {
             });
         });
 
-        describe('deleting a registation', () => {
+        describe('deleting a registration', () => {
+
             it('should delete a single registration', (done) => {
                 async.series([
                     (cb) => {
