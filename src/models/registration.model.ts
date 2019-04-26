@@ -38,13 +38,13 @@ export class Registration extends Model<Registration> {
     @BelongsTo(() => Scout)
     public scout: Scout;
 
-    @BelongsToMany(() => Offering, () => Preference, 'offering_id', 'registration_id')
+    @BelongsToMany(() => Offering, () => Preference, 'registration_id', 'offering_id')
     public preferences: Offering[];
 
-    @BelongsToMany(() => Offering, () => Assignment, 'offering_id', 'registration_id')
+    @BelongsToMany(() => Offering, () => Assignment, 'registration_id', 'offering_id')
     public assignments: Offering[];
 
-    @BelongsToMany(() => Purchasable, () => Purchase, 'purchasable_id', 'registration_id')
+    @BelongsToMany(() => Purchasable, () => Purchase, 'registration_id', 'purchasable_id')
     public purchases: Purchasable[];
 
     public async projectedCost(): Promise<number> {

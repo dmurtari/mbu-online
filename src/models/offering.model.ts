@@ -23,6 +23,7 @@ import { Registration } from '@models/registration.model';
 import { Assignment } from '@models/assignment.model';
 import { durationValidator } from '@models/validators';
 import { OfferingInterface } from '@interfaces/offering.interface';
+import { Preference } from '@models/preference.model';
 
 @Table({
     underscored: true,
@@ -96,10 +97,10 @@ export class Offering extends Model<Offering> implements OfferingInterface {
     @BelongsTo(() => Badge)
     public badge: Badge;
 
-    @BelongsToMany(() => Registration, () => Assignment, 'registration_id', 'offering_id')
+    @BelongsToMany(() => Registration, () => Preference, 'offering_id', 'registration_id')
     public requesters: Registration[];
 
-    @BelongsToMany(() => Registration, () => Assignment, 'registration_id', 'offering_id')
+    @BelongsToMany(() => Registration, () => Assignment, 'offering_id', 'registration_id')
     public assignees: Registration[];
 
     @Validator

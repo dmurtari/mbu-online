@@ -48,7 +48,7 @@ describe.only('preferences', () => {
     });
 
     beforeEach(async () => {
-        await TestUtils.dropTable([Registration]);
+        await TestUtils.dropTable([Registration, Preference]);
         generatedScouts = await TestUtils.createScoutsForUser(generatedUsers.coordinator, testScouts(5));
     });
 

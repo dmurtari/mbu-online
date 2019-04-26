@@ -62,8 +62,8 @@ export const createPreference = async (req: Request, res: Response) => {
             }));
 
             await Preference.bulkCreate(preferences, {
-                validate: true,
-                individualHooks: true
+                individualHooks: true,
+                validate: true
             });
         } else {
             const registration: Registration = await Registration.findOne({

@@ -37,7 +37,7 @@ export class Purchasable extends Model<Purchasable> implements PurchasableInterf
     @HasMany(() => Purchase, 'purchasable_id')
     public sold: Purchase[];
 
-    @BelongsToMany(() => Registration, () => Purchase, 'registration_id', 'purchasable_id')
+    @BelongsToMany(() => Registration, () => Purchase, 'purchasable_id', 'registration_id')
     public buyers: Registration[];
 
     @ForeignKey(() => Event)
