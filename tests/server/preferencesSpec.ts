@@ -18,7 +18,7 @@ import { Preference } from '@models/preference.model';
 
 const request = supertest(app);
 
-describe.only('preferences', () => {
+describe('preferences', () => {
     let badges: Badge[];
     let events: Event[];
     let generatedUsers: RoleTokenObjects;

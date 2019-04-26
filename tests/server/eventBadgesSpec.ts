@@ -434,7 +434,7 @@ describe('event badge association', () => {
                         expect(offering.badge_id).to.equal(badges[0].id);
                         expect(offering.duration).to.equal(offeringUpdate.duration);
                         expect(offering.periods).to.deep.equal(offerings[0].periods);
-                        expect(Number(offering.price)).to.equal(offerings[0].price);
+                        expect(offering.price).to.equal(offerings[0].price);
                         expect(offering.requirements).to.deep.equal(offerings[0].requirements);
                         return done();
                     });
