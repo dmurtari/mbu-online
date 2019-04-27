@@ -2,12 +2,13 @@ import { Table, Model, Column, DataType, Default, ForeignKey, BeforeValidate } f
 
 import { Offering, ClassSizeInformation } from '@models/offering.model';
 import { Registration } from '@models/registration.model';
+import { AssignmentInterface } from '@interfaces/assignment.interface';
 
 @Table({
     underscored: true,
     tableName: 'Assignment'
 })
-export class Assignment extends Model<Assignment> {
+export class Assignment extends Model<Assignment> implements AssignmentInterface {
     @BeforeValidate
     public static async ensureSizeLimit(assignment: Assignment): Promise<void> {
         if (!assignment.changed('periods')) {

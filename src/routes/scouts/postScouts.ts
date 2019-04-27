@@ -9,6 +9,9 @@ import { Event } from '@models/event.model';
 import { Preference } from '@models/preference.model';
 import { PreferenceRequestInterface, PreferenceInterface } from '@interfaces/preference.interface';
 import { Offering } from '@models/offering.model';
+import { Assignment } from '@models/assignment.model';
+import { AssignmentInterface, AssignmentRequestInterface, AssignmentResponseInterface } from '@interfaces/assignment.interface';
+import { Badge } from '@models/badge.model';
 
 export const createRegistration = async (req: Request, res: Response) => {
     try {
@@ -104,75 +107,68 @@ export const createPreference = async (req: Request, res: Response) => {
     }
 };
 
-//   createPreference: function (req, res) {
-//     var scoutId = req.params.scoutId;
-//     var registrationId = req.params.registrationId;
+export const createAssignment = async (req: Request, res: Response) => {
+    try {
+        const registrationId = req.params.registrationId;
+        let assignments: AssignmentInterface[];
 
-//     return Models.Registration.find({
-//         where: {
-//           id: registrationId,
-//           scout_id: scoutId
-//         }
-//       })
-//       .then(function (registration) {
-//         if (Array.isArray(req.body)) {
-//           // Update preferences, override existing
-//           return Models.Preference.destroy({
-//               where: {
-//                 registration_id: registrationId
-//               }
-//             })
-//             .then(function () {
-//               var preferences = _.map(req.body, function (preference) {
-//                 return {
-//                   registration_id: registrationId,
-//                   offering_id: preference.offering,
-//                   rank: preference.rank
-//                 };
-//               });
-//               return Models.Preference.bulkCreate(preferences, {
-//                 validate: true,
-//                 individualHooks: true
-//               });
-//             })
-//             .catch(function (err) {
-//               throw new Error('Failed to destroy existing preferences');
-//             });
-//         } else {
-//           // Add preference, without overriding
-//           return registration.addPreference(req.body.offering, {
-//             through: {
-//               rank: req.body.rank
-//             }
-//           });
-//         }
-//       })
-//       .then(function () {
-//         return Models.Registration.findById(registrationId, {
-//           include: [{
-//             model: Models.Offering,
-//             as: 'preferences',
-//             attributes: ['badge_id', ['id', 'offering_id']],
-//             through: {
-//               as: 'details',
-//               attributes: ['rank']
-//             }
-//           }]
-//         });
-//       })
-//       .then(function (registration) {
-//         res.status(status.CREATED).json({
-//           message: 'Preference created with rank ' + req.body.rank,
-//           registration: registration
-//         });
-//       })
-//       .catch(function (err) {
-//         res.status(status.BAD_REQUEST).json({
-//           message: 'Preference could not be created',
-//           error: err
-//         });
-//       });
-//   },
+        if (Array.isArray(req.body)) {
+            await Assignment.destroy({
+                where: {
+                    registration_id: registrationId
+                }
+            });
+
+            assignments = req.body.map((assignment: AssignmentRequestInterface) => ({
+                registration_id: registrationId,
+                offering_id: assignment.offering,
+                periods: assignment.periods,
+                completions: assignment.completions
+            }));
+
+        } else {
+            assignments = [{
+                registration_id: registrationId,
+                offering_id: req.body.offering,
+                periods: req.body.periods,
+                completions: req.body.completions
+            }];
+        }
+
+        await Assignment.bulkCreate(assignments, {
+            individualHooks: true,
+            validate: true
+        });
+
+        const createdRegistration: Registration = await Registration.findByPk(registrationId, {
+            include: [{
+                model: Offering,
+                as: 'assignments',
+                attributes: ['badge_id', ['id', 'offering_id'], 'price'],
+                through: {
+                    as: 'details',
+                    attributes: ['periods', 'completions']
+                },
+                include: [{
+                    model: Badge,
+                    as: 'badge',
+                    attributes: ['name']
+                }]
+            }],
+        });
+
+        return res.status(status.CREATED).json(<RegistrationResponseInterface>{
+            message: 'Assignment created successfully',
+            registration: createdRegistration
+        });
+    } catch (err) {
+        return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+            message: 'Assignment could not be created',
+            error: 'err'
+        });
+    }
+};
+
 //   createAssignment: function (req, res) {
 //     var scoutId = req.params.scoutId;
 //     var registrationId = req.params.registrationId;

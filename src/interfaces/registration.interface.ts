@@ -6,6 +6,7 @@ export interface RegistrationInterface {
     scout_id?: number;
     notes?: string;
     preferences?: OfferingInterface[];
+    assignments?: OfferingInterface[];
 }
 
 export interface RegistrationResponseInterface {

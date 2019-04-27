@@ -6,6 +6,7 @@ import { Scout } from '@models/scout.model';
 import { Event } from '@models/event.model';
 import { Registration } from '@models/registration.model';
 import { Preference } from '@models/preference.model';
+import { Assignment } from '@models/assignment.model';
 
 export const deleteRegistration = async (req: Request, res: Response) => {
     try {
@@ -66,63 +67,42 @@ export const deletePreference = async (req: Request, res: Response) => {
     }
 };
 
+export const deleteAssignment = async (req: Request, res: Response) => {
+    try {
+        const [registration, assignment]: [Registration, Assignment] = await Promise.all([
+            Registration.findOne({
+                where: {
+                    id: req.params.registrationId,
+                    scout_id: req.params.scoutId
+                }
+            }),
+            Assignment.findOne({
+                where: {
+                    offering_id: req.params.offeringId,
+                    registration_id: req.params.registrationId
+                }
+            })
+        ]);
 
-//   deletePreference: function (req, res) {
-//     var scoutId = req.params.scoutId;
-//     var registrationId = req.params.registrationId;
-//     var offeringId = req.params.offeringId;
+        if (!registration) {
+            throw new Error('No registration to delete from');
+        }
 
-//     return Models.Registration.find({
-//       where: {
-//         id: registrationId,
-//         scout_id: scoutId
-//       }
-//     })
-//       .then(function (registration) {
-//         return registration.removePreference(offeringId);
-//       })
-//       .then(function (deleted) {
-//         if (!deleted) {
-//           throw new Error('No preference to delete');
-//         }
+        if (!assignment) {
+            throw new Error('Assignment to delete not found');
+        }
 
-//         res.status(status.OK).end();
-//       })
-//       .catch(function (err) {
-//         res.status(status.BAD_REQUEST).json({
-//           message: 'Could not remove preference ' + offeringId + ' for registration ' + registrationId,
-//           error: err
-//         });
-//       });
-//   },
-//   deleteAssignment: function (req, res) {
-//     var scoutId = req.params.scoutId;
-//     var registrationId = req.params.registrationId;
-//     var offeringId = req.params.offeringId;
+        await registration.$remove('assignment', req.params.offeringId);
 
-//     return Models.Registration.find({
-//       where: {
-//         id: registrationId,
-//         scout_id: scoutId
-//       }
-//     })
-//       .then(function (registration) {
-//         return registration.removeAssignment(offeringId);
-//       })
-//       .then(function (deleted) {
-//         if (!deleted) {
-//           throw new Error('No assignment to delete');
-//         }
+        return res.status(status.OK).end();
+    } catch (err) {
+        return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+            message: `Could not remove assignment ${req.params.offeringId} for registration ${req.params.registrationId}`,
+            error: err
+        });
+    }
+};
 
-//         res.status(status.OK).end();
-//       .catch(function (err) {
-//       })
-//         res.status(status.BAD_REQUEST).json({
-//           message: 'Could not remove assignment ' + offeringId + ' for registration ' + registrationId,
-//           error: err
-//         });
-//       });
-//   },
 //   deletePurchase: function (req, res) {
 //     var scoutId = req.params.scoutId;
 //     var registrationId = req.params.registrationId;

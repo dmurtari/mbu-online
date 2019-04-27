@@ -550,547 +550,543 @@ describe('purchasables', () => {
             });
         });
 
-        // describe('associating purchasables to a registration', () => {
-        //     let purchasables: Purchasable[];
-        //     let registrationIds: number[];
+        describe.only('associating purchasables to a registration', () => {
+            let purchasables: Purchasable[];
+            let registrationIds: number[];
 
-        //     beforeEach(async () => {
-        //         await TestUtils.dropTable([Registration, Purchasable, Purchase, Scout]);
-        //     });
+            beforeEach(async () => {
+                await TestUtils.dropTable([Registration, Purchasable, Purchase, Scout]);
+            });
 
-        //     beforeEach(async () => {
-        //         generatedScouts = await TestUtils.createScoutsForUser(generatedUsers.coordinator, testScouts(5));
-        //     });
+            beforeEach(async () => {
+                generatedScouts = await TestUtils.createScoutsForUser(generatedUsers.coordinator, testScouts(5));
+            });
 
-        //     beforeEach((done) => {
-        //         scoutId = generatedScouts[0].id;
-        //         registrationIds = [];
-        //         async.series([
-        //             (cb) => {
-        //                 request.post('/api/scouts/' + scoutId + '/registrations')
-        //                     .set('Authorization', generatedUsers.coordinator.token)
-        //                     .send({
-        //                         event_id: events[0].id
-        //                     })
-        //                     .expect(status.CREATED)
-        //                     .end((err, res) => {
-        //                         if (err) { return done(err); }
-        //                         registrationIds.push(res.body.registration.id);
-        //                         return cb();
-        //                     });
-        //             },
-        //             (cb) => {
-        //                 request.post('/api/scouts/' + scoutId + '/registrations')
-        //                     .set('Authorization', generatedUsers.coordinator.token)
-        //                     .send({
-        //                         event_id: events[1].id
-        //                     })
-        //                     .expect(status.CREATED)
-        //                     .end((err, res) => {
-        //                         if (err) { return done(err); }
-        //                         registrationIds.push(res.body.registration.id);
-        //                         return cb();
-        //                     });
-        //             }
-        //         ], done);
-        //     });
+            beforeEach((done) => {
+                scoutId = generatedScouts[0].id;
+                registrationIds = [];
+                async.series([
+                    (cb) => {
+                        request.post('/api/scouts/' + scoutId + '/registrations')
+                            .set('Authorization', generatedUsers.coordinator.token)
+                            .send({
+                                event_id: events[0].id
+                            })
+                            .expect(status.CREATED)
+                            .end((err, res) => {
+                                if (err) { return done(err); }
+                                registrationIds.push(res.body.registration.id);
+                                return cb();
+                            });
+                    },
+                    (cb) => {
+                        request.post('/api/scouts/' + scoutId + '/registrations')
+                            .set('Authorization', generatedUsers.coordinator.token)
+                            .send({
+                                event_id: events[1].id
+                            })
+                            .expect(status.CREATED)
+                            .end((err, res) => {
+                                if (err) { return done(err); }
+                                registrationIds.push(res.body.registration.id);
+                                return cb();
+                            });
+                    }
+                ], done);
+            });
 
-        //     beforeEach((done) => {
-        //         utils.createPurchasablesForEvent(events[0].id, (err, items) => {
-        //             if (err) { return done(err); }
-        //             purchasables = items;
-        //             return done();
-        //         });
-        //     });
+            beforeEach(async () => {
+                purchasables = await TestUtils.createPurchasablesForEvent(events[0]);
+            });
 
-        //     describe('creating a purchase', () => {
-        //         it('should associate the purchasable to an event', (done) => {
-        //             var postData = {
-        //                 purchasable: purchasables[1].id,
-        //                 quantity: 3
-        //             };
+            describe('creating a purchase', () => {
+                it('should associate the purchasable to an event', (done) => {
+                    var postData = {
+                        purchasable: purchasables[1].id,
+                        quantity: 3
+                    };
 
-        //             request.post('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/purchases')
-        //                 .set('Authorization', generatedUsers.coordinator.token)
-        //                 .send(postData)
-        //                 .expect(status.CREATED)
-        //                 .end((err, res) => {
-        //                     if (err) { return done(err); }
-        //                     expect(res.body.registration.purchases).to.have.length(1);
-        //                     var purchase = res.body.registration.purchases[0];
-        //                     expect(purchase.id).to.equal(postData.purchasable);
-        //                     expect(purchase.details.quantity).to.equal(postData.quantity);
-        //                     expect(purchase.details.size).to.not.exist;
-        //                     return done();
-        //                 });
-        //         });
+                    request.post('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/purchases')
+                        .set('Authorization', generatedUsers.coordinator.token)
+                        .send(postData)
+                        .expect(status.CREATED)
+                        .end((err, res) => {
+                            if (err) { return done(err); }
+                            expect(res.body.registration.purchases).to.have.length(1);
+                            var purchase = res.body.registration.purchases[0];
+                            expect(purchase.id).to.equal(postData.purchasable);
+                            expect(purchase.details.quantity).to.equal(postData.quantity);
+                            expect(purchase.details.size).to.not.exist;
+                            return done();
+                        });
+                });
 
-        //         it('should allow a scout that is in the valid age range', (done) => {
-        //             var validPurchaseId;
-        //             async.series([
-        //                 (cb) => {
-        //                     var postData = {
-        //                         item: 'Adult Lunch With Age',
-        //                         price: '12.00',
-        //                         minimum_age: 0
-        //                     };
+                it('should allow a scout that is in the valid age range', (done) => {
+                    var validPurchaseId;
+                    async.series([
+                        (cb) => {
+                            var postData = {
+                                item: 'Adult Lunch With Age',
+                                price: '12.00',
+                                minimum_age: 0
+                            };
 
-        //                     request.post('/api/events/' + events[0].id + '/purchasables')
-        //                         .set('Authorization', generatedUsers.admin.token)
-        //                         .send(postData)
-        //                         .expect(status.CREATED)
-        //                         .end((err, res) => {
-        //                             if (err) { return done(err); }
-        //                             expect(res.body.purchasables[4].item).to.equal(postData.item);
-        //                             validPurchaseId = res.body.purchasables[4].id;
-        //                             return cb();
-        //                         });
-        //                 },
-        //                 (cb) => {
-        //                     var postData = {
-        //                         purchasable: validPurchaseId
-        //                     };
+                            request.post('/api/events/' + events[0].id + '/purchasables')
+                                .set('Authorization', generatedUsers.admin.token)
+                                .send(postData)
+                                .expect(status.CREATED)
+                                .end((err, res) => {
+                                    if (err) { return done(err); }
+                                    expect(res.body.purchasables[4].item).to.equal(postData.item);
+                                    validPurchaseId = res.body.purchasables[4].id;
+                                    return cb();
+                                });
+                        },
+                        (cb) => {
+                            var postData = {
+                                purchasable: validPurchaseId
+                            };
 
-        //                     request.post('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/purchases')
-        //                         .set('Authorization', generatedUsers.coordinator.token)
-        //                         .send(postData)
-        //                         .expect(status.CREATED, cb);
-        //                 }
-        //             ], done);
-        //         });
+                            request.post('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/purchases')
+                                .set('Authorization', generatedUsers.coordinator.token)
+                                .send(postData)
+                                .expect(status.CREATED, cb);
+                        }
+                    ], done);
+                });
 
-        //         xit('should allow scouts to purchase an item multiple times', (done) => {
-        //             var postData = {
-        //                 purchasable: purchasables[1].id,
-        //                 quantity: 3
-        //             };
+                xit('should allow scouts to purchase an item multiple times', (done) => {
+                    var postData = {
+                        purchasable: purchasables[1].id,
+                        quantity: 3
+                    };
 
-        //             async.series([
-        //                 (cb) => {
-        //                     request.post('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/purchases')
-        //                         .set('Authorization', generatedUsers.coordinator.token)
-        //                         .send(postData)
-        //                         .expect(status.CREATED, cb);
-        //                 },
-        //                 (cb) => {
-        //                     request.post('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/purchases')
-        //                         .set('Authorization', generatedUsers.coordinator.token)
-        //                         .send(postData)
-        //                         .expect(status.CREATED, cb);
-        //                 },
-        //                 (cb) => {
-        //                     request.get('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/purchases')
-        //                         .set('Authorization', generatedUsers.coordinator.token)
-        //                         .expect(status.OK)
-        //                         .end((err, res) => {
-        //                             if (err) { return done(err); }
-        //                             var purchases = res.body;
-        //                             expect(purchases).to.have.length(2);
-        //                             return cb();
-        //                         });
-        //                 }
-        //             ], done);
-        //         });
+                    async.series([
+                        (cb) => {
+                            request.post('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/purchases')
+                                .set('Authorization', generatedUsers.coordinator.token)
+                                .send(postData)
+                                .expect(status.CREATED, cb);
+                        },
+                        (cb) => {
+                            request.post('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/purchases')
+                                .set('Authorization', generatedUsers.coordinator.token)
+                                .send(postData)
+                                .expect(status.CREATED, cb);
+                        },
+                        (cb) => {
+                            request.get('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/purchases')
+                                .set('Authorization', generatedUsers.coordinator.token)
+                                .expect(status.OK)
+                                .end((err, res) => {
+                                    if (err) { return done(err); }
+                                    var purchases = res.body;
+                                    expect(purchases).to.have.length(2);
+                                    return cb();
+                                });
+                        }
+                    ], done);
+                });
 
-        //         xit('should not allow a scout that is too old to purchase', (done) => {
-        //             var invalidPurchaseId;
-        //             async.series([
-        //                 (cb) => {
-        //                     var postData = {
-        //                         item: 'Youth Lunch With Age',
-        //                         price: '12.00',
-        //                         maximum_age: 0
-        //                     };
+                xit('should not allow a scout that is too old to purchase', (done) => {
+                    var invalidPurchaseId;
+                    async.series([
+                        (cb) => {
+                            var postData = {
+                                item: 'Youth Lunch With Age',
+                                price: '12.00',
+                                maximum_age: 0
+                            };
 
-        //                     request.post('/api/events/' + events[0].id + '/purchasables')
-        //                         .set('Authorization', generatedUsers.admin.token)
-        //                         .send(postData)
-        //                         .expect(status.CREATED)
-        //                         .end((err, res) => {
-        //                             if (err) { return done(err); }
-        //                             expect(res.body.purchasables[4].item).to.equal(postData.item);
-        //                             invalidPurchaseId = res.body.purchasables[4].id;
-        //                             return cb();
-        //                         });
-        //                 },
-        //                 (cb) => {
-        //                     var postData = {
-        //                         purchasable: invalidPurchaseId
-        //                     };
+                            request.post('/api/events/' + events[0].id + '/purchasables')
+                                .set('Authorization', generatedUsers.admin.token)
+                                .send(postData)
+                                .expect(status.CREATED)
+                                .end((err, res) => {
+                                    if (err) { return done(err); }
+                                    expect(res.body.purchasables[4].item).to.equal(postData.item);
+                                    invalidPurchaseId = res.body.purchasables[4].id;
+                                    return cb();
+                                });
+                        },
+                        (cb) => {
+                            var postData = {
+                                purchasable: invalidPurchaseId
+                            };
 
-        //                     request.post('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/purchases')
-        //                         .set('Authorization', generatedUsers.coordinator.token)
-        //                         .send(postData)
-        //                         .expect(status.BAD_REQUEST, cb);
-        //                 }
-        //             ], done);
-        //         });
+                            request.post('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/purchases')
+                                .set('Authorization', generatedUsers.coordinator.token)
+                                .send(postData)
+                                .expect(status.BAD_REQUEST, cb);
+                        }
+                    ], done);
+                });
 
-        //         it('should default to 0 for quantity', (done) => {
-        //             var postData = {
-        //                 purchasable: purchasables[0].id
-        //             };
+                it('should default to 0 for quantity', (done) => {
+                    var postData = {
+                        purchasable: purchasables[0].id
+                    };
 
-        //             request.post('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/purchases')
-        //                 .set('Authorization', generatedUsers.coordinator.token)
-        //                 .send(postData)
-        //                 .expect(status.CREATED)
-        //                 .end((err, res) => {
-        //                     if (err) { return done(err); }
-        //                     expect(res.body.registration.purchases).to.have.length(1);
-        //                     var purchase = res.body.registration.purchases[0];
-        //                     expect(purchase.id).to.equal(postData.purchasable);
-        //                     expect(purchase.details.quantity).to.equal(0);
-        //                     expect(purchase.details.size).to.not.exist;
-        //                     return done();
-        //                 });
-        //         });
+                    request.post('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/purchases')
+                        .set('Authorization', generatedUsers.coordinator.token)
+                        .send(postData)
+                        .expect(status.CREATED)
+                        .end((err, res) => {
+                            if (err) { return done(err); }
+                            expect(res.body.registration.purchases).to.have.length(1);
+                            var purchase = res.body.registration.purchases[0];
+                            expect(purchase.id).to.equal(postData.purchasable);
+                            expect(purchase.details.quantity).to.equal(0);
+                            expect(purchase.details.size).to.not.exist;
+                            return done();
+                        });
+                });
 
-        //         it('should accept a size', (done) => {
-        //             var postData = {
-        //                 purchasable: purchasables[0].id,
-        //                 size: 'l',
-        //                 quantity: 2
-        //             };
+                it('should accept a size', (done) => {
+                    var postData = {
+                        purchasable: purchasables[0].id,
+                        size: 'l',
+                        quantity: 2
+                    };
 
-        //             request.post('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/purchases')
-        //                 .set('Authorization', generatedUsers.coordinator.token)
-        //                 .send(postData)
-        //                 .expect(status.CREATED)
-        //                 .end((err, res) => {
-        //                     if (err) { return done(err); }
-        //                     expect(res.body.registration.purchases).to.have.length(1);
-        //                     var purchase = res.body.registration.purchases[0];
-        //                     expect(purchase.id).to.equal(postData.purchasable);
-        //                     expect(purchase.details.quantity).to.equal(postData.quantity);
-        //                     expect(purchase.details.size).to.equal(postData.size);
-        //                     return done();
-        //                 });
-        //         });
+                    request.post('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/purchases')
+                        .set('Authorization', generatedUsers.coordinator.token)
+                        .send(postData)
+                        .expect(status.CREATED)
+                        .end((err, res) => {
+                            if (err) { return done(err); }
+                            expect(res.body.registration.purchases).to.have.length(1);
+                            var purchase = res.body.registration.purchases[0];
+                            expect(purchase.id).to.equal(postData.purchasable);
+                            expect(purchase.details.quantity).to.equal(postData.quantity);
+                            expect(purchase.details.size).to.equal(postData.size);
+                            return done();
+                        });
+                });
 
-        //         it('should check for the scouts owner', (done) => {
-        //             var postData = {
-        //                 purchasable: purchasables[0].id,
-        //                 size: 'l',
-        //                 quantity: 2
-        //             };
+                it('should check for the scouts owner', (done) => {
+                    var postData = {
+                        purchasable: purchasables[0].id,
+                        size: 'l',
+                        quantity: 2
+                    };
 
-        //             request.post('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/purchases')
-        //                 .set('Authorization', generatedUsers.coordinator2.token)
-        //                 .send(postData)
-        //                 .expect(status.UNAUTHORIZED, done);
-        //         });
+                    request.post('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/purchases')
+                        .set('Authorization', generatedUsers.coordinator2.token)
+                        .send(postData)
+                        .expect(status.UNAUTHORIZED, done);
+                });
 
-        //         it('should not allow teachers to create', (done) => {
-        //             var postData = {
-        //                 purchasable: purchasables[0].id,
-        //                 size: 'l',
-        //                 quantity: 2
-        //             };
+                it('should not allow teachers to create', (done) => {
+                    var postData = {
+                        purchasable: purchasables[0].id,
+                        size: 'l',
+                        quantity: 2
+                    };
 
-        //             request.post('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/purchases')
-        //                 .set('Authorization', generatedUsers.teacher.token)
-        //                 .send(postData)
-        //                 .expect(status.UNAUTHORIZED, done);
-        //         });
+                    request.post('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/purchases')
+                        .set('Authorization', generatedUsers.teacher.token)
+                        .send(postData)
+                        .expect(status.UNAUTHORIZED, done);
+                });
 
-        //         it('should allow admins to create', (done) => {
-        //             var postData = {
-        //                 purchasable: purchasables[0].id,
-        //                 size: 'l',
-        //                 quantity: 2
-        //             };
+                it('should allow admins to create', (done) => {
+                    var postData = {
+                        purchasable: purchasables[0].id,
+                        size: 'l',
+                        quantity: 2
+                    };
 
-        //             request.post('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/purchases')
-        //                 .set('Authorization', generatedUsers.admin.token)
-        //                 .send(postData)
-        //                 .expect(status.CREATED, done);
-        //         });
+                    request.post('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/purchases')
+                        .set('Authorization', generatedUsers.admin.token)
+                        .send(postData)
+                        .expect(status.CREATED, done);
+                });
 
-        //         it('should not create for a nonexistant purchasable', (done) => {
-        //             var postData = {
-        //                 purchasable: utils.badId,
-        //                 quantity: 1
-        //             };
+                it('should not create for a nonexistant purchasable', (done) => {
+                    var postData = {
+                        purchasable: utils.badId,
+                        quantity: 1
+                    };
 
-        //             request.post('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/purchases')
-        //                 .set('Authorization', generatedUsers.coordinator.token)
-        //                 .send(postData)
-        //                 .expect(status.BAD_REQUEST, done);
-        //         });
+                    request.post('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/purchases')
+                        .set('Authorization', generatedUsers.coordinator.token)
+                        .send(postData)
+                        .expect(status.BAD_REQUEST, done);
+                });
 
-        //         it('should not create for a nonexistant registration', (done) => {
-        //             var postData = {
-        //                 purchasable: purchasables[0].id,
-        //                 quantity: 1
-        //             };
+                it('should not create for a nonexistant registration', (done) => {
+                    var postData = {
+                        purchasable: purchasables[0].id,
+                        quantity: 1
+                    };
 
-        //             request.post('/api/scouts/' + scoutId + '/registrations/' + utils.badId + '/purchases')
-        //                 .set('Authorization', generatedUsers.coordinator.token)
-        //                 .send(postData)
-        //                 .expect(status.BAD_REQUEST, done);
-        //         });
+                    request.post('/api/scouts/' + scoutId + '/registrations/' + utils.badId + '/purchases')
+                        .set('Authorization', generatedUsers.coordinator.token)
+                        .send(postData)
+                        .expect(status.BAD_REQUEST, done);
+                });
 
-        //         it('should not create for a nonexistant scout', (done) => {
-        //             var postData = {
-        //                 purchasable: purchasables[0].id,
-        //                 quantity: 1
-        //             };
+                it('should not create for a nonexistant scout', (done) => {
+                    var postData = {
+                        purchasable: purchasables[0].id,
+                        quantity: 1
+                    };
 
-        //             request.post('/api/scouts/' + utils.badId + '/registrations/' + registrationIds[0] + '/purchases')
-        //                 .set('Authorization', generatedUsers.coordinator.token)
-        //                 .send(postData)
-        //                 .expect(status.BAD_REQUEST, done);
-        //         });
-        //     });
+                    request.post('/api/scouts/' + utils.badId + '/registrations/' + registrationIds[0] + '/purchases')
+                        .set('Authorization', generatedUsers.coordinator.token)
+                        .send(postData)
+                        .expect(status.BAD_REQUEST, done);
+                });
+            });
 
-        //     describe('when purchases already exist', () => {
-        //         beforeEach((done) => {
-        //             async.series([
-        //                 (cb) => {
-        //                     request.post('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/purchases')
-        //                         .set('Authorization', generatedUsers.coordinator.token)
-        //                         .send({
-        //                             purchasable: purchasables[0].id,
-        //                             size: 'l',
-        //                             quantity: 2
-        //                         })
-        //                         .expect(status.CREATED, cb);
-        //                 },
-        //                 (cb) => {
-        //                     request.post('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/purchases')
-        //                         .set('Authorization', generatedUsers.coordinator.token)
-        //                         .send({
-        //                             purchasable: purchasables[1].id,
-        //                             quantity: 1
-        //                         })
-        //                         .expect(status.CREATED, cb);
-        //                 },
-        //                 (cb) => {
-        //                     request.post('/api/scouts/' + scoutId + '/registrations/' + registrationIds[1] + '/purchases')
-        //                         .set('Authorization', generatedUsers.coordinator.token)
-        //                         .send({
-        //                             purchasable: purchasables[3].id,
-        //                             quantity: 5
-        //                         })
-        //                         .expect(status.CREATED, cb);
-        //                 }
-        //             ], done);
-        //         });
+            describe('when purchases already exist', () => {
+                beforeEach((done) => {
+                    async.series([
+                        (cb) => {
+                            request.post('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/purchases')
+                                .set('Authorization', generatedUsers.coordinator.token)
+                                .send({
+                                    purchasable: purchasables[0].id,
+                                    size: 'l',
+                                    quantity: 2
+                                })
+                                .expect(status.CREATED, cb);
+                        },
+                        (cb) => {
+                            request.post('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/purchases')
+                                .set('Authorization', generatedUsers.coordinator.token)
+                                .send({
+                                    purchasable: purchasables[1].id,
+                                    quantity: 1
+                                })
+                                .expect(status.CREATED, cb);
+                        },
+                        (cb) => {
+                            request.post('/api/scouts/' + scoutId + '/registrations/' + registrationIds[1] + '/purchases')
+                                .set('Authorization', generatedUsers.coordinator.token)
+                                .send({
+                                    purchasable: purchasables[3].id,
+                                    quantity: 5
+                                })
+                                .expect(status.CREATED, cb);
+                        }
+                    ], done);
+                });
 
-        //         describe('getting purchases', () => {
-        //             it('should get all purchases for a registration', (done) => {
-        //                 request.get('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/purchases')
-        //                     .set('Authorization', generatedUsers.coordinator.token)
-        //                     .expect(status.OK)
-        //                     .end((err, res) => {
-        //                         if (err) { return done(err); }
-        //                         var purchases = res.body;
-        //                         expect(purchases).to.have.length(2);
-        //                         expect(purchases[0].id).to.equal(purchasables[0].id);
-        //                         expect(purchases[0].details.size).to.equal('l');
-        //                         expect(purchases[0].details.quantity).to.equal(2);
-        //                         expect(purchases[1].id).to.equal(purchasables[1].id);
-        //                         expect(purchases[1].details.quantity).to.equal(1);
-        //                         expect(purchases[1].details.size).to.not.exist;
-        //                         return done();
-        //                     });
-        //             });
+                describe('getting purchases', () => {
+                    it('should get all purchases for a registration', (done) => {
+                        request.get('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/purchases')
+                            .set('Authorization', generatedUsers.coordinator.token)
+                            .expect(status.OK)
+                            .end((err, res) => {
+                                if (err) { return done(err); }
+                                var purchases = res.body;
+                                expect(purchases).to.have.length(2);
+                                expect(purchases[0].id).to.equal(purchasables[0].id);
+                                expect(purchases[0].details.size).to.equal('l');
+                                expect(purchases[0].details.quantity).to.equal(2);
+                                expect(purchases[1].id).to.equal(purchasables[1].id);
+                                expect(purchases[1].details.quantity).to.equal(1);
+                                expect(purchases[1].details.size).to.not.exist;
+                                return done();
+                            });
+                    });
 
-        //             it('should not get with an incorrect scout', (done) => {
-        //                 request.get('/api/scouts/' + badId + '/registrations/' + registrationIds[0] + '/purchases')
-        //                     .set('Authorization', generatedUsers.coordinator.token)
-        //                     .expect(status.BAD_REQUEST, done);
-        //             });
+                    it('should not get with an incorrect scout', (done) => {
+                        request.get('/api/scouts/' + badId + '/registrations/' + registrationIds[0] + '/purchases')
+                            .set('Authorization', generatedUsers.coordinator.token)
+                            .expect(status.BAD_REQUEST, done);
+                    });
 
-        //             it('should not get with an incorrect registration', (done) => {
-        //                 request.get('/api/scouts/' + generatedScouts[0].id + '/registrations/' + badId + '/purchases')
-        //                     .set('Authorization', generatedUsers.coordinator.token)
-        //                     .expect(status.BAD_REQUEST, done);
-        //             });
-        //         });
+                    it('should not get with an incorrect registration', (done) => {
+                        request.get('/api/scouts/' + generatedScouts[0].id + '/registrations/' + badId + '/purchases')
+                            .set('Authorization', generatedUsers.coordinator.token)
+                            .expect(status.BAD_REQUEST, done);
+                    });
+                });
 
-        //         describe('updating purchases', () => {
-        //             it('should update a purchase', (done) => {
-        //                 async.series([
-        //                     (cb) => {
-        //                         request.get('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/purchases')
-        //                             .set('Authorization', generatedUsers.coordinator.token)
-        //                             .expect(status.OK)
-        //                             .end((err, res) => {
-        //                                 if (err) { return done(err); }
-        //                                 expect(res.body[0].details.quantity).to.equal(2);
-        //                                 return cb();
-        //                             });
-        //                     },
-        //                     (cb) => {
-        //                         request.put('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/purchases/' + purchasables[0].id)
-        //                             .set('Authorization', generatedUsers.coordinator.token)
-        //                             .send({
-        //                                 quantity: 1
-        //                             })
-        //                             .expect(status.OK, cb);
-        //                     },
-        //                     (cb) => {
-        //                         request.get('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/purchases')
-        //                             .set('Authorization', generatedUsers.coordinator.token)
-        //                             .expect(status.OK)
-        //                             .end((err, res) => {
-        //                                 if (err) { return done(err); }
-        //                                 expect(res.body[0].details.quantity).to.equal(1);
-        //                                 return cb();
-        //                             });
-        //                     }
-        //                 ], done);
-        //             });
+                describe('updating purchases', () => {
+                    it('should update a purchase', (done) => {
+                        async.series([
+                            (cb) => {
+                                request.get('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/purchases')
+                                    .set('Authorization', generatedUsers.coordinator.token)
+                                    .expect(status.OK)
+                                    .end((err, res) => {
+                                        if (err) { return done(err); }
+                                        expect(res.body[0].details.quantity).to.equal(2);
+                                        return cb();
+                                    });
+                            },
+                            (cb) => {
+                                request.put('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/purchases/' + purchasables[0].id)
+                                    .set('Authorization', generatedUsers.coordinator.token)
+                                    .send({
+                                        quantity: 1
+                                    })
+                                    .expect(status.OK, cb);
+                            },
+                            (cb) => {
+                                request.get('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/purchases')
+                                    .set('Authorization', generatedUsers.coordinator.token)
+                                    .expect(status.OK)
+                                    .end((err, res) => {
+                                        if (err) { return done(err); }
+                                        expect(res.body[0].details.quantity).to.equal(1);
+                                        return cb();
+                                    });
+                            }
+                        ], done);
+                    });
 
-        //             it('should check for the scouts owner', (done) => {
-        //                 request.put('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/purchases/' + purchasables[0].id)
-        //                     .set('Authorization', generatedUsers.coordinator2.token)
-        //                     .send({
-        //                         quantity: 1
-        //                     })
-        //                     .expect(status.UNAUTHORIZED, done);
-        //             });
+                    it('should check for the scouts owner', (done) => {
+                        request.put('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/purchases/' + purchasables[0].id)
+                            .set('Authorization', generatedUsers.coordinator2.token)
+                            .send({
+                                quantity: 1
+                            })
+                            .expect(status.UNAUTHORIZED, done);
+                    });
 
-        //             it('should not allow teachers to update', (done) => {
-        //                 request.put('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/purchases/' + purchasables[0].id)
-        //                     .set('Authorization', generatedUsers.teacher.token)
-        //                     .send({
-        //                         quantity: 1
-        //                     })
-        //                     .expect(status.UNAUTHORIZED, done);
-        //             });
+                    it('should not allow teachers to update', (done) => {
+                        request.put('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/purchases/' + purchasables[0].id)
+                            .set('Authorization', generatedUsers.teacher.token)
+                            .send({
+                                quantity: 1
+                            })
+                            .expect(status.UNAUTHORIZED, done);
+                    });
 
-        //             it('should allow admins to update', (done) => {
-        //                 request.put('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/purchases/' + purchasables[0].id)
-        //                     .set('Authorization', generatedUsers.admin.token)
-        //                     .send({
-        //                         quantity: 1
-        //                     })
-        //                     .expect(status.OK, done);
-        //             });
+                    it('should allow admins to update', (done) => {
+                        request.put('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/purchases/' + purchasables[0].id)
+                            .set('Authorization', generatedUsers.admin.token)
+                            .send({
+                                quantity: 1
+                            })
+                            .expect(status.OK, done);
+                    });
 
-        //             it('should not update an invalid purchase', (done) => {
-        //                 request.put('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/purchases/' + utils.badId)
-        //                     .set('Authorization', generatedUsers.coordinator.token)
-        //                     .send({
-        //                         quantity: 1
-        //                     })
-        //                     .expect(status.BAD_REQUEST, done);
-        //             });
+                    it('should not update an invalid purchase', (done) => {
+                        request.put('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/purchases/' + utils.badId)
+                            .set('Authorization', generatedUsers.coordinator.token)
+                            .send({
+                                quantity: 1
+                            })
+                            .expect(status.BAD_REQUEST, done);
+                    });
 
-        //             it('should not update an invalid registration', (done) => {
-        //                 request.put('/api/scouts/' + generatedScouts[0].id + '/registrations/' + utils.badId + '/purchases/' + purchasables[0].id)
-        //                     .set('Authorization', generatedUsers.coordinator.token)
-        //                     .send({
-        //                         quantity: 1
-        //                     })
-        //                     .expect(status.BAD_REQUEST, done);
-        //             });
+                    it('should not update an invalid registration', (done) => {
+                        request.put('/api/scouts/' + generatedScouts[0].id + '/registrations/' + utils.badId + '/purchases/' + purchasables[0].id)
+                            .set('Authorization', generatedUsers.coordinator.token)
+                            .send({
+                                quantity: 1
+                            })
+                            .expect(status.BAD_REQUEST, done);
+                    });
 
-        //             it('should not update an invalid scout', (done) => {
-        //                 request.put('/api/scouts/' + utils.badId + '/registrations/' + registrationIds[0] + '/purchases/' + purchasables[0].id)
-        //                     .set('Authorization', generatedUsers.coordinator.token)
-        //                     .send({
-        //                         quantity: 1
-        //                     })
-        //                     .expect(status.BAD_REQUEST, done);
-        //             });
+                    it('should not update an invalid scout', (done) => {
+                        request.put('/api/scouts/' + utils.badId + '/registrations/' + registrationIds[0] + '/purchases/' + purchasables[0].id)
+                            .set('Authorization', generatedUsers.coordinator.token)
+                            .send({
+                                quantity: 1
+                            })
+                            .expect(status.BAD_REQUEST, done);
+                    });
 
-        //             it('should not update a purchase for the wrong registration', (done) => {
-        //                 request.put('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/purchases/' + purchasables[3].id)
-        //                     .set('Authorization', generatedUsers.coordinator.token)
-        //                     .send({
-        //                         quantity: 1
-        //                     })
-        //                     .expect(status.BAD_REQUEST, done);
-        //             });
+                    it('should not update a purchase for the wrong registration', (done) => {
+                        request.put('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/purchases/' + purchasables[3].id)
+                            .set('Authorization', generatedUsers.coordinator.token)
+                            .send({
+                                quantity: 1
+                            })
+                            .expect(status.BAD_REQUEST, done);
+                    });
 
-        //             it('should not allow a required value to be unset', (done) => {
-        //                 request.put('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/purchases/' + purchasables[0].id)
-        //                     .set('Authorization', generatedUsers.coordinator.token)
-        //                     .send({
-        //                         quantity: null
-        //                     })
-        //                     .expect(status.BAD_REQUEST, done);
-        //             });
-        //         });
+                    it('should not allow a required value to be unset', (done) => {
+                        request.put('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/purchases/' + purchasables[0].id)
+                            .set('Authorization', generatedUsers.coordinator.token)
+                            .send({
+                                quantity: null
+                            })
+                            .expect(status.BAD_REQUEST, done);
+                    });
+                });
 
-        //         describe('deleting purchases', () => {
-        //             it('should delete a purchase', (done) => {
-        //                 async.series([
-        //                     (cb) => {
-        //                         request.get('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/purchases')
-        //                             .set('Authorization', generatedUsers.coordinator.token)
-        //                             .expect(status.OK)
-        //                             .end((err, res) => {
-        //                                 if (err) { return done(err); }
-        //                                 expect(res.body).to.have.length(2);
-        //                                 return cb();
-        //                             });
-        //                     },
-        //                     (cb) => {
-        //                         request.del('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/purchases/' + purchasables[0].id)
-        //                             .set('Authorization', generatedUsers.coordinator.token)
-        //                             .expect(status.OK, cb);
-        //                     },
-        //                     (cb) => {
-        //                         request.get('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/purchases')
-        //                             .set('Authorization', generatedUsers.coordinator.token)
-        //                             .expect(status.OK)
-        //                             .end((err, res) => {
-        //                                 if (err) { return done(err); }
-        //                                 expect(res.body).to.have.length(1);
-        //                                 return cb();
-        //                             });
-        //                     }
-        //                 ], done);
-        //             });
+                describe('deleting purchases', () => {
+                    it('should delete a purchase', (done) => {
+                        async.series([
+                            (cb) => {
+                                request.get('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/purchases')
+                                    .set('Authorization', generatedUsers.coordinator.token)
+                                    .expect(status.OK)
+                                    .end((err, res) => {
+                                        if (err) { return done(err); }
+                                        expect(res.body).to.have.length(2);
+                                        return cb();
+                                    });
+                            },
+                            (cb) => {
+                                request.del('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/purchases/' + purchasables[0].id)
+                                    .set('Authorization', generatedUsers.coordinator.token)
+                                    .expect(status.OK, cb);
+                            },
+                            (cb) => {
+                                request.get('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/purchases')
+                                    .set('Authorization', generatedUsers.coordinator.token)
+                                    .expect(status.OK)
+                                    .end((err, res) => {
+                                        if (err) { return done(err); }
+                                        expect(res.body).to.have.length(1);
+                                        return cb();
+                                    });
+                            }
+                        ], done);
+                    });
 
-        //             it('should check for the scouts owner', (done) => {
-        //                 request.del('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/purchases/' + purchasables[0].id)
-        //                     .set('Authorization', generatedUsers.coordinator2.token)
-        //                     .expect(status.UNAUTHORIZED, done);
-        //             });
+                    it('should check for the scouts owner', (done) => {
+                        request.del('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/purchases/' + purchasables[0].id)
+                            .set('Authorization', generatedUsers.coordinator2.token)
+                            .expect(status.UNAUTHORIZED, done);
+                    });
 
-        //             it('should not allow teachers to delete', (done) => {
-        //                 request.del('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/purchases/' + purchasables[0].id)
-        //                     .set('Authorization', generatedUsers.teacher.token)
-        //                     .expect(status.UNAUTHORIZED, done);
-        //             });
+                    it('should not allow teachers to delete', (done) => {
+                        request.del('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/purchases/' + purchasables[0].id)
+                            .set('Authorization', generatedUsers.teacher.token)
+                            .expect(status.UNAUTHORIZED, done);
+                    });
 
-        //             it('should allow admins to delete', (done) => {
-        //                 request.del('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/purchases/' + purchasables[0].id)
-        //                     .set('Authorization', generatedUsers.admin.token)
-        //                     .expect(status.OK, done);
-        //             });
+                    it('should allow admins to delete', (done) => {
+                        request.del('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/purchases/' + purchasables[0].id)
+                            .set('Authorization', generatedUsers.admin.token)
+                            .expect(status.OK, done);
+                    });
 
-        //             it('should not delete an invalid purchase', (done) => {
-        //                 request.del('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/purchases/' + utils.badId)
-        //                     .set('Authorization', generatedUsers.coordinator.token)
-        //                     .expect(status.BAD_REQUEST, done);
-        //             });
+                    it('should not delete an invalid purchase', (done) => {
+                        request.del('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/purchases/' + utils.badId)
+                            .set('Authorization', generatedUsers.coordinator.token)
+                            .expect(status.BAD_REQUEST, done);
+                    });
 
-        //             it('should not delete an invalid registration', (done) => {
-        //                 request.del('/api/scouts/' + generatedScouts[0].id + '/registrations/' + utils.badId + '/purchases/' + purchasables[0].id)
-        //                     .set('Authorization', generatedUsers.coordinator.token)
-        //                     .expect(status.BAD_REQUEST, done);
-        //             });
+                    it('should not delete an invalid registration', (done) => {
+                        request.del('/api/scouts/' + generatedScouts[0].id + '/registrations/' + utils.badId + '/purchases/' + purchasables[0].id)
+                            .set('Authorization', generatedUsers.coordinator.token)
+                            .expect(status.BAD_REQUEST, done);
+                    });
 
-        //             it('should not delete an invalid scout', (done) => {
-        //                 request.del('/api/scouts/' + utils.badId + '/registrations/' + registrationIds[0] + '/purchases/' + purchasables[0].id)
-        //                     .set('Authorization', generatedUsers.coordinator.token)
-        //                     .expect(status.BAD_REQUEST, done);
-        //             });
+                    it('should not delete an invalid scout', (done) => {
+                        request.del('/api/scouts/' + utils.badId + '/registrations/' + registrationIds[0] + '/purchases/' + purchasables[0].id)
+                            .set('Authorization', generatedUsers.coordinator.token)
+                            .expect(status.BAD_REQUEST, done);
+                    });
 
-        //             it('should not delete a purchase for the wrong registration', (done) => {
-        //                 request.del('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/purchases/' + purchasables[3].id)
-        //                     .set('Authorization', generatedUsers.coordinator.token)
-        //                     .expect(status.BAD_REQUEST, done);
-        //             });
-        //         });
-        //     });
-        // });
+                    it('should not delete a purchase for the wrong registration', (done) => {
+                        request.del('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/purchases/' + purchasables[3].id)
+                            .set('Authorization', generatedUsers.coordinator.token)
+                            .expect(status.BAD_REQUEST, done);
+                    });
+                });
+            });
+        });
     });
 });

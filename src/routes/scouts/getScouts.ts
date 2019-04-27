@@ -31,6 +31,10 @@ export const getPreferences = async (req: Request, res: Response) => {
     getRegistrationDetails(req, res, 'preferences');
 };
 
+export const getAssignments = async (req: Request, res: Response) => {
+    getRegistrationDetails(req, res, 'assignments');
+};
+
 interface QueryDetailInterface {
     model: typeof Model;
     modelAttributes?: FindAttributeOptions;

@@ -5,6 +5,8 @@ import { ErrorResponseInterface } from '@interfaces/shared.interface';
 import { Registration } from '@models/registration.model';
 import { Preference } from '@models/preference.model';
 import { PreferenceResponseInterface } from '@interfaces/preference.interface';
+import { Assignment } from '@models/assignment.model';
+import { AssignmentResponseInterface } from '@interfaces/assignment.interface';
 
 export const updatePreference = async (req: Request, res: Response) => {
     try {
@@ -41,6 +43,46 @@ export const updatePreference = async (req: Request, res: Response) => {
     } catch (err) {
         return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
             message: 'Error updating preference',
+            error: err
+        });
+    }
+};
+
+export const updateAssignment = async (req: Request, res: Response) => {
+    try {
+        const [registration, assignment]: [Registration, Assignment] = await Promise.all([
+            Registration.findOne({
+                where: {
+                    id: req.params.registrationId,
+                    scout_id: req.params.scoutId
+                }
+            }),
+            Assignment.findOne({
+                where: {
+                    offering_id: req.params.offeringId,
+                    registration_id: req.params.registrationId
+                }
+            })
+        ]);
+
+        if (!registration) {
+            throw new Error('Registration to update not found');
+
+        }
+
+        if (!assignment) {
+            throw new Error('Assignment to update not found');
+        }
+
+        await assignment.update(req.body);
+
+        return res.status(status.OK).json(<AssignmentResponseInterface>{
+            message: 'Assignment updated successfully',
+            assignment: assignment
+        });
+    } catch (err) {
+        return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+            message: 'Error updating assignment',
             error: err
         });
     }

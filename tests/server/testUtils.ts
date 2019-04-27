@@ -20,6 +20,7 @@ import { EventInterface } from '@interfaces/event.interface';
 import { Event } from '@models/event.model';
 import { Offering } from '@models/offering.model';
 import { OfferingInterface } from '@interfaces/offering.interface';
+import { Purchasable } from '@models/purchasable.model';
 
 const request = supertest(app);
 
@@ -138,6 +139,18 @@ export default class TestUtils {
         }
 
         return await Offering.findAll({ where: { event_id: event.id }});
+    }
+
+    public static async createPurchasablesForEvent(event: Event): Promise<Purchasable[]> {
+        const createdPurchasables: Purchasable[] = [];
+
+        for await (const purchasable of testPurchasables) {
+            const createdPurchasable: Purchasable = await Purchasable.create(purchasable);
+            createdPurchasables.push(createdPurchasable);
+            await event.$add('purchasable', createdPurchasable);
+        }
+
+        return createdPurchasables;
     }
 
     // createPurchasablesForEvent: function (eventId, done) {

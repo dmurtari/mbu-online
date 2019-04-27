@@ -3,7 +3,7 @@ import { Router } from 'express';
 import { isAuthorized } from '@middleware/isAuthorized';
 import { UserRole } from '@app/interfaces/user.interface';
 import { createEvent, setCurrentEvent, createOffering, createPurchasable } from '@routes/events/postEvents';
-import { getCurrentEvent, getEvent, getPurchasables } from '@routes/events/getEvents';
+import { getCurrentEvent, getEvent, getPurchasables, getClassSize, getRegistrations } from '@routes/events/getEvents';
 import { deleteEvent, deleteOffering, deletePurchasable } from '@routes/events/deleteEvents';
 import { updateEvent, updateOffering, updatePurchasable } from '@routes/events/updateEvents';
 
@@ -21,12 +21,12 @@ eventRoutes.get('/current', getCurrentEvent);
 eventRoutes.post('/:id/badges', isAuthorized([UserRole.ADMIN]), createOffering);
 eventRoutes.put('/:eventId/badges/:badgeId', isAuthorized([UserRole.ADMIN]), updateOffering);
 eventRoutes.delete('/:eventId/badges/:badgeId', isAuthorized([UserRole.ADMIN]), deleteOffering);
-// router.get('/:eventId/badges/:badgeId/limits', isAuthorized(['admin', 'teacher']), getEvents.classSize);
+eventRoutes.get('/:eventId/badges/:badgeId/limits', isAuthorized([UserRole.ADMIN, UserRole.TEACHER]), getClassSize);
 
 // // Routes for Purchasable CRUD
 eventRoutes.post('/:id/purchasables', isAuthorized([UserRole.ADMIN]), createPurchasable);
 eventRoutes.get('/:id/purchasables', getPurchasables);
-// router.get('/:id/registrations', isAuthorized(['teacher']), getEvents.getRegistrations);
+eventRoutes.get('/:id/registrations', isAuthorized([UserRole.TEACHER]), getRegistrations);
 eventRoutes.put('/:eventId/purchasables/:purchasableId', isAuthorized([UserRole.ADMIN]), updatePurchasable);
 eventRoutes.delete('/:eventId/purchasables/:purchasableId', isAuthorized([UserRole.ADMIN]), deletePurchasable);
 

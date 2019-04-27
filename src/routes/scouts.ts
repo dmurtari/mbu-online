@@ -6,10 +6,10 @@ import { isAuthorized } from '@middleware/isAuthorized';
 import { isOwner } from '@middleware/isOwner';
 import { UserRole } from '@interfaces/user.interface';
 
-import { createRegistration, createPreference } from '@routes/scouts/postScouts';
-import { getRegistrations, getPreferences } from '@routes/scouts/getScouts';
-import { deleteRegistration, deletePreference } from '@routes/scouts/deleteScouts';
-import { updatePreference } from '@routes/scouts/updateScouts';
+import { createRegistration, createPreference, createAssignment } from '@routes/scouts/postScouts';
+import { getRegistrations, getPreferences, getAssignments } from '@routes/scouts/getScouts';
+import { deleteRegistration, deletePreference, deleteAssignment } from '@routes/scouts/deleteScouts';
+import { updatePreference, updateAssignment } from '@routes/scouts/updateScouts';
 
 export const scoutRoutes = Router();
 
@@ -30,10 +30,10 @@ scoutRoutes.put('/:scoutId/registrations/:registrationId/preferences/:offeringId
 scoutRoutes.delete('/:scoutId/registrations/:registrationId/preferences/:offeringId', isAuthorized([UserRole.TEACHER, UserRole.COORDINATOR]), deletePreference);
 
 // // Assignments
-// router.post('/:scoutId/registrations/:registrationId/assignments', isAuthorized(['teacher']), postScouts.createAssignment);
-// router.get('/:scoutId/registrations/:registrationId/assignments', isAuthorized(['teacher']), getScouts.getAssignments);
-// router.put('/:scoutId/registrations/:registrationId/assignments/:offeringId', isAuthorized(['teacher']), updateScouts.updateAssignment);
-// router.delete('/:scoutId/registrations/:registrationId/assignments/:offeringId', isAuthorized(['teacher']), deleteScouts.deleteAssignment);
+scoutRoutes.post('/:scoutId/registrations/:registrationId/assignments', isAuthorized([UserRole.TEACHER]), createAssignment);
+scoutRoutes.get('/:scoutId/registrations/:registrationId/assignments', isAuthorized([UserRole.TEACHER]), getAssignments);
+scoutRoutes.put('/:scoutId/registrations/:registrationId/assignments/:offeringId', isAuthorized([UserRole.TEACHER]), updateAssignment);
+scoutRoutes.delete('/:scoutId/registrations/:registrationId/assignments/:offeringId', isAuthorized([UserRole.TEACHER]), deleteAssignment);
 
 // // Purchases
 // router.post('/:scoutId/registrations/:registrationId/purchases', isAuthorized(['coordinator']), postScouts.createPurchase);

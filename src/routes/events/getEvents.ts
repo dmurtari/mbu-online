@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { WhereOptions } from 'sequelize';
 import status from 'http-status-codes';
+import { cloneDeep } from 'lodash';
 
 import { CurrentEvent } from '@models/currentEvent.model';
 import { Event } from '@models/event.model';
@@ -8,6 +9,9 @@ import { ErrorResponseInterface } from '@app/interfaces/shared.interface';
 import { Badge } from '@models/badge.model';
 import { Purchasable } from '@models/purchasable.model';
 import { EventInterface } from '@interfaces/event.interface';
+import { Offering } from '@models/offering.model';
+import registrationInformation from '@models/queries/registrationInformation';
+import { Registration } from '@models/registration.model';
 
 export const getEvent = async (req: Request, res: Response) => {
     try {
@@ -71,6 +75,44 @@ export const getPurchasables = async (req: Request, res: Response) => {
         });
     }
 };
+
+export const getClassSize = async (req: Request, res: Response) => {
+    try {
+        const offering: Offering = await Offering.findOne({
+            where: {
+                badge_id: req.params.badgeId,
+                event_id: req.params.eventId
+            }
+        });
+
+        return res.status(status.OK).send(await offering.getClassSizes());
+    } catch (err) {
+        res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+            message: 'Failed to get class size',
+            error: err
+        });
+    }
+};
+
+export const getRegistrations = async (req: Request, res: Response) => {
+    try {
+        const query = cloneDeep(registrationInformation);
+
+        query.where = {
+            event_id: req.params.id
+        };
+
+        const registrations: Registration[] = await Registration.findAll(query);
+
+        return res.status(status.OK).json(registrations);
+    } catch (err) {
+        res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+            message: 'Failed to get registrations',
+            error: err
+        });
+    }
+};
+
 
 //   getAssignees: function (req, res) {
 //     var eventId = req.params.id;
