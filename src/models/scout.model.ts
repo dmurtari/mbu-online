@@ -49,6 +49,16 @@ export class Scout extends Model<Scout> implements ScoutInterface{
     })
     public emergency_phone!: string;
 
+    @Column
+    public get fullname(): string {
+        return `${this.firstname.trim()} ${this.lastname.trim()}`;
+    }
+
+    @Column
+    public get age(): number {
+        return moment().diff(moment(this.birthday, 'years'));
+    }
+
     @ForeignKey(() => User)
     @Column
     public user_id: number;
@@ -65,13 +75,4 @@ export class Scout extends Model<Scout> implements ScoutInterface{
             throw new Error('Birthday must be in the past');
         }
     }
-
-    public get fullname(): string {
-        return `${this.firstname.trim()} ${this.lastname.trim()}`;
-    }
-
-    public get age(): number {
-        return moment().diff(moment(this.birthday, 'years'));
-    }
-
 }

@@ -3,7 +3,7 @@ import { Router } from 'express';
 import { isAuthorized } from '@middleware/isAuthorized';
 import { UserRole } from '@app/interfaces/user.interface';
 import { createEvent, setCurrentEvent, createOffering, createPurchasable } from '@routes/events/postEvents';
-import { getCurrentEvent, getEvent, getPurchasables, getClassSize, getRegistrations } from '@routes/events/getEvents';
+import { getCurrentEvent, getEvent, getPurchasables, getClassSize, getRegistrations, getAssignees } from '@routes/events/getEvents';
 import { deleteEvent, deleteOffering, deletePurchasable } from '@routes/events/deleteEvents';
 import { updateEvent, updateOffering, updatePurchasable } from '@routes/events/updateEvents';
 
@@ -35,6 +35,6 @@ eventRoutes.delete('/:eventId/purchasables/:purchasableId', isAuthorized([UserRo
 // router.get('/:id/income', isAuthorized(['admin']), getEvents.getIncome);
 
 // router.get('/:id/stats', isAuthorized(['admin', 'teacher', 'coordinator']), getEvents.getStats);
-// router.get('/:id/offerings/assignees', isAuthorized(['admin', 'teacher']), getEvents.getAssignees);
+eventRoutes.get('/:id/offerings/assignees', isAuthorized([UserRole.TEACHER]), getAssignees);
 
 // module.exports = router;

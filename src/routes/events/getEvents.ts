@@ -12,6 +12,8 @@ import { EventInterface } from '@interfaces/event.interface';
 import { Offering } from '@models/offering.model';
 import registrationInformation from '@models/queries/registrationInformation';
 import { Registration } from '@models/registration.model';
+import { try } from 'bluebird';
+import { Scout } from '@models/scout.model';
 
 export const getEvent = async (req: Request, res: Response) => {
     try {
@@ -29,7 +31,7 @@ export const getEvent = async (req: Request, res: Response) => {
             include: [{
                 model: Badge,
                 as: 'offerings',
-                through: <any> {
+                through: <any>{
                     as: 'details'
                 }
             }, {
@@ -108,6 +110,67 @@ export const getRegistrations = async (req: Request, res: Response) => {
     } catch (err) {
         res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
             message: 'Failed to get registrations',
+            error: err
+        });
+    }
+};
+
+export const getAssignees = async (req: Request, res: Response) => {
+    try {
+        const offerings: Offering[] = await Offering.findAll({
+            where: {
+                event_id: req.params.id
+            },
+            attributes: [
+                ['id', 'offering_id'],
+                'duration',
+                'periods',
+                'requirements'
+            ],
+            include: [{
+                model: Badge,
+                as: 'badge',
+                attributes: [
+                    'name',
+                    ['id', 'badge_id']
+                ]
+            }, {
+                model: Registration,
+                as: 'assignees',
+                attributes: {
+                    exclude: [
+                        'projectedCost',
+                        'actualCost'
+                    ],
+                    include: [
+                        ['id', 'registration_id'],
+                        'notes'
+                    ],
+                },
+                through: {
+                    as: 'assignment',
+                    attributes: [
+                        'periods',
+                        'completions'
+                    ]
+                },
+                include: [{
+                    model: Scout,
+                    as: 'scout',
+                    attributes: [
+                        'firstname',
+                        'lastname',
+                        'fullname',
+                        'troop'
+                    ]
+                }]
+            }]
+        });
+
+        return res.status(status.OK).json(offerings);
+    } catch (err) {
+        res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+            message: 'Failed to get assignees',
             error: err
         });
     }

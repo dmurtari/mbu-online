@@ -106,6 +106,7 @@ export class User extends Model<User> implements UserInterface {
     @HasMany(() => Scout, 'user_id')
     public scouts: Scout[];
 
+    @Column
     public get fullname(): string {
         return `${this.firstname.trim()} ${this.lastname.trim()}`;
     }

@@ -1,4 +1,4 @@
-import { Model, FindAttributeOptions } from 'sequelize';
+import { Model, FindAttributeOptions, FindOptions } from 'sequelize';
 import { Request, Response } from 'express';
 import status from 'http-status-codes';
 import { cloneDeep } from 'lodash';
@@ -8,6 +8,51 @@ import registrationInformation from '@models/queries/registrationInformation';
 import { Registration } from '@models/registration.model';
 import { Offering } from '@models/offering.model';
 import { Purchasable } from '@models/purchasable.model';
+import { Scout } from '@models/scout.model';
+import { Event } from '@models/event.model';
+import { User } from '@models/user.model';
+
+const scoutQuery: FindOptions = {
+    attributes: [
+        ['id', 'scout_id'],
+        'firstname',
+        'lastname',
+        'fullname',
+        'troop',
+        'notes',
+        'emergency_name',
+        'emergency_relation',
+        'emergency_phone'
+    ],
+    include: [{
+        model: Event,
+        as: 'registrations',
+        attributes: [
+            ['id', 'event_id'],
+            'year',
+            'semester'
+        ],
+        through: <any>{
+            as: 'details'
+        }
+    }, {
+        model: User,
+        as: 'user',
+        attributes: [
+            ['id', 'user_id'],
+            'firstname',
+            'lastname',
+            'fullname',
+            'email'
+        ]
+    }]
+};
+
+interface QueryDetailInterface {
+    model: typeof Model;
+    modelAttributes?: FindAttributeOptions;
+    joinAttributes: FindAttributeOptions;
+}
 
 export const getRegistrations = async (req: Request, res: Response) => {
     try {
@@ -39,11 +84,31 @@ export const getPurchases = async (req: Request, res: Response) => {
     getRegistrationDetails(req, res, 'purchases');
 };
 
-interface QueryDetailInterface {
-    model: typeof Model;
-    modelAttributes?: FindAttributeOptions;
-    joinAttributes: FindAttributeOptions;
-}
+export const getAll = async (_req: Request, res: Response) => {
+    try {
+        const scouts: Scout[] = await Scout.findAll(scoutQuery);
+
+        return res.status(status.OK).json(scouts);
+    } catch (err) {
+        return res.status(status.BAD_REQUEST).send(<ErrorResponseInterface>{
+            message: `Failed to get all scouts`,
+            error: err
+        });
+    }
+};
+
+export const getScout = async (req: Request, res: Response) => {
+    try {
+        const scout: Scout = await Scout.findByPk(req.params.scoutId, scoutQuery);
+
+        return res.status(status.OK).json(scout);
+    } catch (err) {
+        return res.status(status.BAD_REQUEST).send(<ErrorResponseInterface>{
+            message: `Failed to get scout`,
+            error: err
+        });
+    }
+};
 
 async function getRegistrationDetails(req: Request, res: Response, target: 'preferences'|'assignments'|'purchases'): Promise<Response> {
     const detailQueryMap: { [key: string]: QueryDetailInterface } = {
@@ -90,65 +155,6 @@ async function getRegistrationDetails(req: Request, res: Response, target: 'pref
 }
 
 
-// module.exports = {
-//   getAll: function (req, res) {
-//     Models.Scout.findAll({
-//       attributes: [['id', 'scout_id'], 'firstname', 'lastname', 'troop', 'notes',
-//         'emergency_name', 'emergency_relation', 'emergency_phone'],
-//       include: [{
-//         model: Models.Event,
-//         as: 'registrations',
-//         attributes: [['id', 'event_id'], 'year', 'semester'],
-//         through: {
-//           as: 'details'
-//         },
-//       }, {
-//         model: Models.User,
-//         as: 'user',
-//         attributes: [['id', 'user_id'], 'firstname', 'lastname', 'email']
-//       }]
-//     })
-//       .then(function (scouts) {
-//         res.status(status.OK).json(scouts);
-//       })
-//       .catch(function (err) {
-//         res.status(status.BAD_REQUEST).send(err);
-//       });
-//   },
-//   getScout: function (req, res) {
-//     Models.Scout.findById(req.params.scoutId, {
-//       attributes: [['id', 'scout_id'], 'firstname', 'lastname', 'troop', 'notes',
-//         'emergency_name', 'emergency_relation', 'emergency_phone',
-//         'birthday', 'created_at'],
-//       include: [{
-//         model: Models.Event,
-//         as: 'registrations',
-//         attributes: [['id', 'event_id'], 'year', 'semester'],
-//         through: {
-//           as: 'details'
-//         },
-//       }, {
-//         model: Models.User,
-//         as: 'user',
-//         attributes: [['id', 'user_id'], 'firstname', 'lastname', 'email', 'details']
-//       }]
-//     })
-//       .then(function (scouts) {
-//         res.status(status.OK).json(scouts);
-//       })
-//       .catch(function (err) {
-//         res.status(status.BAD_REQUEST).json(err);
-//       });
-//   },
-//   getPreferences: function (req, res) {
-//     getRegistrationDetails(req, res, 'preferences');
-//   },
-//   getAssignments: function (req, res) {
-//     getRegistrationDetails(req, res, 'assignments');
-//   },
-//   getPurchases: function (req, res) {
-//     getRegistrationDetails(req, res, 'purchases');
-//   },
 //   getProjectedCost: function (req, res) {
 //     getCost(req, res, 'projectedCost');
 //   },

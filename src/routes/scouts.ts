@@ -7,7 +7,7 @@ import { isOwner } from '@middleware/isOwner';
 import { UserRole } from '@interfaces/user.interface';
 
 import { createRegistration, createPreference, createAssignment, createPurchase } from '@routes/scouts/postScouts';
-import { getRegistrations, getPreferences, getAssignments, getPurchases } from '@routes/scouts/getScouts';
+import { getRegistrations, getPreferences, getAssignments, getPurchases, getAll, getScout } from '@routes/scouts/getScouts';
 import { deleteRegistration, deletePreference, deleteAssignment, deletePurchase } from '@routes/scouts/deleteScouts';
 import { updatePreference, updateAssignment, updatePurchase } from '@routes/scouts/updateScouts';
 
@@ -15,8 +15,8 @@ export const scoutRoutes = Router();
 
 scoutRoutes.param('scoutId', isOwner);
 
-// router.get('/', isAuthorized(['admin', 'teacher']), getScouts.getAll);
-// router.get('/:scoutId', isAuthorized(['admin', 'teacher', 'coordinator']), getScouts.getScout);
+scoutRoutes.get('/', isAuthorized([UserRole.TEACHER]), getAll);
+scoutRoutes.get('/:scoutId', isAuthorized([UserRole.TEACHER, UserRole.COORDINATOR]), getScout);
 
 // // Registration
 scoutRoutes.post('/:scoutId/registrations', isAuthorized([UserRole.TEACHER, UserRole.COORDINATOR]), createRegistration);
