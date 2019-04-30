@@ -1,4 +1,4 @@
-import { Request, Response} from 'express';
+import { Request, Response } from 'express';
 import status from 'http-status-codes';
 
 import { ErrorResponseInterface } from '@interfaces/shared.interface';
@@ -7,6 +7,8 @@ import { Preference } from '@models/preference.model';
 import { PreferenceResponseInterface } from '@interfaces/preference.interface';
 import { Assignment } from '@models/assignment.model';
 import { AssignmentResponseInterface } from '@interfaces/assignment.interface';
+import { Purchase } from '@models/purchase.model';
+import { PurchaseResponseInterface } from '@interfaces/purchase.interface';
 
 export const updatePreference = async (req: Request, res: Response) => {
     try {
@@ -35,7 +37,7 @@ export const updatePreference = async (req: Request, res: Response) => {
 
         await preference.update(req.body);
 
-        return res.status(status.OK).json(<PreferenceResponseInterface> {
+        return res.status(status.OK).json(<PreferenceResponseInterface>{
             message: 'Preference updated successfully',
             preference: preference
         });
@@ -88,88 +90,41 @@ export const updateAssignment = async (req: Request, res: Response) => {
     }
 };
 
-//   updateAssignment: function (req, res) {
-//     var scoutId = req.params.scoutId;
-//     var registrationId = req.params.registrationId;
-//     var offeringId = req.params.offeringId;
-//     var assignmentUpdate = req.body;
+export const updatePurchase = async (req: Request, res: Response) => {
+    try {
+        const [registration, purchase]: [Registration, Purchase] = await Promise.all([
+            Registration.findOne({
+                where: {
+                    id: req.params.registrationId,
+                    scout_id: req.params.scoutId
+                }
+            }),
+            Purchase.findOne({
+                where: {
+                    purchasable_id: req.params.purchasableId,
+                    registration_id: req.params.registrationId
+                }
+            })
+        ]);
 
-//     return Models.Registration.find({
-//       where: {
-//         id: registrationId,
-//         scout_id: scoutId
-//       }
-//     })
-//       .then(function (registration) {
-//         return registration.getAssignments({
-//           where: {
-//             id: offeringId
-//           }
-//         });
-//       })
-//       .then(function (assignments) {
-//         if (assignments.length < 1) {
-//           throw new Error('No assignments found');
-//         } else if (assignments.length > 1) {
-//           throw new Error('Duplicate assignments exist');
-//         }
+        if (!registration) {
+            throw new Error('Registration to update not found');
+        }
 
-//         var assignment = assignments[0];
-//         return assignment.Assignment.update(assignmentUpdate);
-//       })
-//       .then(function (assignment) {
-//         res.status(status.OK).json({
-//           message: 'Assignment updated successfully',
-//           assignment: assignment
-//         });
-//       })
-//       .catch(function (err) {
-//         res.status(status.BAD_REQUEST).json({
-//           message: 'Error updating assignment',
-//           error: err
-//         });
-//       });
-//   },
-//   updatePurchase: function (req, res) {
-//     var scoutId = req.params.scoutId;
-//     var registrationId = req.params.registrationId;
-//     var purchasableId = req.params.purchasableId;
-//     var purchaseUpdate = req.body;
+        if (!purchase) {
+            throw new Error('Purchase to update not found');
+        }
 
-//     return Models.Registration.find({
-//       where: {
-//         id: registrationId,
-//         scout_id: scoutId
-//       }
-//     })
-//       .then(function (registration) {
-//         return registration.getPurchases({
-//           where: {
-//             id: purchasableId
-//           }
-//         });
-//       })
-//       .then(function (purchases) {
-//         if (purchases.length < 1) {
-//           throw new Error('No purchase found');
-//         } else if (purchases.length > 1) {
-//           throw new Error('Duplicate purchases exist');
-//         }
+        await purchase.update(req.body);
 
-//         var purchase = purchases[0];
-//         return purchase.Purchase.update(purchaseUpdate);
-//       })
-//       .then(function (purchase) {
-//         res.status(status.OK).json({
-//           message: 'Purchase updated successfully',
-//           purchase: purchase
-//         });
-//       })
-//       .catch(function (err) {
-//         res.status(status.BAD_REQUEST).json({
-//           message: 'Error updating purchase',
-//           error: err
-//         });
-//       });
-//   }
-// };
+        return res.status(status.OK).json(<PurchaseResponseInterface>{
+            message: 'Purchase updated successfully',
+            purchase: purchase
+        });
+    } catch (err) {
+        return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+            message: 'Error updating purchase',
+            error: 'err'
+        });
+    }
+};

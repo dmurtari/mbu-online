@@ -57,6 +57,7 @@
             "request": "attach",
             "name": "Attach by Process ID",
             "processId": "${command:PickProcess}",
+            "restart": true,
             "protocol": "inspector"
         },
         {

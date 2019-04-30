@@ -35,6 +35,10 @@ export const getAssignments = async (req: Request, res: Response) => {
     getRegistrationDetails(req, res, 'assignments');
 };
 
+export const getPurchases = async (req: Request, res: Response) => {
+    getRegistrationDetails(req, res, 'purchases');
+};
+
 interface QueryDetailInterface {
     model: typeof Model;
     modelAttributes?: FindAttributeOptions;

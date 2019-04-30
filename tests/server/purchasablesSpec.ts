@@ -14,6 +14,7 @@ import { PurchasableInterface } from '@interfaces/purchasable.interface';
 import { Registration } from '@models/registration.model';
 import { Purchase } from '@models/purchase.model';
 import testScouts from './testScouts';
+import { PurchaseRequestInterface, Size } from '@interfaces/purchase.interface';
 
 const request = supertest(app);
 
@@ -550,7 +551,7 @@ describe('purchasables', () => {
             });
         });
 
-        describe.only('associating purchasables to a registration', () => {
+        describe('associating purchasables to a registration', () => {
             let purchasables: Purchasable[];
             let registrationIds: number[];
 
@@ -601,7 +602,7 @@ describe('purchasables', () => {
 
             describe('creating a purchase', () => {
                 it('should associate the purchasable to an event', (done) => {
-                    var postData = {
+                    const postData: PurchaseRequestInterface = {
                         purchasable: purchasables[1].id,
                         quantity: 3
                     };
@@ -613,7 +614,7 @@ describe('purchasables', () => {
                         .end((err, res) => {
                             if (err) { return done(err); }
                             expect(res.body.registration.purchases).to.have.length(1);
-                            var purchase = res.body.registration.purchases[0];
+                            const purchase = res.body.registration.purchases[0];
                             expect(purchase.id).to.equal(postData.purchasable);
                             expect(purchase.details.quantity).to.equal(postData.quantity);
                             expect(purchase.details.size).to.not.exist;
@@ -622,10 +623,10 @@ describe('purchasables', () => {
                 });
 
                 it('should allow a scout that is in the valid age range', (done) => {
-                    var validPurchaseId;
+                    let validPurchaseId: number;
                     async.series([
                         (cb) => {
-                            var postData = {
+                            const postData: PurchasableInterface = {
                                 item: 'Adult Lunch With Age',
                                 price: '12.00',
                                 minimum_age: 0
@@ -643,7 +644,7 @@ describe('purchasables', () => {
                                 });
                         },
                         (cb) => {
-                            var postData = {
+                            const postData: PurchaseRequestInterface = {
                                 purchasable: validPurchaseId
                             };
 
@@ -656,7 +657,7 @@ describe('purchasables', () => {
                 });
 
                 xit('should allow scouts to purchase an item multiple times', (done) => {
-                    var postData = {
+                    const postData: PurchaseRequestInterface = {
                         purchasable: purchasables[1].id,
                         quantity: 3
                     };
@@ -680,7 +681,7 @@ describe('purchasables', () => {
                                 .expect(status.OK)
                                 .end((err, res) => {
                                     if (err) { return done(err); }
-                                    var purchases = res.body;
+                                    const purchases = res.body;
                                     expect(purchases).to.have.length(2);
                                     return cb();
                                 });
@@ -689,10 +690,10 @@ describe('purchasables', () => {
                 });
 
                 xit('should not allow a scout that is too old to purchase', (done) => {
-                    var invalidPurchaseId;
+                    let invalidPurchaseId: number;
                     async.series([
                         (cb) => {
-                            var postData = {
+                            const postData: PurchasableInterface = {
                                 item: 'Youth Lunch With Age',
                                 price: '12.00',
                                 maximum_age: 0
@@ -710,7 +711,7 @@ describe('purchasables', () => {
                                 });
                         },
                         (cb) => {
-                            var postData = {
+                            const postData: PurchaseRequestInterface = {
                                 purchasable: invalidPurchaseId
                             };
 
@@ -723,7 +724,7 @@ describe('purchasables', () => {
                 });
 
                 it('should default to 0 for quantity', (done) => {
-                    var postData = {
+                    const postData: PurchaseRequestInterface = {
                         purchasable: purchasables[0].id
                     };
 
@@ -734,7 +735,7 @@ describe('purchasables', () => {
                         .end((err, res) => {
                             if (err) { return done(err); }
                             expect(res.body.registration.purchases).to.have.length(1);
-                            var purchase = res.body.registration.purchases[0];
+                            const purchase = res.body.registration.purchases[0];
                             expect(purchase.id).to.equal(postData.purchasable);
                             expect(purchase.details.quantity).to.equal(0);
                             expect(purchase.details.size).to.not.exist;
@@ -743,9 +744,9 @@ describe('purchasables', () => {
                 });
 
                 it('should accept a size', (done) => {
-                    var postData = {
+                    const postData: PurchaseRequestInterface = {
                         purchasable: purchasables[0].id,
-                        size: 'l',
+                        size: Size.L,
                         quantity: 2
                     };
 
@@ -756,7 +757,7 @@ describe('purchasables', () => {
                         .end((err, res) => {
                             if (err) { return done(err); }
                             expect(res.body.registration.purchases).to.have.length(1);
-                            var purchase = res.body.registration.purchases[0];
+                            const purchase = res.body.registration.purchases[0];
                             expect(purchase.id).to.equal(postData.purchasable);
                             expect(purchase.details.quantity).to.equal(postData.quantity);
                             expect(purchase.details.size).to.equal(postData.size);
@@ -765,9 +766,9 @@ describe('purchasables', () => {
                 });
 
                 it('should check for the scouts owner', (done) => {
-                    var postData = {
+                    const postData: PurchaseRequestInterface = {
                         purchasable: purchasables[0].id,
-                        size: 'l',
+                        size: Size.L,
                         quantity: 2
                     };
 
@@ -778,9 +779,9 @@ describe('purchasables', () => {
                 });
 
                 it('should not allow teachers to create', (done) => {
-                    var postData = {
+                    const postData: PurchaseRequestInterface = {
                         purchasable: purchasables[0].id,
-                        size: 'l',
+                        size: Size.L,
                         quantity: 2
                     };
 
@@ -791,9 +792,9 @@ describe('purchasables', () => {
                 });
 
                 it('should allow admins to create', (done) => {
-                    var postData = {
+                    const postData: PurchaseRequestInterface = {
                         purchasable: purchasables[0].id,
-                        size: 'l',
+                        size: Size.L,
                         quantity: 2
                     };
 
@@ -804,8 +805,8 @@ describe('purchasables', () => {
                 });
 
                 it('should not create for a nonexistant purchasable', (done) => {
-                    var postData = {
-                        purchasable: utils.badId,
+                    const postData: PurchaseRequestInterface = {
+                        purchasable: TestUtils.badId as any,
                         quantity: 1
                     };
 
@@ -816,24 +817,24 @@ describe('purchasables', () => {
                 });
 
                 it('should not create for a nonexistant registration', (done) => {
-                    var postData = {
+                    const postData: PurchaseRequestInterface = {
                         purchasable: purchasables[0].id,
                         quantity: 1
                     };
 
-                    request.post('/api/scouts/' + scoutId + '/registrations/' + utils.badId + '/purchases')
+                    request.post('/api/scouts/' + scoutId + '/registrations/' + TestUtils.badId + '/purchases')
                         .set('Authorization', generatedUsers.coordinator.token)
                         .send(postData)
                         .expect(status.BAD_REQUEST, done);
                 });
 
                 it('should not create for a nonexistant scout', (done) => {
-                    var postData = {
+                    const postData: PurchaseRequestInterface = {
                         purchasable: purchasables[0].id,
                         quantity: 1
                     };
 
-                    request.post('/api/scouts/' + utils.badId + '/registrations/' + registrationIds[0] + '/purchases')
+                    request.post('/api/scouts/' + TestUtils.badId + '/registrations/' + registrationIds[0] + '/purchases')
                         .set('Authorization', generatedUsers.coordinator.token)
                         .send(postData)
                         .expect(status.BAD_REQUEST, done);
@@ -881,7 +882,7 @@ describe('purchasables', () => {
                             .expect(status.OK)
                             .end((err, res) => {
                                 if (err) { return done(err); }
-                                var purchases = res.body;
+                                const purchases = res.body;
                                 expect(purchases).to.have.length(2);
                                 expect(purchases[0].id).to.equal(purchasables[0].id);
                                 expect(purchases[0].details.size).to.equal('l');
@@ -920,7 +921,8 @@ describe('purchasables', () => {
                                     });
                             },
                             (cb) => {
-                                request.put('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/purchases/' + purchasables[0].id)
+                                request.put('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] +
+                                    '/purchases/' + purchasables[0].id)
                                     .set('Authorization', generatedUsers.coordinator.token)
                                     .send({
                                         quantity: 1
@@ -941,7 +943,8 @@ describe('purchasables', () => {
                     });
 
                     it('should check for the scouts owner', (done) => {
-                        request.put('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/purchases/' + purchasables[0].id)
+                        request.put('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] +
+                            '/purchases/' + purchasables[0].id)
                             .set('Authorization', generatedUsers.coordinator2.token)
                             .send({
                                 quantity: 1
@@ -950,7 +953,8 @@ describe('purchasables', () => {
                     });
 
                     it('should not allow teachers to update', (done) => {
-                        request.put('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/purchases/' + purchasables[0].id)
+                        request.put('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] +
+                            '/purchases/' + purchasables[0].id)
                             .set('Authorization', generatedUsers.teacher.token)
                             .send({
                                 quantity: 1
@@ -959,7 +963,8 @@ describe('purchasables', () => {
                     });
 
                     it('should allow admins to update', (done) => {
-                        request.put('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/purchases/' + purchasables[0].id)
+                        request.put('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] +
+                            '/purchases/' + purchasables[0].id)
                             .set('Authorization', generatedUsers.admin.token)
                             .send({
                                 quantity: 1
@@ -968,7 +973,8 @@ describe('purchasables', () => {
                     });
 
                     it('should not update an invalid purchase', (done) => {
-                        request.put('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/purchases/' + utils.badId)
+                        request.put('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] +
+                            '/purchases/' + TestUtils.badId)
                             .set('Authorization', generatedUsers.coordinator.token)
                             .send({
                                 quantity: 1
@@ -977,7 +983,8 @@ describe('purchasables', () => {
                     });
 
                     it('should not update an invalid registration', (done) => {
-                        request.put('/api/scouts/' + generatedScouts[0].id + '/registrations/' + utils.badId + '/purchases/' + purchasables[0].id)
+                        request.put('/api/scouts/' + generatedScouts[0].id + '/registrations/' + TestUtils.badId +
+                            '/purchases/' + purchasables[0].id)
                             .set('Authorization', generatedUsers.coordinator.token)
                             .send({
                                 quantity: 1
@@ -986,7 +993,8 @@ describe('purchasables', () => {
                     });
 
                     it('should not update an invalid scout', (done) => {
-                        request.put('/api/scouts/' + utils.badId + '/registrations/' + registrationIds[0] + '/purchases/' + purchasables[0].id)
+                        request.put('/api/scouts/' + TestUtils.badId + '/registrations/' + registrationIds[0] +
+                            '/purchases/' + purchasables[0].id)
                             .set('Authorization', generatedUsers.coordinator.token)
                             .send({
                                 quantity: 1
@@ -995,7 +1003,8 @@ describe('purchasables', () => {
                     });
 
                     it('should not update a purchase for the wrong registration', (done) => {
-                        request.put('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/purchases/' + purchasables[3].id)
+                        request.put('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] +
+                            '/purchases/' + purchasables[3].id)
                             .set('Authorization', generatedUsers.coordinator.token)
                             .send({
                                 quantity: 1
@@ -1004,7 +1013,8 @@ describe('purchasables', () => {
                     });
 
                     it('should not allow a required value to be unset', (done) => {
-                        request.put('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/purchases/' + purchasables[0].id)
+                        request.put('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] +
+                            '/purchases/' + purchasables[0].id)
                             .set('Authorization', generatedUsers.coordinator.token)
                             .send({
                                 quantity: null
@@ -1027,7 +1037,8 @@ describe('purchasables', () => {
                                     });
                             },
                             (cb) => {
-                                request.del('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/purchases/' + purchasables[0].id)
+                                request.del('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] +
+                                    '/purchases/' + purchasables[0].id)
                                     .set('Authorization', generatedUsers.coordinator.token)
                                     .expect(status.OK, cb);
                             },
@@ -1045,43 +1056,50 @@ describe('purchasables', () => {
                     });
 
                     it('should check for the scouts owner', (done) => {
-                        request.del('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/purchases/' + purchasables[0].id)
+                        request.del('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] +
+                            '/purchases/' + purchasables[0].id)
                             .set('Authorization', generatedUsers.coordinator2.token)
                             .expect(status.UNAUTHORIZED, done);
                     });
 
                     it('should not allow teachers to delete', (done) => {
-                        request.del('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/purchases/' + purchasables[0].id)
+                        request.del('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] +
+                            '/purchases/' + purchasables[0].id)
                             .set('Authorization', generatedUsers.teacher.token)
                             .expect(status.UNAUTHORIZED, done);
                     });
 
                     it('should allow admins to delete', (done) => {
-                        request.del('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/purchases/' + purchasables[0].id)
+                        request.del('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] +
+                            '/purchases/' + purchasables[0].id)
                             .set('Authorization', generatedUsers.admin.token)
                             .expect(status.OK, done);
                     });
 
                     it('should not delete an invalid purchase', (done) => {
-                        request.del('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/purchases/' + utils.badId)
+                        request.del('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] +
+                            '/purchases/' + TestUtils.badId)
                             .set('Authorization', generatedUsers.coordinator.token)
                             .expect(status.BAD_REQUEST, done);
                     });
 
                     it('should not delete an invalid registration', (done) => {
-                        request.del('/api/scouts/' + generatedScouts[0].id + '/registrations/' + utils.badId + '/purchases/' + purchasables[0].id)
+                        request.del('/api/scouts/' + generatedScouts[0].id + '/registrations/' + TestUtils.badId +
+                            '/purchases/' + purchasables[0].id)
                             .set('Authorization', generatedUsers.coordinator.token)
                             .expect(status.BAD_REQUEST, done);
                     });
 
                     it('should not delete an invalid scout', (done) => {
-                        request.del('/api/scouts/' + utils.badId + '/registrations/' + registrationIds[0] + '/purchases/' + purchasables[0].id)
+                        request.del('/api/scouts/' + TestUtils.badId + '/registrations/' + registrationIds[0] +
+                            '/purchases/' + purchasables[0].id)
                             .set('Authorization', generatedUsers.coordinator.token)
                             .expect(status.BAD_REQUEST, done);
                     });
 
                     it('should not delete a purchase for the wrong registration', (done) => {
-                        request.del('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/purchases/' + purchasables[3].id)
+                        request.del('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] +
+                            '/purchases/' + purchasables[3].id)
                             .set('Authorization', generatedUsers.coordinator.token)
                             .expect(status.BAD_REQUEST, done);
                     });

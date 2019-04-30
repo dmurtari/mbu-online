@@ -12,6 +12,7 @@ import { Offering } from '@models/offering.model';
 import { Assignment } from '@models/assignment.model';
 import { AssignmentInterface, AssignmentRequestInterface, AssignmentResponseInterface } from '@interfaces/assignment.interface';
 import { Badge } from '@models/badge.model';
+import { Purchasable } from '@models/purchasable.model';
 
 export const createRegistration = async (req: Request, res: Response) => {
     try {
@@ -169,124 +170,41 @@ export const createAssignment = async (req: Request, res: Response) => {
     }
 };
 
-//   createAssignment: function (req, res) {
-//     var scoutId = req.params.scoutId;
-//     var registrationId = req.params.registrationId;
+export const createPurchase = async (req: Request, res: Response) => {
+    try {
+        const registration: Registration = await Registration.findOne({
+            where: {
+                id: req.params.registrationId,
+                scout_id: req.params.scoutId
+            }
+        });
 
-//     return Models.Registration.find({
-//         where: {
-//           id: registrationId,
-//           scout_id: scoutId
-//         }
-//       })
-//       .then(function (registration) {
-//         if (Array.isArray(req.body)) {
-//           // Update assignments, override existing
-//           return Models.Assignment.destroy({
-//               where: {
-//                 registration_id: registrationId
-//               }
-//             })
-//             .then(function () {
-//               var assignments = _.map(req.body, function (assignment) {
-//                 return {
-//                   registration_id: registrationId,
-//                   offering_id: assignment.offering,
-//                   periods: assignment.periods,
-//                   completions: assignment.completions
-//                 };
-//               });
+        await registration.$add('purchase', req.body.purchasable, {
+            through: {
+                quantity: req.body.quantity,
+                size: req.body.size
+            }
+        });
 
-//               return Models.Assignment.bulkCreate(assignments, {
-//                 validate: true,
-//                 individualHooks: true
-//               });
-//             })
-//             .catch(function () {
-//               throw new Error('Failed to destroy existing assignments');
-//             });
-//         } else {
-//           // Add assignment, without overriding
-//           return registration.addAssignment(req.body.offering, {
-//             individualHooks: true,
-//             through: {
-//               periods: req.body.periods
-//             }
-//           });
-//         }
-//       })
-//       .then(function () {
-//         return Models.Registration.findById(registrationId, {
-//           include: [{
-//             model: Models.Offering,
-//             as: 'assignments',
-//             attributes: ['badge_id', ['id', 'offering_id'], 'price'],
-//             through: {
-//               as: 'details',
-//               attributes: ['periods', 'completions']
-//             },
-//             include: [{
-//               model: Models.Badge,
-//               as: 'badge',
-//               attributes: ['name']
-//             }]
-//           }]
-//         });
-//       })
-//       .then(function (registration) {
-//         res.status(status.CREATED).json({
-//           message: 'Assignment created for period(s) ' + req.body.periods,
-//           registration: registration
-//         });
-//       })
-//       .catch(function (err) {
-//         res.status(status.BAD_REQUEST).json({
-//           message: 'Assignment could not be created',
-//           error: err
-//         });
-//       });
-//   },
-//   createPurchase: function (req, res) {
-//     var scoutId = req.params.scoutId;
-//     var registrationId = req.params.registrationId;
+        const createdRegistration: Registration = await Registration.findByPk(req.params.registrationId, {
+            include: [{
+                model: Purchasable,
+                as: 'purchases',
+                through: {
+                    as: 'details',
+                    attributes: ['size', 'quantity']
+                }
+            }]
+        });
 
-//     return Models.Registration.find({
-//         where: {
-//           id: registrationId,
-//           scout_id: scoutId
-//         }
-//       })
-//       .then(function (registration) {
-//         return registration.addPurchase(req.body.purchasable, {
-//           through: {
-//             quantity: req.body.quantity,
-//             size: req.body.size
-//           }
-//         });
-//       })
-//       .then(function () {
-//         return Models.Registration.findById(registrationId, {
-//           include: [{
-//             model: Models.Purchasable,
-//             as: 'purchases',
-//             through: {
-//               as: 'details',
-//               attributes: ['size', 'quantity']
-//             }
-//           }]
-//         });
-//       })
-//       .then(function (registration) {
-//         res.status(status.CREATED).json({
-//           message: 'Purchase created',
-//           registration: registration
-//         });
-//       })
-//       .catch(function (err) {
-//         res.status(status.BAD_REQUEST).json({
-//           message: 'Purchase could not be created',
-//           error: err
-//         });
-//       });
-//   }
-// };
+        return res.status(status.CREATED).json(<RegistrationResponseInterface>{
+            message: 'Purchase created' ,
+            registration: createdRegistration
+        });
+    } catch (err) {
+        return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+            message: 'Purchase could not be created',
+            error: 'err'
+        });
+    }
+};

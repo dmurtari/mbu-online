@@ -17,7 +17,7 @@ import testScouts from './testScouts';
 
 const request = supertest(app);
 
-describe.only('Assignments and registrations', () => {
+describe('Assignments and registrations', () => {
     let badges: Badge[];
     let events: Event[];
     let generatedUsers: RoleTokenObjects;

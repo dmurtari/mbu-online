@@ -7,6 +7,7 @@ import { Event } from '@models/event.model';
 import { Registration } from '@models/registration.model';
 import { Preference } from '@models/preference.model';
 import { Assignment } from '@models/assignment.model';
+import { Purchase } from '@models/purchase.model';
 
 export const deleteRegistration = async (req: Request, res: Response) => {
     try {
@@ -103,32 +104,38 @@ export const deleteAssignment = async (req: Request, res: Response) => {
     }
 };
 
-//   deletePurchase: function (req, res) {
-//     var scoutId = req.params.scoutId;
-//     var registrationId = req.params.registrationId;
-//     var purchasableId = req.params.purchasableId;
+export const deletePurchase = async (req: Request, res: Response) => {
+    try {
+        const [registration, purchase]: [Registration, Purchase] = await Promise.all([
+            Registration.findOne({
+                where: {
+                    id: req.params.registrationId,
+                    scout_id: req.params.scoutId
+                }
+            }),
+            Purchase.findOne({
+                where: {
+                    purchasable_id: req.params.purchasableId,
+                    registration_id: req.params.registrationId
+                }
+            })
+        ]);
 
-//     return Models.Registration.find({
-//       where: {
-//         id: registrationId,
-//         scout_id: scoutId
-//       }
-//     })
-//       .then(function (registration) {
-//         return registration.removePurchase(purchasableId);
-//       })
-//       .then(function (deleted) {
-//         if (!deleted) {
-//           throw new Error('No purchase to delete');
-//         }
+        if (!registration) {
+            throw new Error('No registration to delete from');
+        }
 
-//         res.status(status.OK).end();
-//       })
-//       .catch(function (err) {
-//         res.status(status.BAD_REQUEST).json({
-//           message: 'Could not remove purchasable ' + purchasableId + ' for registration ' + registrationId,
-//           error: err
-//         });
-//       });
-//   }
-// };
+        if (!purchase) {
+            throw new Error('Purchase to delete not found');
+        }
+
+        await registration.$remove('purchase', req.params.purchasableId);
+
+        return res.status(status.OK).end();
+    } catch (err) {
+        return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+            message: `Could not remove purchase ${req.params.purchasableId} for registration ${req.params.registrationId}`,
+            error: err
+        });
+    }
+};
