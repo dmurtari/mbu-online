@@ -12,7 +12,6 @@ import { EventInterface } from '@interfaces/event.interface';
 import { Offering } from '@models/offering.model';
 import registrationInformation from '@models/queries/registrationInformation';
 import { Registration } from '@models/registration.model';
-import { try } from 'bluebird';
 import { Scout } from '@models/scout.model';
 
 export const getEvent = async (req: Request, res: Response) => {
