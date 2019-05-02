@@ -10,7 +10,7 @@ import { ScoutInterface } from '@interfaces/scout.interface';
     underscored: true,
     tableName: 'Scout'
 })
-export class Scout extends Model<Scout> implements ScoutInterface{
+export class Scout extends Model<Scout> implements ScoutInterface {
     @Column({
         allowNull: false
     })
@@ -51,12 +51,12 @@ export class Scout extends Model<Scout> implements ScoutInterface{
 
     @Column
     public get fullname(): string {
-        return `${this.firstname.trim()} ${this.lastname.trim()}`;
+        return `${(this.firstname || '').trim()} ${(this.lastname || '').trim()}`;
     }
 
     @Column
     public get age(): number {
-        return moment().diff(moment(this.birthday, 'years'));
+        return moment().diff(moment(this.birthday), 'years');
     }
 
     @ForeignKey(() => User)
