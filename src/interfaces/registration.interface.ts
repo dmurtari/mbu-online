@@ -18,3 +18,7 @@ export interface RegistrationRequestInterface {
     event_id?: string;
     notes?: string;
 }
+
+export interface CostCalculationResponseInterface {
+    cost: string;
+}

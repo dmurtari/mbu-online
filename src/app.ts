@@ -3,7 +3,7 @@
 import 'module-alias/register';
 import '@config/passport';
 
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import bodyParser from 'body-parser';
 import morgan from 'morgan';
 import passport from 'passport';
@@ -47,7 +47,7 @@ if (env === 'production') {
     app.use(express.static(path.join(__dirname, '../node_modules/mbu-frontend/dist')));
 }
 
-app.use((_req, res, next) => {
+app.use((_req: Request, res: Response, next: NextFunction) => {
     if (env === 'development') {
         res.setHeader('Access-Control-Allow-Origin', 'http://localhost:8080');
     }

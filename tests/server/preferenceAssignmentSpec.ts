@@ -19,7 +19,7 @@ import { AssignmentRequestInterface } from '@interfaces/assignment.interface';
 
 const request = supertest(app);
 
-describe.only('using preference and assignments', () => {
+describe('using preference and assignments', () => {
     let events: Event[];
     let purchasables: Purchasable[];
     let generatedUsers: RoleTokenObjects;

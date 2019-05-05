@@ -7,7 +7,7 @@ import { isOwner } from '@middleware/isOwner';
 import { UserRole } from '@interfaces/user.interface';
 
 import { createRegistration, createPreference, createAssignment, createPurchase } from '@routes/scouts/postScouts';
-import { getRegistrations, getPreferences, getAssignments, getPurchases, getAll, getScout } from '@routes/scouts/getScouts';
+import { getRegistrations, getPreferences, getAssignments, getPurchases, getAll, getScout, getProjectedCost, getActualCost } from '@routes/scouts/getScouts';
 import { deleteRegistration, deletePreference, deleteAssignment, deletePurchase } from '@routes/scouts/deleteScouts';
 import { updatePreference, updateAssignment, updatePurchase } from '@routes/scouts/updateScouts';
 
@@ -42,5 +42,5 @@ scoutRoutes.put('/:scoutId/registrations/:registrationId/purchases/:purchasableI
 scoutRoutes.delete('/:scoutId/registrations/:registrationId/purchases/:purchasableId', isAuthorized([UserRole.COORDINATOR]), deletePurchase);
 
 // // Payments
-// router.get('/:scoutId/registrations/:registrationId/projectedCost', isAuthorized(['teacher', 'coordinator']), getScouts.getProjectedCost);
-// router.get('/:scoutId/registrations/:registrationId/cost', isAuthorized(['teacher', 'coordinator']), getScouts.getActualCost);
+scoutRoutes.get('/:scoutId/registrations/:registrationId/projectedCost', isAuthorized([UserRole.TEACHER, UserRole.COORDINATOR]), getProjectedCost);
+scoutRoutes.get('/:scoutId/registrations/:registrationId/cost', isAuthorized([UserRole.TEACHER, UserRole.COORDINATOR]), getActualCost);
