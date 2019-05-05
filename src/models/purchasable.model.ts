@@ -43,6 +43,8 @@ export class Purchasable extends Model<Purchasable> implements PurchasableInterf
     @ForeignKey(() => Event)
     public event_id: number;
 
+    public Purchase: Purchase;
+
     @Validator
     public maxGreaterThanMin(): void {
         if (this.maximum_age && this.minimum_age && (this.maximum_age < this.minimum_age)) {
