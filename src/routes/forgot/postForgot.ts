@@ -94,7 +94,7 @@ export const reset = async (req: Request, res: Response) => {
             subject: 'MBU Online Password Changed',
             templateId: '6822bdf9-bdb2-4359-ab1a-6f5dc9ca2d2c',
             substitutions: {
-                url: url
+                email: user.email
             },
             content: [
                 {

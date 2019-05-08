@@ -5,6 +5,7 @@
   "scripts": {
     "start": "npm run serve",
     "build": "npm run build-ts && npm run tslint",
+    "postinstall": "npm run build-ts",
     "serve": "node dist/app.js",
     "dev-env": "cross-env NODE_ENV=development",
     "test-env": "cross-env export NODE_ENV=test",
@@ -98,6 +99,7 @@
     "@models": "./dist/models",
     "@config": "./dist/config",
     "@routes": "./dist/routes",
+    "@interfaces": "./dist/interfaces",
     "@middleware": "./dist/middleware",
     "@app": "./dist"
   }
