@@ -8,11 +8,12 @@ import { Event } from '@models/event.model';
 import { ErrorResponseInterface } from '@app/interfaces/shared.interface';
 import { Badge } from '@models/badge.model';
 import { Purchasable } from '@models/purchasable.model';
-import { EventInterface } from '@interfaces/event.interface';
+import { EventInterface, IncomeCalculationResponseInterface } from '@interfaces/event.interface';
 import { Offering } from '@models/offering.model';
 import registrationInformation from '@models/queries/registrationInformation';
 import { Registration } from '@models/registration.model';
 import { Scout } from '@models/scout.model';
+import { CalculationType } from '@routes/shared/calculationType.enum';
 
 export const getEvent = async (req: Request, res: Response) => {
     try {
@@ -175,78 +176,43 @@ export const getAssignees = async (req: Request, res: Response) => {
     }
 };
 
+export const getPotentialIncome = async (req: Request, res: Response) => {
+    income(req, res, CalculationType.Projected);
+};
 
-//   getAssignees: function (req, res) {
-//     var eventId = req.params.id;
+export const getActualIncome = async (req: Request, res: Response) => {
+    income(req, res, CalculationType.Actual);
+};
 
-//     Model.Offering.findAll({
-//       where: {
-//         event_id: eventId
-//       },
-//       attributes: [['id', 'offering_id'], 'duration', 'periods', 'requirements'],
-//       include: [{
-//         model: Model.Badge,
-//         as: 'badge',
-//         attributes: ['name', ['id', 'badge_id']]
-//       }, {
-//         model: Model.Registration,
-//         as: 'assignees',
-//         attributes: {
-//           exclude: ['projectedCost', 'actualCost'],
-//           include: [['id', 'registration_id'], 'notes'],
-//         },
-//         through: {
-//           as: 'assignment',
-//           attributes: ['periods', 'completions']
-//         },
-//         include: [{
-//           model: Model.Scout,
-//           as: 'scout',
-//           attributes: ['firstname', 'lastname', 'troop']
-//         }]
-//       }]
-//     })
-//       .then(function (offerings) {
-//         return res.status(status.OK).json(offerings);
-//       })
-//       .catch(function (err) {
-//         res.status(status.BAD_REQUEST).end();
-//       })
-//   },
-//   getRegistrations: function (req, res) {
-//     var eventId = req.params.id;
-//     var query = _.cloneDeep(registrationInformation);
+async function income(req: Request, res: Response, type: CalculationType): Promise<Response> {
+    try {
+        const registrations: Registration[] = await Registration.findAll({
+            where: {
+                event_id: req.params.id
+            }
+        });
 
-//     query.where = {
-//       event_id: eventId
-//     };
+        if (registrations.length < 1) {
+            throw new Error('No registrations found');
+        }
 
-//     Model.Registration.findAll(query)
-//       .then(function (registrations) {
-//         res.status(status.OK).json(registrations);
-//       })
-//       .catch(function () {
-//         res.status(status.BAD_REQUEST).end();
-//       });
-//   },
-//   getCurrentEvent: function (req, res) {
-//     Model.CurrentEvent.findOne({
-//       include: [{
-//         model: Model.Event
-//       }]
-//     })
-//       .then(function (currentEvent) {
-//         res.status(status.OK).send(currentEvent.Event);
-//       })
-//       .catch(function () {
-//         res.status(status.OK).end();
-//       });
-//   },
-//   getPotentialIncome: function (req, res) {
-//     income(req, res, 'projectedCost');
-//   },
-//   getIncome: function (req, res) {
-//     income(req, res, 'actualCost');
+        const prices: number[] = await Promise.all(registrations.map(registration => {
+            return (type === CalculationType.Actual ? registration.actualCost() : registration.projectedCost());
+        }));
+
+        const cost: number = prices.reduce((acc, cur) => acc + cur, 0);
+
+        return res.status(status.OK).json(<IncomeCalculationResponseInterface>{
+            income: String(cost.toFixed(2))
+        });
+    } catch (err) {
+        return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+            message: `Failed to get ${type} event income`,
+            error: err
+        });
+    }
+}
+
 //   },
 //   getStats: function (req, res) {
 //     var resultObject = {};
@@ -304,58 +270,7 @@ export const getAssignees = async (req: Request, res: Response) => {
 //       .catch(function (err) {
 //         res.status(status.BAD_REQUEST).send(err);
 //       });
-//   },
-//   classSize(req, res) {
-//     var offering;
-
-//     Model.Offering.findOne({
-//       where: {
-//         badge_id: req.params.badgeId,
-//         event_id: req.params.eventId
-//       }
-//     })
-//       .then(function (offeringFromDb) {
-//         offering = offeringFromDb;
-//         return offeringFromDb.getClassSizes()
-//       })
-//       .then(function (results) {
-//         res.status(status.OK).send(results);
-//       })
-//       .catch(function (err) {
-//         res.status(status.BAD_REQUEST).send(err);
-//       })
 //   }
 // };
 
-// function income(req, res, type) {
-//   var totalIncome = 0;
 
-//   return Model.Registration.findAll({
-//     where: {
-//       event_id: req.params.id
-//     }
-//   })
-//     .then(function (registrations) {
-//       if (registrations.length < 1) {
-//         throw new Error('No registrations found');
-//       }
-
-//       var items = _.map(registrations, function (registration) {
-//         return registration[type]();
-//       });
-
-//       return Promise.all(items);
-//     })
-//     .then(function (costs) {
-//       totalIncome = _.reduce(costs, function (sum, cost) {
-//         return sum + cost;
-//       }, totalIncome);
-
-//       return res.status(status.OK).json({
-//         income: String(totalIncome.toFixed(2))
-//       });
-//     })
-//     .catch(function (err) {
-//       return res.status(status.BAD_REQUEST).send(err);
-//     });
-// }

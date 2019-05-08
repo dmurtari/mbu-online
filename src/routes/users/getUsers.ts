@@ -3,7 +3,6 @@ import { Request, Response } from 'express';
 import status from 'http-status-codes';
 import { Op, WhereOptions, Includeable } from 'sequelize';
 
-
 import { User } from '@models/user.model';
 import { ErrorResponseInterface } from '@interfaces/shared.interface';
 import { UserExistsResponseInterface, TokenAuthResponseInterface } from '@interfaces/user.interface';
@@ -12,6 +11,8 @@ import registrationInformation from '@models/queries/registrationInformation';
 import { cloneDeep } from 'lodash';
 import { Registration } from '@models/registration.model';
 import { Event } from '@models/event.model';
+import { CostCalculationResponseInterface } from '@interfaces/registration.interface';
+import { CalculationType } from '@routes/shared/calculationType.enum';
 
 export const byEmail = async (req: Request, res: Response) => {
     try {
@@ -133,77 +134,45 @@ export const getScoutRegistrations = async (req: Request, res: Response) => {
     }
 };
 
-//   getScoutRegistrations: function (req, res) {
-//     return Models.Scout.findAll({
-//       where: {
-//         user_id: req.params.userId,
-//       },
-//       include: [{
-//         model: Models.Event,
-//         as: 'registrations',
-//         through: {
-//           as: 'details'
-//         },
-//         attributes: [['id', 'event_id']]
-//       }]
-//     })
-//       .then(function (scouts) {
-//         return res.status(status.OK).json(scouts);
-//       })
-//       .catch(function (err) {
-//         return res.status(status.BAD_REQUEST).json({
-//           error: err,
-//           message: 'Error getting registrations'
-//         });
-//       });
-//   },
-//   getProjectedCost: function (req, res) {
-//     getCost(req, res, 'projectedCost');
-//   },
-//   getActualCost: function (req, res) {
-//     getCost(req, res, 'actualCost');
-//   }
-// };
+export const getProjectedCost = async (req: Request, res: Response) => {
+    getCost(req, res, CalculationType.Projected);
+};
 
-// function getCost(req, res, type) {
-//   var eventId = req.params.eventId;
+export const getActualCost = async (req: Request, res: Response) => {
+    getCost(req, res, CalculationType.Actual);
+};
 
-//   return Models.Scout.findAll({
-//     where: {
-//       user_id: req.params.userId
-//     },
-//     include: [{
-//       model: Models.Event,
-//       as: 'registrations',
-//       where: {
-//         id: eventId
-//       },
-//       through: {
-//         as: 'details'
-//       }
-//     }]
-//   })
-//     .then(function (scouts) {
-//       if (scouts.length < 1) {
-//         throw new Error('No scouts found');
-//       }
+async function getCost(req: Request, res: Response, type: CalculationType): Promise<Response> {
+    try {
+        const registrations: Registration[] = await Registration.findAll({
+            where: {
+                event_id: req.params.eventId
+            },
+            include: [{
+                model: Scout,
+                where: {
+                    user_id: req.params.userId
+                }
+            }]
+        });
 
-//       var prices = _.map(scouts, function (scout) {
-//         return scout.registrations[0].details[type]();
-//       });
+        if (registrations.length < 1) {
+            throw new Error('No registrations found');
+        }
 
-//       return Promise.all(prices);
-//     })
-//     .then(function (results) {
-//       var cost = _.reduce(results, function (sum, result) {
-//         return sum + result;
-//       }, 0);
+        const prices: number[] = await Promise.all(registrations.map(registration => {
+            return (type === CalculationType.Actual ? registration.actualCost() : registration.projectedCost());
+        }));
 
-//       return res.status(status.OK).json({
-//         cost: String(cost.toFixed(2))
-//       });
-//     })
-//     .catch(function () {
-//       return res.status(status.BAD_REQUEST).end();
-//     });
-// }
+        const cost: number = prices.reduce((acc, cur) => acc + cur, 0);
+
+        return res.status(status.OK).json(<CostCalculationResponseInterface>{
+            cost: String(cost.toFixed(2))
+        });
+    } catch (err) {
+        return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+            error: err,
+            message: `Could not calculate ${type} pricing information`
+        });
+    }
+}

@@ -14,7 +14,7 @@ import { UserRole } from '@interfaces/user.interface';
 
 const request = supertest(app);
 
-describe.only('payments', () => {
+describe('payments', () => {
     let generatedUsers: RoleTokenObjects;
     let generatedTroop1: Scout[];
     let generatedTroop2: Scout[];

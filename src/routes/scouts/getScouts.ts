@@ -12,6 +12,7 @@ import { Scout } from '@models/scout.model';
 import { Event } from '@models/event.model';
 import { User } from '@models/user.model';
 import { CostCalculationResponseInterface } from '@interfaces/registration.interface';
+import { CalculationType } from '@routes/shared/calculationType.enum';
 
 const scoutQuery: FindOptions = {
     attributes: [
@@ -86,11 +87,11 @@ export const getPurchases = async (req: Request, res: Response) => {
 };
 
 export const getProjectedCost = async (req: Request, res: Response) => {
-    getCost(req, res, 'projectedCost');
+    getCost(req, res, CalculationType.Projected);
 };
 
 export const getActualCost = async (req: Request, res: Response) => {
-    getCost(req, res, 'actualCost');
+    getCost(req, res, CalculationType.Actual);
 };
 
 export const getAll = async (_req: Request, res: Response) => {
@@ -163,7 +164,7 @@ async function getRegistrationDetails(req: Request, res: Response, target: 'pref
     }
 }
 
-async function getCost(req: Request, res: Response, type: 'projectedCost'|'actualCost'): Promise<Response> {
+async function getCost(req: Request, res: Response, type: CalculationType): Promise<Response> {
     try {
         const registration: Registration = await Registration.findOne({
             where: {
@@ -172,7 +173,7 @@ async function getCost(req: Request, res: Response, type: 'projectedCost'|'actua
             }
         });
 
-        const cost: number = await (type === 'actualCost' ? registration.actualCost() : registration.projectedCost());
+        const cost: number = await (type === CalculationType.Actual ? registration.actualCost() : registration.projectedCost());
 
         return res.status(status.OK).json(<CostCalculationResponseInterface>{
             cost: String(cost.toFixed(2))

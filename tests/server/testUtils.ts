@@ -114,10 +114,10 @@ export default class TestUtils {
     public static async createBadges(badges: BadgeInterface[] = testBadges): Promise<Badge[]> {
         const createdBadges: Badge[] = [];
 
-        await Promise.all(badges.map(async (badge) => {
+        for await (const badge of badges) {
             const createdBadge: Badge = await Badge.create(badge);
             createdBadges.push(createdBadge);
-        }));
+        }
 
         return createdBadges;
     }
@@ -125,10 +125,10 @@ export default class TestUtils {
     public static async createEvents(events: EventInterface[] = testEvents): Promise<Event[]> {
         const createdEvents: Event[] = [];
 
-        await Promise.all(events.map(async (event) => {
+        for await (const event of events) {
             const createdEvent: Event = await Event.create(event);
             createdEvents.push(createdEvent);
-        }));
+        }
 
         return createdEvents;
     }
