@@ -11,13 +11,13 @@ import {
     getRegistrations,
     getAssignees,
     getPotentialIncome,
-    getActualIncome
+    getActualIncome,
+    getStats
 } from '@routes/events/getEvents';
 import { deleteEvent, deleteOffering, deletePurchasable } from '@routes/events/deleteEvents';
 import { updateEvent, updateOffering, updatePurchasable } from '@routes/events/updateEvents';
 
 export const eventRoutes = Router();
-
 
 eventRoutes.post('/', isAuthorized([UserRole.ADMIN]), createEvent);
 eventRoutes.get('/', getEvent);
@@ -43,7 +43,5 @@ eventRoutes.delete('/:eventId/purchasables/:purchasableId', isAuthorized([UserRo
 eventRoutes.get('/:id/potentialIncome', isAuthorized([UserRole.ADMIN]), getPotentialIncome);
 eventRoutes.get('/:id/income', isAuthorized([UserRole.ADMIN]), getActualIncome);
 
-// router.get('/:id/stats', isAuthorized(['admin', 'teacher', 'coordinator']), getEvents.getStats);
+eventRoutes.get('/:id/stats', isAuthorized([UserRole.ADMIN, UserRole.COORDINATOR, UserRole.TEACHER]), getStats);
 eventRoutes.get('/:id/offerings/assignees', isAuthorized([UserRole.TEACHER]), getAssignees);
-
-// module.exports = router;

@@ -184,6 +184,52 @@ export const getActualIncome = async (req: Request, res: Response) => {
     income(req, res, CalculationType.Actual);
 };
 
+export const getStats = async (req: Request, res: Response) => {
+    try {
+        const statsResult: any = {};
+
+        const [event, registrations]: [Event, Registration[]] = await Promise.all([
+            Event.findByPk(req.params.id, {
+                include: [{
+                    model: Scout,
+                    as: 'attendees',
+                    attributes: ['id', 'firstname', 'lastname', 'troop']
+                }, {
+                    model: Badge,
+                    as: 'offerings',
+                    attributes: ['id', 'name']
+                }]
+            }),
+            Registration.findAll({
+                where: {
+                    event_id: req.params.id
+                },
+                attributes: ['scout_id'],
+                include: [{
+                    model: Purchasable,
+                    as: 'purchases',
+                    attributes: ['id', 'price', 'has_size'],
+                    through: <any>[{
+                        as: 'details',
+                        attributes: ['quantity', 'size']
+                    }]
+                }]
+            })
+        ]);
+
+        statsResult.scouts = event.attendees;
+        statsResult.offerings = event.offerings;
+        statsResult.registrations = registrations;
+
+        return res.status(status.OK).send(statsResult);
+    } catch (err) {
+        return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+            message: 'Failed to get stats',
+            error: err
+        });
+    }
+};
+
 async function income(req: Request, res: Response, type: CalculationType): Promise<Response> {
     try {
         const registrations: Registration[] = await Registration.findAll({
@@ -212,65 +258,3 @@ async function income(req: Request, res: Response, type: CalculationType): Promi
         });
     }
 }
-
-//   },
-//   getStats: function (req, res) {
-//     var resultObject = {};
-
-//     Model.Event.findById(req.params.id, {
-//       include: [{
-//         model: Model.Scout,
-//         as: 'attendees',
-//         attributes: ['id', 'firstname', 'lastname', 'troop']
-//       }, {
-//         model: Model.Badge,
-//         as: 'offerings',
-//         attributes: ['id', 'name'],
-//       }]
-//     })
-//       .then(function (event) {
-//         resultObject.scouts = event.attendees;
-//         resultObject.offerings = event.offerings;
-
-//         return Model.Registration.findAll({
-//           where: {
-//             event_id: req.params.id
-//           },
-//           attributes: ['scout_id'],
-//           include: [{
-//             model: Model.Purchasable,
-//             as: 'purchases',
-//             attributes: ['id', 'price', 'has_size'],
-//             through: [{
-//               as: 'details',
-//               attributes: ['quantity', 'size']
-//             }]
-//           }]
-//         });
-//       })
-//       .then(function (registrations) {
-//         resultObject.registrations = registrations;
-
-//       //   return Model.Purchasable.findAll({
-//       //     where: {
-//       //       event_id: req.params.id
-//       //     },
-//       //     attributes: ['id', 'price', 'has_size'],
-//       //     include: [{
-//       //       model: Model.Purchase,
-//       //       as: 'sold',
-//       //       attributes: ['quantity', 'size']
-//       //     }]
-//       //   })
-//       // })
-//       // .then(function (purchases) {
-//       //   resultObject.purchases = purchases;
-//         res.status(status.OK).send(resultObject);
-//       })
-//       .catch(function (err) {
-//         res.status(status.BAD_REQUEST).send(err);
-//       });
-//   }
-// };
-
-
