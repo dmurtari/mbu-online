@@ -14,7 +14,7 @@ export default <FindOptions>{
         {
             model: Scout,
             as: 'scout',
-            attributes: [['id', 'scout_id'], 'firstname', 'lastname', 'troop', 'notes']
+            attributes: [['id', 'scout_id'], 'firstname', 'lastname', 'fullname', 'troop', 'notes']
         }, {
             model: Offering,
             as: 'preferences',

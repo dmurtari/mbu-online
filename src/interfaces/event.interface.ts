@@ -36,3 +36,7 @@ export interface CurrentEventResponseInterface {
     message: string;
     currentEvent: EventInterface;
 }
+
+export interface IncomeCalculationResponseInterface {
+    income: string;
+}
