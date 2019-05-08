@@ -3,7 +3,16 @@ import { Router } from 'express';
 import { isAuthorized } from '@middleware/isAuthorized';
 import { UserRole } from '@app/interfaces/user.interface';
 import { createEvent, setCurrentEvent, createOffering, createPurchasable } from '@routes/events/postEvents';
-import { getCurrentEvent, getEvent, getPurchasables, getClassSize, getRegistrations, getAssignees } from '@routes/events/getEvents';
+import {
+    getCurrentEvent,
+    getEvent,
+    getPurchasables,
+    getClassSize,
+    getRegistrations,
+    getAssignees,
+    getPotentialIncome,
+    getActualIncome
+} from '@routes/events/getEvents';
 import { deleteEvent, deleteOffering, deletePurchasable } from '@routes/events/deleteEvents';
 import { updateEvent, updateOffering, updatePurchasable } from '@routes/events/updateEvents';
 
@@ -31,8 +40,8 @@ eventRoutes.put('/:eventId/purchasables/:purchasableId', isAuthorized([UserRole.
 eventRoutes.delete('/:eventId/purchasables/:purchasableId', isAuthorized([UserRole.ADMIN]), deletePurchasable);
 
 // // Event income
-// router.get('/:id/potentialIncome', isAuthorized(['admin']), getEvents.getPotentialIncome);
-// router.get('/:id/income', isAuthorized(['admin']), getEvents.getIncome);
+eventRoutes.get('/:id/potentialIncome', isAuthorized([UserRole.ADMIN]), getPotentialIncome);
+eventRoutes.get('/:id/income', isAuthorized([UserRole.ADMIN]), getActualIncome);
 
 // router.get('/:id/stats', isAuthorized(['admin', 'teacher', 'coordinator']), getEvents.getStats);
 eventRoutes.get('/:id/offerings/assignees', isAuthorized([UserRole.TEACHER]), getAssignees);

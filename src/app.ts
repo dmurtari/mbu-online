@@ -18,6 +18,7 @@ import { userRoutes } from '@routes/users';
 import { eventRoutes } from '@routes/events';
 import { badgeRoutes } from '@routes/badges';
 import { scoutRoutes } from '@routes/scouts';
+import { forgotPasswordRoutes } from '@routes/forgot';
 
 const app = express();
 const env = process.env.NODE_ENV || 'development';
@@ -63,10 +64,9 @@ app.use(passport.initialize());
 
 app.use('/api', indexRoutes);
 app.use('/api', userRoutes);
-// app.use('/api', require('./routes/forgot'));
+app.use('/api', forgotPasswordRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/badges', badgeRoutes);
-// app.use('/api/badges', require('./routes/badges'));
 app.use('/api/scouts', scoutRoutes);
 
 app.use((_req, res, _next) => {
