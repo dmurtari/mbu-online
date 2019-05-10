@@ -5,7 +5,7 @@ import { Op, WhereOptions, Includeable } from 'sequelize';
 
 import { User } from '@models/user.model';
 import { ErrorResponseInterface } from '@interfaces/shared.interface';
-import { UserExistsResponseInterface, TokenAuthResponseInterface } from '@interfaces/user.interface';
+import { UserExistsResponseDto, UserProfileResponseDto } from '@interfaces/user.interface';
 import { Scout } from '@models/scout.model';
 import registrationInformation from '@models/queries/registrationInformation';
 import { cloneDeep } from 'lodash';
@@ -24,7 +24,7 @@ export const byEmail = async (req: Request, res: Response) => {
             }
         });
 
-        res.status(status.OK).json(<UserExistsResponseInterface>{ exists: users.length > 0 });
+        res.status(status.OK).json(<UserExistsResponseDto>{ exists: users.length > 0 });
     } catch (err) {
         res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
             message: 'Failed to find users',
@@ -34,7 +34,7 @@ export const byEmail = async (req: Request, res: Response) => {
 };
 
 export const fromToken = async (req: Request, res: Response) => {
-    return res.status(status.OK).json(<TokenAuthResponseInterface>{
+    return res.status(status.OK).json(<UserProfileResponseDto>{
         message: 'Successfully authenticated',
         profile: req.user
     });

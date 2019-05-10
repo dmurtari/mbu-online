@@ -28,7 +28,7 @@ export interface UserDetailsInterface {
     council?: string;
     chapter?: string;
 }
-export interface SignupRequestInterface {
+export interface SignupRequestDto {
     email: string;
     password: string;
     firstname: string;
@@ -37,7 +37,7 @@ export interface SignupRequestInterface {
     details?: UserDetailsInterface;
 }
 
-export interface EditUserInterface {
+export interface EditUserDto {
     email?: string;
     password?: string;
     firstname?: string;
@@ -45,22 +45,29 @@ export interface EditUserInterface {
     details?: UserDetailsInterface;
 }
 
-export interface EditUserResponseInterface {
+export interface EditUserResponseDto {
     message: string;
     profile: UserInterface;
     token?: string;
 }
 
-export interface UserTokenResponseInterface {
+export type UsersResponseDto = UserInterface[];
+
+export interface LoginRequestDto {
+    email: string;
+    password: string;
+}
+
+export interface UserTokenResponseDto {
     token: string;
     profile: UserInterface;
 }
 
-export interface UserExistsResponseInterface {
+export interface UserExistsResponseDto {
     exists: boolean;
 }
 
-export interface TokenAuthResponseInterface {
+export interface UserProfileResponseDto {
     message: string;
     profile: UserInterface;
 }

@@ -10,7 +10,7 @@ import { sequelize } from '@app/sequelize';
 import testEvents from './testEvents';
 import testBadges from './testBadges';
 import testPurchasables from './testPurchasables';
-import { UserInterface, SignupRequestInterface, UserRole } from '@interfaces/user.interface';
+import { UserInterface, SignupRequestDto, UserRole } from '@interfaces/user.interface';
 import { Model } from 'sequelize-typescript';
 import { ScoutInterface } from '@interfaces/scout.interface';
 import { Scout } from '@models/scout.model';
@@ -66,7 +66,7 @@ export default class TestUtils {
 
         const roleSearchRegexp: RegExp = /(\D+)/;
         const role = roleSearchRegexp.exec(name)[1];
-        const postData: SignupRequestInterface = {
+        const postData: SignupRequestDto = {
             email: name + '@test.com',
             password: 'password',
             firstname: 'firstname',

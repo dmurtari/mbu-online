@@ -5,7 +5,7 @@ import status from 'http-status-codes';
 
 import config from '@config/secrets';
 import { User } from '@models/user.model';
-import { UserTokenResponseInterface, UserRole } from '@interfaces/user.interface';
+import { UserTokenResponseDto, UserRole } from '@interfaces/user.interface';
 import { ErrorResponseInterface } from '@interfaces/shared.interface';
 import { Scout } from '@models/scout.model';
 import { Event } from '@models/event.model';
@@ -26,7 +26,7 @@ export const signup = async (req: Request, res: Response) => {
         const token = jwt.sign(user.id, config.APP_SECRET);
         user.set('password', null);
 
-        return res.status(status.CREATED).json(<UserTokenResponseInterface>{
+        return res.status(status.CREATED).json(<UserTokenResponseDto>{
             token: `JWT ${token}`,
             profile: user
         });
@@ -56,7 +56,7 @@ export const authenticate = async (req: Request, res: Response) => {
             const token: string = jwt.sign(user.id, config.APP_SECRET);
             user.set('password', null);
 
-            return res.status(status.OK).json(<UserTokenResponseInterface>{
+            return res.status(status.OK).json(<UserTokenResponseDto>{
                 token: `JWT ${token}`,
                 profile: user
             });

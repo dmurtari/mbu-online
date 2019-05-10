@@ -5,8 +5,19 @@ import { expect } from 'chai';
 
 import app from '@app/app';
 import TestUtils, { RoleTokenObjects } from './testUtils';
-import { SignupRequestInterface, UserInterface, EditUserInterface, UserRole } from '@interfaces/user.interface';
+import {
+    SignupRequestDto,
+    UserInterface,
+    EditUserDto,
+    UserRole,
+    UserTokenResponseDto,
+    UsersResponseDto,
+    EditUserResponseDto,
+    LoginRequestDto,
+    UserProfileResponseDto
+} from '@interfaces/user.interface';
 import { ScoutInterface } from '@interfaces/scout.interface';
+import { SuperTestResponse } from '@test/helpers/supertest.interface';
 
 const request = supertest(app);
 
@@ -27,7 +38,7 @@ describe('user profiles', () => {
 
     describe('account details', () => {
         it('creates an account with coordinator information', (done) => {
-            const postData: SignupRequestInterface = {
+            const postData: SignupRequestDto = {
                 email: 'test@test.com',
                 password: 'password',
                 firstname: 'firstname',
@@ -43,7 +54,7 @@ describe('user profiles', () => {
             request.post('/api/signup')
                 .send(postData)
                 .expect(status.CREATED)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<UserTokenResponseDto>) => {
                     if (err) { return done(err); }
                     expect(res.body.profile.email).to.equal(postData.email);
                     expect(res.body.profile.firstname).to.equal(postData.firstname);
@@ -56,7 +67,7 @@ describe('user profiles', () => {
         });
 
         it('creates an account with teacher information', (done) => {
-            const postData: SignupRequestInterface = {
+            const postData: SignupRequestDto = {
                 email: 'test@test.com',
                 password: 'password',
                 firstname: 'firstname',
@@ -70,7 +81,7 @@ describe('user profiles', () => {
             request.post('/api/signup')
                 .send(postData)
                 .expect(status.CREATED)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<UserTokenResponseDto>) => {
                     if (err) { return done(err); }
                     expect(res.body.profile.email).to.equal(postData.email);
                     expect(res.body.profile.firstname).to.equal(postData.firstname);
@@ -83,7 +94,7 @@ describe('user profiles', () => {
         });
 
         it('does not create coordinator with teacher info', (done) => {
-            const postData: SignupRequestInterface = {
+            const postData: SignupRequestDto = {
                 email: 'test@test.com',
                 password: 'password',
                 firstname: 'firstname',
@@ -100,7 +111,7 @@ describe('user profiles', () => {
         });
 
         it('does not create teacher with coordinator info', (done) => {
-            const postData: SignupRequestInterface = {
+            const postData: SignupRequestDto = {
                 email: 'test@test.com',
                 password: 'password',
                 firstname: 'firstname',
@@ -157,7 +168,7 @@ describe('user profiles', () => {
                     request.post('/api/signup')
                         .send(user1)
                         .expect(status.CREATED)
-                        .end((err, res) => {
+                        .end((err, res: SuperTestResponse<UserTokenResponseDto>) => {
                             if (err) { return done(err); }
                             user1.id = res.body.profile.id;
                             user1Token = res.body.token;
@@ -168,7 +179,7 @@ describe('user profiles', () => {
                     request.post('/api/signup')
                         .send(user2)
                         .expect(status.CREATED)
-                        .end((err, res) => {
+                        .end((err, res: SuperTestResponse<UserTokenResponseDto>) => {
                             if (err) { return done(err); }
                             user2.id = res.body.profile.id;
                             user2Token = res.body.token;
@@ -193,7 +204,7 @@ describe('user profiles', () => {
             request.get('/api/users/' + user1.id)
                 .set('Authorization', user1Token)
                 .expect(status.OK)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<UsersResponseDto>) => {
                     if (err) { return done(err); }
                     expect(res.body[0].id).to.equal(user1.id);
                     expect(res.body[0].details).to.deep.equal(user1.details);
@@ -205,7 +216,7 @@ describe('user profiles', () => {
             request.get('/api/users/' + user1.id)
                 .set('Authorization', generatedUsers.admin.token)
                 .expect(status.OK)
-                .end((err, res) => {
+                .end((err, res:  SuperTestResponse<UsersResponseDto>) => {
                     if (err) { return done(err); }
                     expect(res.body[0].id).to.equal(user1.id);
                     expect(res.body[0].details).to.deep.equal(user1.details);
@@ -217,7 +228,7 @@ describe('user profiles', () => {
             request.get('/api/users/' + user1.id)
                 .set('Authorization', generatedUsers.teacher.token)
                 .expect(status.OK)
-                .end((err, res) => {
+                .end((err, res:  SuperTestResponse<UsersResponseDto>) => {
                     if (err) { return done(err); }
                     expect(res.body[0].id).to.equal(user1.id);
                     expect(res.body[0].details).to.deep.equal(user1.details);
@@ -280,7 +291,7 @@ describe('user profiles', () => {
                     request.post('/api/signup')
                         .send(user1)
                         .expect(status.CREATED)
-                        .end((err, res) => {
+                        .end((err, res: SuperTestResponse<UserTokenResponseDto>) => {
                             if (err) { return done(err); }
                             user1.id = res.body.profile.id;
                             user1Token = res.body.token;
@@ -291,7 +302,7 @@ describe('user profiles', () => {
                     request.post('/api/signup')
                         .send(user2)
                         .expect(status.CREATED)
-                        .end((err, res) => {
+                        .end((err, res: SuperTestResponse<UserTokenResponseDto>) => {
                             if (err) { return done(err); }
                             user2.id = res.body.profile.id;
                             user2Token = res.body.token;
@@ -302,7 +313,7 @@ describe('user profiles', () => {
         });
 
         it('should edit a profile', (done) => {
-            const edited: EditUserInterface = {
+            const edited: EditUserDto = {
                 firstname: 'changed',
                 details: {
                     troop: 1000
@@ -313,7 +324,7 @@ describe('user profiles', () => {
                 .set('Authorization', user1Token)
                 .send(edited)
                 .expect(status.OK)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<EditUserResponseDto>) => {
                     if (err) { return done(err); }
                     expect(res.body.profile.id).to.equal(user1.id);
                     expect(res.body.profile.firstname).to.equal(edited.firstname);
@@ -327,7 +338,7 @@ describe('user profiles', () => {
             async.series([
                 (cb) => {
                     request.post('/api/authenticate')
-                        .send({
+                        .send(<LoginRequestDto>{
                             email: user2.email,
                             password: user2.password
                         })
@@ -336,7 +347,7 @@ describe('user profiles', () => {
                 (cb) => {
                     request.put('/api/users/' + user2.id)
                         .set('Authorization', user2Token)
-                        .send({ firstname: 'New' })
+                        .send(<EditUserDto>{ firstname: 'New' })
                         .expect(status.OK)
                         .end((err) => {
                             if (err) { return done(err); }
@@ -345,7 +356,7 @@ describe('user profiles', () => {
                 },
                 (cb) => {
                     request.post('/api/authenticate')
-                        .send({
+                        .send(<LoginRequestDto>{
                             email: user2.email,
                             password: user2.password
                         })
@@ -357,7 +368,7 @@ describe('user profiles', () => {
         it('should not send a token if the password did not change', (done) => {
             request.put('/api/users/' + user1.id)
                 .set('Authorization', user1Token)
-                .send({ firstname: 'New' })
+                .send(<EditUserDto>{ firstname: 'New' })
                 .expect(status.OK)
                 .end((err, res) => {
                     if (err) { return done(err); }
@@ -369,7 +380,7 @@ describe('user profiles', () => {
         it('should not allow invalid details', (done) => {
             request.put('/api/users/' + user2.id)
                 .set('Authorization', user2Token)
-                .send({
+                .send(<EditUserDto>{
                     details: { troop: 450 }
                 })
                 .expect(status.BAD_REQUEST, done);
@@ -401,14 +412,14 @@ describe('user profiles', () => {
 
         it('should change a password', (done) => {
             let newToken: string;
-            const edit: EditUserInterface = {
+            const edit: EditUserDto = {
                 password: 'edited'
             };
 
             async.series([
                 (cb) => {
                     request.post('/api/authenticate')
-                        .send({
+                        .send(<LoginRequestDto>{
                             email: user2.email,
                             password: user2.password
                         })
@@ -419,7 +430,7 @@ describe('user profiles', () => {
                         .set('Authorization', user2Token)
                         .send(edit)
                         .expect(status.OK)
-                        .end((err, res) => {
+                        .end((err, res: SuperTestResponse<EditUserResponseDto>) => {
                             if (err) { return done(err); }
                             newToken = res.body.token;
                             cb();
@@ -427,7 +438,7 @@ describe('user profiles', () => {
                 },
                 (cb) => {
                     request.post('/api/authenticate')
-                        .send({
+                        .send(<LoginRequestDto>{
                             email: user2.email,
                             password: edit.password
                         })
@@ -437,7 +448,7 @@ describe('user profiles', () => {
                     request.get('/api/profile')
                         .set('Authorization', newToken)
                         .expect(status.OK)
-                        .end((err, res) => {
+                        .end((err, res: SuperTestResponse<UserProfileResponseDto>) => {
                             if (err) { return done(err); }
                             expect(res.body.profile.email).to.equal(user2.email);
                             expect(res.body.profile.details).to.deep.equal(user2.details);
@@ -453,7 +464,7 @@ describe('user profiles', () => {
             async.series([
                 (cb) => {
                     request.post('/api/authenticate')
-                        .send({
+                        .send(<LoginRequestDto>{
                             email: user2.email,
                             password: user2.password
                         })
@@ -462,7 +473,7 @@ describe('user profiles', () => {
                 (cb) => {
                     request.put('/api/users/' + user2.id)
                         .set('Authorization', user2Token)
-                        .send({
+                        .send(<EditUserDto>{
                             password: user2.password
                         })
                         .expect(status.OK)
@@ -474,7 +485,7 @@ describe('user profiles', () => {
                 },
                 (cb) => {
                     request.post('/api/authenticate')
-                        .send({
+                        .send(<LoginRequestDto>{
                             email: user2.email,
                             password: user2.password
                         })
@@ -484,7 +495,7 @@ describe('user profiles', () => {
                     request.get('/api/profile')
                         .set('Authorization', newToken)
                         .expect(status.OK)
-                        .end((err, res) => {
+                        .end((err, res: SuperTestResponse<UserProfileResponseDto>) => {
                             if (err) { return done(err); }
                             expect(res.body.profile.email).to.equal(user2.email);
                             expect(res.body.profile.details).to.deep.equal(user2.details);
@@ -499,14 +510,14 @@ describe('user profiles', () => {
                 (cb) => {
                     request.put('/api/users/' + user2.id)
                         .set('Authorization', generatedUsers.admin.token)
-                        .send({ role: 'admin' })
+                        .send(<EditUserDto>{ role: 'admin' })
                         .expect(status.OK, cb);
                 },
                 (cb) => {
                     request.get('/api/users/' + user2.id)
                         .set('Authorization', user2Token)
                         .expect(status.OK)
-                        .end((err, res) => {
+                        .end((err, res: SuperTestResponse<UsersResponseDto>) => {
                             if (err) { return done(err); }
                             expect(res.body[0].id).to.equal(user2.id);
                             expect(res.body[0].role).to.equal('admin');
@@ -519,44 +530,44 @@ describe('user profiles', () => {
         it('should not allow teachers to edit a role', (done) => {
             request.put('/api/users/' + user2.id)
                 .set('Authorization', generatedUsers.teacher.token)
-                .send({ role: 'admin' })
+                .send(<EditUserDto>{ role: 'admin' })
                 .expect(status.UNAUTHORIZED, done);
         });
 
         it('should not allow coordinators to edit a role', (done) => {
             request.put('/api/users/' + user2.id)
                 .set('Authorization', generatedUsers.coordinator.token)
-                .send({ role: 'admin' })
+                .send(<EditUserDto>{ role: 'admin' })
                 .expect(status.UNAUTHORIZED, done);
         });
 
         it('should not allow self role edits', (done) => {
             request.put('/api/users/' + user2.id)
                 .set('Authorization', user2Token)
-                .send({ role: 'admin' })
+                .send(<EditUserDto>{ role: 'admin' })
                 .expect(status.UNAUTHORIZED, done);
         });
 
         it('should not allow teachers to edit other passwords', (done) => {
             request.put('/api/users/' + user2.id)
                 .set('Authorization', generatedUsers.teacher.token)
-                .send({ password: 'oops' })
+                .send(<EditUserDto>{ password: 'oops' })
                 .expect(status.UNAUTHORIZED, done);
         });
 
         it('should allow admins to edit a password', (done) => {
             request.put('/api/users/' + user2.id)
                 .set('Authorization', generatedUsers.admin.token)
-                .send({ password: 'oops' })
+                .send(<EditUserDto>{ password: 'oops' })
                 .expect(status.OK, done);
         });
 
         it('should allow admins to edit a password', (done) => {
             request.put('/api/users/' + user2.id)
                 .set('Authorization', generatedUsers.admin.token)
-                .send({ password: 'new' })
+                .send(<EditUserDto>{ password: 'new' })
                 .expect(status.OK)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<EditUserResponseDto>) => {
                     if (err) { return done(err); }
                     expect(res.body.token).to.exist;
                     done();
@@ -600,7 +611,7 @@ describe('user profiles', () => {
                     request.post('/api/signup')
                         .send(coordinator)
                         .expect(status.CREATED)
-                        .end((err, res) => {
+                        .end((err, res: SuperTestResponse<UserTokenResponseDto>) => {
                             if (err) { return done(err); }
                             coordinator.id = res.body.profile.id;
                             coordinatorToken = res.body.token;
@@ -611,7 +622,7 @@ describe('user profiles', () => {
                     request.post('/api/signup')
                         .send(teacher)
                         .expect(status.CREATED)
-                        .end((err, res) => {
+                        .end((err, res: SuperTestResponse<UserTokenResponseDto>) => {
                             if (err) { return done(err); }
                             teacher.id = res.body.profile.id;
                             teacherToken = res.body.token;
@@ -627,7 +638,7 @@ describe('user profiles', () => {
                     request.get('/api/users/' + coordinator.id)
                         .set('Authorization', coordinatorToken)
                         .expect(status.OK)
-                        .end((err, res) => {
+                        .end((err, res: SuperTestResponse<UsersResponseDto>) => {
                             if (err) { return done(err); }
                             expect(res.body[0].id).to.equal(coordinator.id);
                             cb();
@@ -678,7 +689,7 @@ describe('user profiles', () => {
 
     describe('account approval', () => {
         it('should default new accounts to not approved', (done) => {
-            const postData: SignupRequestInterface = {
+            const postData: SignupRequestDto = {
                 email: 'test@test.com',
                 password: 'helloworld',
                 firstname: 'firstname',
@@ -688,7 +699,7 @@ describe('user profiles', () => {
             request.post('/api/signup')
                 .send(postData)
                 .expect(status.CREATED)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<UserTokenResponseDto>) => {
                     if (err) { return done(err); }
                     expect(res.body.profile.approved).to.be.false;
                     return done();
@@ -707,7 +718,7 @@ describe('user profiles', () => {
             request.post('/api/signup')
                 .send(postData)
                 .expect(status.CREATED)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<UserTokenResponseDto>) => {
                     if (err) { return done(err); }
                     expect(res.body.profile.approved).to.be.false;
                     return done();
@@ -715,11 +726,11 @@ describe('user profiles', () => {
         });
 
         it('should allow admins to change an accounts approval status', (done) => {
-            let accountId: string;
+            let accountId: number;
 
             async.series([
                 (cb) => {
-                    const postData: SignupRequestInterface = {
+                    const postData: SignupRequestDto = {
                         email: 'test@test.com',
                         password: 'helloworld',
                         firstname: 'firstname',
@@ -729,7 +740,7 @@ describe('user profiles', () => {
                     request.post('/api/signup')
                         .send(postData)
                         .expect(status.CREATED)
-                        .end((err, res) => {
+                        .end((err, res: SuperTestResponse<UserTokenResponseDto>) => {
                             if (err) { return done(err); }
                             expect(res.body.profile.approved).to.be.false;
                             accountId = res.body.profile.id;
@@ -752,11 +763,11 @@ describe('user profiles', () => {
         });
 
         it('should not allow coordinators to change account approval status', (done) => {
-            let accountId: string;
+            let accountId: number;
 
             async.series([
                 (cb) => {
-                    const postData: SignupRequestInterface = {
+                    const postData: SignupRequestDto = {
                         email: 'test@test.com',
                         password: 'helloworld',
                         firstname: 'firstname',
@@ -766,7 +777,7 @@ describe('user profiles', () => {
                     request.post('/api/signup')
                         .send(postData)
                         .expect(status.CREATED)
-                        .end((err, res) => {
+                        .end((err, res: SuperTestResponse<UserTokenResponseDto>) => {
                             if (err) { return done(err); }
                             expect(res.body.profile.approved).to.be.false;
                             accountId = res.body.profile.id;
@@ -776,18 +787,18 @@ describe('user profiles', () => {
                 (cb) => {
                     request.put('/api/users/' + accountId)
                         .set('Authorization', generatedUsers.coordinator.token)
-                        .send({ approved: true })
+                        .send(<EditUserDto>{ approved: true })
                         .expect(status.UNAUTHORIZED, cb);
                 }
             ], done);
         });
 
         it('should not allow teachers to change account approval status', (done) => {
-            let accountId: string;
+            let accountId: number;
 
             async.series([
                 (cb) => {
-                    const postData: SignupRequestInterface = {
+                    const postData: SignupRequestDto = {
                         email: 'test@test.com',
                         password: 'helloworld',
                         firstname: 'firstname',
@@ -807,7 +818,7 @@ describe('user profiles', () => {
                 (cb) => {
                     request.put('/api/users/' + accountId)
                         .set('Authorization', generatedUsers.teacher.token)
-                        .send({ approved: true })
+                        .send(<EditUserDto>{ approved: true })
                         .expect(status.UNAUTHORIZED, cb);
                 }
             ], done);
@@ -815,7 +826,7 @@ describe('user profiles', () => {
 
         it('should require approval for protected routes', (done) => {
             let token: string;
-            let accountId: string;
+            let accountId: number;
             const exampleScout: ScoutInterface = {
                 firstname: 'Scouty',
                 lastname: 'McScoutFace',
@@ -829,7 +840,7 @@ describe('user profiles', () => {
 
             async.series([
                 (cb) => {
-                    const postData: SignupRequestInterface = {
+                    const postData: SignupRequestDto = {
                         email: 'test@test.com',
                         password: 'helloworld',
                         firstname: 'firstname',
@@ -845,7 +856,7 @@ describe('user profiles', () => {
                     request.post('/api/signup')
                         .send(postData)
                         .expect(status.CREATED)
-                        .end((err, res) => {
+                        .end((err, res: SuperTestResponse<UserTokenResponseDto>) => {
                             if (err) { return done(err); }
                             expect(res.body.profile.approved).to.be.false;
                             accountId = res.body.profile.id;
@@ -864,7 +875,7 @@ describe('user profiles', () => {
 
         it('should allow changes once an account is approved', (done) => {
             let token: string;
-            let accountId: string;
+            let accountId: number;
             const exampleScout: ScoutInterface = {
                 firstname: 'Scouty',
                 lastname: 'McScoutFace',
@@ -878,7 +889,7 @@ describe('user profiles', () => {
 
             async.series([
                 (cb) => {
-                    const postData: SignupRequestInterface = {
+                    const postData: SignupRequestDto = {
                         email: 'test@test.com',
                         password: 'helloworld',
                         firstname: 'firstname',
@@ -894,7 +905,7 @@ describe('user profiles', () => {
                     request.post('/api/signup')
                         .send(postData)
                         .expect(status.CREATED)
-                        .end((err, res) => {
+                        .end((err, res: SuperTestResponse<UserTokenResponseDto>) => {
                             if (err) { return done(err); }
                             expect(res.body.profile.approved).to.be.false;
                             accountId = res.body.profile.id;
@@ -913,7 +924,7 @@ describe('user profiles', () => {
                         .set('Authorization', generatedUsers.admin.token)
                         .send({ approved: true })
                         .expect(status.OK)
-                        .end((err, res) => {
+                        .end((err, res: SuperTestResponse<EditUserResponseDto>) => {
                             if (err) { return done(err); }
                             expect(res.body.profile.approved).to.be.true;
                             expect(res.body.profile.id).to.equal(accountId);

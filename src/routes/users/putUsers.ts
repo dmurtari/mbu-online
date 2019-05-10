@@ -5,10 +5,10 @@ import jwt from 'jsonwebtoken';
 import { User } from '@models/user.model';
 import config from '@config/secrets';
 
-import { EditUserResponseInterface } from '@app/interfaces/user.interface';
+import { EditUserResponseDto } from '@app/interfaces/user.interface';
 import { ErrorResponseInterface } from '@app/interfaces/shared.interface';
 import { Scout } from '@models/scout.model';
-import { ScoutResponseInterface } from '@interfaces/scout.interface';
+import { ScoutResponseDto } from '@interfaces/scout.interface';
 
 export const updateProfile = async (req: Request, res: Response) => {
     try {
@@ -22,7 +22,7 @@ export const updateProfile = async (req: Request, res: Response) => {
 
         user.set('password', null);
 
-        const response: EditUserResponseInterface = {
+        const response: EditUserResponseDto = {
             message: 'User profile updated',
             profile: user
         };
@@ -46,7 +46,7 @@ export const updateScout = async (req: Request, res: Response) => {
         const scout: Scout = await Scout.findByPk(req.params.scoutId);
         await scout.update(req.body);
 
-        return res.status(status.OK).json(<ScoutResponseInterface>{
+        return res.status(status.OK).json(<ScoutResponseDto>{
             message: 'Scout successfully updated',
             scout: scout
         });

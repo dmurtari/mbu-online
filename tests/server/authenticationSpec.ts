@@ -4,7 +4,7 @@ import { expect } from 'chai';
 
 import app from '@app/app';
 import TestUtils from './testUtils';
-import { SignupRequestInterface } from '@interfaces/user.interface';
+import { SignupRequestDto } from '@interfaces/user.interface';
 
 const request = supertest(app);
 
@@ -19,7 +19,7 @@ describe('authentication', () => {
 
     describe('user roles', () => {
         it('should create a user with a default role', (done) => {
-            const postData: SignupRequestInterface = {
+            const postData: SignupRequestDto = {
                 email: 'test@test.com',
                 password: 'password',
                 firstname: 'firstname',
@@ -39,7 +39,7 @@ describe('authentication', () => {
         });
 
         it('should create a user with a role', (done) => {
-            const postData: SignupRequestInterface = {
+            const postData: SignupRequestDto = {
                 email: 'test@test.com',
                 password: 'password',
                 firstname: 'firstname',
@@ -60,7 +60,7 @@ describe('authentication', () => {
         });
 
         it('should not create a user with an invalid role', (done) => {
-            const postData: SignupRequestInterface = {
+            const postData: SignupRequestDto = {
                 email: 'test@test.com',
                 password: 'password',
                 firstname: 'firstname',

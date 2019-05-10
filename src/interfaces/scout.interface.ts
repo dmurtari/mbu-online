@@ -11,8 +11,9 @@ export interface ScoutInterface {
     registrations?: any[];
 }
 
+export type ScoutRequestDto = ScoutInterface;
 
-export interface ScoutResponseInterface {
+export interface ScoutResponseDto {
     message: string;
     scout: ScoutInterface;
 }

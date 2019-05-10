@@ -5,7 +5,14 @@ import { expect } from 'chai';
 
 import app from '@app/app';
 import TestUtils from './testUtils';
-import { SignupRequestInterface } from '@interfaces/user.interface';
+import {
+    SignupRequestDto,
+    UserTokenResponseDto,
+    UserExistsResponseDto,
+    LoginRequestDto,
+    UserProfileResponseDto
+} from '@interfaces/user.interface';
+import { SuperTestResponse } from '@test/helpers/supertest.interface';
 
 const request = supertest(app);
 
@@ -20,7 +27,7 @@ describe('users', () => {
 
     describe('user account creation', () => {
         it('creates an account if all required info is supplied', (done) => {
-            const postData: SignupRequestInterface = {
+            const postData: SignupRequestDto = {
                 email: 'test@test.com',
                 password: 'password',
                 firstname: 'firstname',
@@ -33,7 +40,7 @@ describe('users', () => {
         });
 
         it('should return a token and the profile', (done) => {
-            const postData: SignupRequestInterface = {
+            const postData: SignupRequestDto = {
                 email: 'test@test.com',
                 password: 'password',
                 firstname: 'firstname',
@@ -43,7 +50,7 @@ describe('users', () => {
             request.post('/api/signup')
                 .send(postData)
                 .expect(status.CREATED)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<UserTokenResponseDto>) => {
                     if (err) { done(err); }
                     expect(res.body.profile.email).to.equal(postData.email);
                     expect(res.body.profile.firstname).to.equal(postData.firstname);
@@ -90,7 +97,7 @@ describe('users', () => {
         });
 
         it('checks for a valid email address', (done) => {
-            let postData: SignupRequestInterface;
+            let postData: SignupRequestDto;
 
             async.series([
              (cb) => {
@@ -128,7 +135,7 @@ describe('users', () => {
         });
 
         describe('when a user already exists', () => {
-            let postData: SignupRequestInterface;
+            let postData: SignupRequestDto;
 
             beforeEach((done) => {
                 postData = {
@@ -146,7 +153,7 @@ describe('users', () => {
             it('should know if a user exists by email', (done) => {
                 request.get('/api/users/exists/Test@test.com')
                     .expect(status.OK)
-                    .end((err, res) => {
+                    .end((err, res: SuperTestResponse<UserExistsResponseDto>) => {
                         if (err) { done(err); }
                         expect(res.body.exists).to.be.true;
                         done();
@@ -160,7 +167,7 @@ describe('users', () => {
             });
 
             it('should treat email as case insensitive', (done) => {
-                const uppercaseData: SignupRequestInterface = {
+                const uppercaseData: SignupRequestDto = {
                     email: 'Test@Test.com',
                     password: 'password',
                     firstname: 'firstname',
@@ -176,7 +183,7 @@ describe('users', () => {
 
     describe('account authentication', () => {
         beforeEach((done) => {
-            const postData: SignupRequestInterface = {
+            const postData: SignupRequestDto = {
                 email: 'test@test.com',
                 password: 'password',
                 firstname: 'firstname',
@@ -190,7 +197,7 @@ describe('users', () => {
 
         it('should find a user and send back a token', (done) => {
             request.post('/api/authenticate')
-                .send({
+                .send(<LoginRequestDto>{
                     email: 'test@test.com',
                     password: 'password'
                 })
@@ -199,7 +206,7 @@ describe('users', () => {
 
         it('should not enforce case sensitivity for emails', (done) => {
             request.post('/api/authenticate')
-                .send({
+                .send(<LoginRequestDto>{
                     email: 'Test@Test.com',
                     password: 'password'
                 })
@@ -213,15 +220,16 @@ describe('users', () => {
 
         it('should not find a nonexistent email', (done) => {
             request.post('/api/authenticate')
-                .send({
-                    email: 'dne'
+                .send(<LoginRequestDto>{
+                    email: 'dne',
+                    password: 'test'
                 })
                 .expect(status.UNAUTHORIZED, done);
         });
 
         it('should fail to authenticate without a password', (done) => {
             request.post('/api/authenticate')
-                .send({
+                .send(<LoginRequestDto>{
                     email: 'test@test.com'
                 })
                 .expect(status.UNAUTHORIZED, done);
@@ -229,7 +237,7 @@ describe('users', () => {
 
         it('should fail to authenticate with an incorrect password', (done) => {
             request.post('/api/authenticate')
-                .send({
+                .send(<LoginRequestDto>{
                     email: 'test@test.com',
                     password: 'pwd'
                 })
@@ -241,7 +249,7 @@ describe('users', () => {
         let token: string = null;
 
         beforeEach((done) => {
-            const postData: SignupRequestInterface = {
+            const postData: SignupRequestDto = {
                 email: 'test@test.com',
                 password: 'password',
                 firstname: 'firstname',
@@ -251,7 +259,7 @@ describe('users', () => {
             request.post('/api/signup')
                 .send(postData)
                 .expect(status.CREATED)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<UserTokenResponseDto>) => {
                     if (err) { done(err); }
                     token = res.body.token;
                     done();
@@ -262,7 +270,7 @@ describe('users', () => {
             request.get('/api/profile')
                 .set('Authorization', token)
                 .expect(status.OK)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<UserProfileResponseDto>) => {
                     if (err) { done(err); }
                     expect(res.body.profile.email).to.equal('test@test.com');
                     expect(res.body.profile.firstname).to.equal('firstname');

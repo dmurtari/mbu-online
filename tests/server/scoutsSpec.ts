@@ -6,14 +6,15 @@ import { expect } from 'chai';
 import app from '@app/app';
 import TestUtils, { RoleTokenObjects } from './testUtils';
 import testScouts from './testScouts';
-import { ScoutInterface } from '@interfaces/scout.interface';
-import { UserRole } from '@interfaces/user.interface';
+import { ScoutRequestDto, ScoutResponseDto } from '@interfaces/scout.interface';
+import { UserRole, UsersResponseDto } from '@interfaces/user.interface';
+import { SuperTestResponse } from '@test/helpers/supertest.interface';
 
 const request = supertest(app);
 
 describe('scouts', () => {
     let generatedUsers: RoleTokenObjects;
-    let exampleScout: ScoutInterface;
+    let exampleScout: ScoutRequestDto;
     const badId = TestUtils.badId;
 
     before(async () => {
@@ -56,7 +57,7 @@ describe('scouts', () => {
                 .set('Authorization', generatedUsers.coordinator.token)
                 .send(exampleScout)
                 .expect(status.CREATED)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<ScoutResponseDto>) => {
                     if (err) { return done(err); }
                     const scout = res.body.scout;
                     // expect(scout.name).to.equal(exampleScout.name);
@@ -124,7 +125,7 @@ describe('scouts', () => {
 
     describe('when scouts exist', () => {
         const scoutCount = 5;
-        let scouts: ScoutInterface[];
+        let scouts: ScoutRequestDto[];
 
         beforeEach(async () => {
             TestUtils.removeScoutsForUser(generatedUsers.coordinator);
@@ -139,7 +140,7 @@ describe('scouts', () => {
                 request.get('/api/users/' + generatedUsers.coordinator.profile.id + '/scouts')
                     .set('Authorization', generatedUsers.coordinator.token)
                     .expect(status.OK)
-                    .end((err, res) => {
+                    .end((err, res: SuperTestResponse<UsersResponseDto>) => {
                         if (err) { return done(err); }
                         const user = res.body[0];
                         expect(user.scouts.length).to.equal(scoutCount);
@@ -151,7 +152,7 @@ describe('scouts', () => {
                 request.get('/api/users/' + generatedUsers.coordinator.profile.id + '/scouts')
                     .set('Authorization', generatedUsers.admin.token)
                     .expect(status.OK)
-                    .end((err, res) => {
+                    .end((err, res: SuperTestResponse<UsersResponseDto>) => {
                         if (err) { return done(err); }
                         const user = res.body[0];
                         expect(user.scouts.length).to.equal(scoutCount);
@@ -163,7 +164,7 @@ describe('scouts', () => {
                 request.get('/api/users/' + generatedUsers.coordinator.profile.id + '/scouts')
                     .set('Authorization', generatedUsers.teacher.token)
                     .expect(status.OK)
-                    .end((err, res) => {
+                    .end((err, res: SuperTestResponse<UsersResponseDto>) => {
                         if (err) { return done(err); }
                         const user = res.body[0];
                         expect(user.scouts.length).to.equal(scoutCount);
@@ -185,7 +186,7 @@ describe('scouts', () => {
         });
 
         describe('updating registered scouts', () => {
-            let scoutUpdate: ScoutInterface;
+            let scoutUpdate: ScoutRequestDto;
 
             beforeEach(() => {
                 scoutUpdate = Object.assign({}, scouts[0]);
@@ -200,7 +201,7 @@ describe('scouts', () => {
                     .set('Authorization', generatedUsers.coordinator.token)
                     .send(scoutUpdate)
                     .expect(status.OK)
-                    .end((err, res) => {
+                    .end((err, res: SuperTestResponse<ScoutResponseDto>) => {
                         if (err) { return done(err); }
                         const scout = res.body.scout;
                         expect(scout.id).to.equal(scouts[0].id);
@@ -216,7 +217,7 @@ describe('scouts', () => {
                     .set('Authorization', generatedUsers.coordinator.token)
                     .send(scoutUpdate)
                     .expect(status.OK)
-                    .end((err, res) => {
+                    .end((err, res: SuperTestResponse<ScoutResponseDto>) => {
                         if (err) { return done(err); }
                         const scout = res.body.scout;
                         expect(scout.notes).to.not.exist;
@@ -275,7 +276,7 @@ describe('scouts', () => {
                         request.get('/api/users/' + generatedUsers.coordinator.profile.id + '/scouts')
                             .set('Authorization', generatedUsers.admin.token)
                             .expect(status.OK)
-                            .end((err, res) => {
+                            .end((err, res: SuperTestResponse<UsersResponseDto>) => {
                                 if (err) { return done(err); }
                                 expect(res.body[0].scouts).to.have.lengthOf(scoutCount);
                                 return cb();
@@ -290,7 +291,7 @@ describe('scouts', () => {
                         request.get('/api/users/' + generatedUsers.coordinator.profile.id + '/scouts')
                             .set('Authorization', generatedUsers.admin.token)
                             .expect(status.OK)
-                            .end((err, res) => {
+                            .end((err, res: SuperTestResponse<UsersResponseDto>) => {
                                 if (err) { return done(err); }
                                 expect(res.body[0].scouts).to.have.lengthOf(scoutCount - 1);
                                 return cb();
