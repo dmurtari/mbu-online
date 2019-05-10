@@ -9,12 +9,12 @@ export interface OfferingInterface {
     size_limit?: number;
 }
 
-export interface CreateOfferingInterface {
+export interface CreateOfferingDto {
     badge_id: number;
     offering: OfferingInterface;
 }
 
-export interface OfferingResponseInterface {
+export interface OfferingResponseDto {
     message: string;
     offering: OfferingInterface;
 }

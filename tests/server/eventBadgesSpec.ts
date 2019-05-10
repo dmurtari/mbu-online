@@ -1,4 +1,4 @@
-import supertest from 'supertest';
+import supertest, { SuperTest } from 'supertest';
 import * as async from 'async';
 import status from 'http-status-codes';
 import { expect } from 'chai';
@@ -9,8 +9,9 @@ import { Badge } from '@models/badge.model';
 import { Event } from '@models/event.model';
 import { UserRole } from '@interfaces/user.interface';
 import { Offering } from '@models/offering.model';
-import { CreateOfferingInterface, OfferingInterface } from '@interfaces/offering.interface';
-import { EventInterface, Semester, EventOfferingInterface } from '@interfaces/event.interface';
+import { CreateOfferingDto, OfferingInterface, OfferingResponseDto } from '@interfaces/offering.interface';
+import { EventInterface, Semester, EventOfferingInterface, CreateOfferingResponseDto, EventsResponseDto } from '@interfaces/event.interface';
+import { SuperTestResponse } from '@test/helpers/supertest.interface';
 
 const request = supertest(app);
 
@@ -44,7 +45,7 @@ describe('event badge association', () => {
 
     describe('when offerings do not exist', () => {
         it('should create a badge offering', (done) => {
-            const postData: CreateOfferingInterface = {
+            const postData: CreateOfferingDto = {
                 badge_id: badges[1].id,
                 offering: {
                     duration: 1,
@@ -58,7 +59,7 @@ describe('event badge association', () => {
                 .set('Authorization', adminToken)
                 .send(postData)
                 .expect(status.CREATED)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<CreateOfferingResponseDto>) => {
                     if (err) { return done(err); }
                     const event = res.body.event;
                     expect(event.offerings).to.have.lengthOf(1);
@@ -70,7 +71,7 @@ describe('event badge association', () => {
         });
 
         it('should default to a price of 0', (done) => {
-            const postData: CreateOfferingInterface = {
+            const postData: CreateOfferingDto = {
                 badge_id: badges[0].id,
                 offering: {
                     duration: 1,
@@ -82,7 +83,7 @@ describe('event badge association', () => {
                 .set('Authorization', adminToken)
                 .send(postData)
                 .expect(status.CREATED)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<CreateOfferingResponseDto>) => {
                     if (err) { return done(err); }
                     const event = res.body.event;
                     expect(event.offerings).to.have.lengthOf(1);
@@ -93,7 +94,7 @@ describe('event badge association', () => {
         });
 
         it('should default to empty requirements', (done) => {
-            const postData: CreateOfferingInterface = {
+            const postData: CreateOfferingDto = {
                 badge_id: badges[1].id,
                 offering: {
                     duration: 1,
@@ -106,7 +107,7 @@ describe('event badge association', () => {
                 .set('Authorization', adminToken)
                 .send(postData)
                 .expect(status.CREATED)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<CreateOfferingResponseDto>) => {
                     if (err) { return done(err); }
                     const event = res.body.event as EventOfferingInterface;
                     expect(event.offerings).to.have.lengthOf(1);
@@ -118,7 +119,7 @@ describe('event badge association', () => {
         });
 
         it('should not save null periods', (done) => {
-            const postData: CreateOfferingInterface = {
+            const postData: CreateOfferingDto = {
                 badge_id: badges[1].id,
                 offering: {
                     duration: 1,
@@ -131,7 +132,7 @@ describe('event badge association', () => {
                 .set('Authorization', adminToken)
                 .send(postData)
                 .expect(status.CREATED)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<CreateOfferingResponseDto>) => {
                     if (err) { return done(err); }
                     const event = res.body.event;
                     expect(event.offerings).to.have.lengthOf(1);
@@ -145,7 +146,7 @@ describe('event badge association', () => {
         it('should create multiple offerings', (done) => {
             async.series([
                 (cb) => {
-                    const postData: CreateOfferingInterface = {
+                    const postData: CreateOfferingDto = {
                         badge_id: badges[0].id,
                         offering: {
                             duration: 1,
@@ -158,9 +159,9 @@ describe('event badge association', () => {
                         .set('Authorization', adminToken)
                         .send(postData)
                         .expect(status.CREATED)
-                        .end((err, res) => {
+                        .end((err, res: SuperTestResponse<CreateOfferingResponseDto>) => {
                             if (err) { return done(err); }
-                            const event: EventInterface = res.body.event;
+                            const event = res.body.event;
                             expect(event.offerings).to.have.lengthOf(1);
                             const offering = event.offerings.find(_offering => _offering.id === badges[0].id);
                             expect(offering.details.price).to.equal('10.00');
@@ -171,7 +172,7 @@ describe('event badge association', () => {
                         });
                 },
                 (cb) => {
-                    const postData: CreateOfferingInterface = {
+                    const postData: CreateOfferingDto = {
                         badge_id: badges[1].id,
                         offering: {
                             duration: 2,
@@ -182,9 +183,9 @@ describe('event badge association', () => {
                         .set('Authorization', adminToken)
                         .send(postData)
                         .expect(status.CREATED)
-                        .end((err, res) => {
+                        .end((err, res: SuperTestResponse<CreateOfferingResponseDto>) => {
                             if (err) { return done(err); }
-                            const event: EventInterface = res.body.event;
+                            const event = res.body.event;
                             expect(event.offerings).to.have.lengthOf(2);
                             const offering = event.offerings.find(_offering => _offering.id === badges[1].id);
                             expect(offering.details.price).to.equal('0.00');
@@ -198,7 +199,7 @@ describe('event badge association', () => {
         });
 
         it('should not create an offering if the badge does not exist', (done) => {
-            const postData: CreateOfferingInterface = {
+            const postData: CreateOfferingDto = {
                 badge_id: Number(badId),
                 offering: {
                     duration: 1,
@@ -213,7 +214,7 @@ describe('event badge association', () => {
         });
 
         it('should not create an offering if the event does not exist', (done) => {
-            const postData: CreateOfferingInterface = {
+            const postData: CreateOfferingDto = {
                 badge_id: badges[0].id,
                 offering: {
                     duration: 1,
@@ -239,7 +240,7 @@ describe('event badge association', () => {
         });
 
         it('should validate for correct durations', (done) => {
-            const postData: CreateOfferingInterface = {
+            const postData: CreateOfferingDto = {
                 badge_id: badges[0].id,
                 offering: {
                     duration: 2,
@@ -254,7 +255,7 @@ describe('event badge association', () => {
         });
 
         it('should respond gracefully to bad ids', (done) => {
-            const postData: CreateOfferingInterface = {
+            const postData: CreateOfferingDto = {
                 badge_id: badges[0].id,
                 offering: {
                     duration: 1,
@@ -286,9 +287,9 @@ describe('event badge association', () => {
             it('should get all offerings for an event', (done) => {
                 request.get('/api/events?id=' + events[0].id)
                     .expect(status.OK)
-                    .end((err, res) => {
+                    .end((err, res: SuperTestResponse<EventsResponseDto>) => {
                         if (err) { return done(err); }
-                        const event: EventInterface = res.body[0];
+                        const event = res.body[0];
                         expect(event.offerings.length).to.equal(3);
                         expect(event.offerings.map(offering => offering.id)).to.have.same.members(badges.map(badge => badge.id));
                         return done();
@@ -308,7 +309,7 @@ describe('event badge association', () => {
                 request.put('/api/events/' + events[0].id + '/badges/' + offerings[0].badge_id)
                     .set('Authorization', adminToken)
                     .send(offeringUpdate)
-                    .end((err, res) => {
+                    .end((err, res: SuperTestResponse<OfferingResponseDto>) => {
                         if (err) { return done(err); }
                         const offering = res.body.offering;
                         expect(offering.badge_id).to.equal(badges[0].id);
@@ -329,7 +330,7 @@ describe('event badge association', () => {
                 request.put('/api/events/' + events[0].id + '/badges/' + offerings[0].badge_id)
                     .set('Authorization', adminToken)
                     .send(offeringUpdate)
-                    .end((err, res) => {
+                    .end((err, res: SuperTestResponse<OfferingResponseDto>) => {
                         if (err) { return done(err); }
                         const offering = res.body.offering;
                         expect(offering.badge_id).to.equal(badges[0].id);
@@ -349,7 +350,7 @@ describe('event badge association', () => {
                 request.put('/api/events/' + events[0].id + '/badges/' + offerings[0].badge_id)
                     .set('Authorization', adminToken)
                     .send(offeringUpdate)
-                    .end((err, res) => {
+                    .end((err, res: SuperTestResponse<OfferingResponseDto>) => {
                         if (err) { return done(err); }
                         const offering = res.body.offering;
                         expect(offering.badge_id).to.equal(badges[0].id);
@@ -374,7 +375,7 @@ describe('event badge association', () => {
                     .set('Authorization', adminToken)
                     .send(eventUpdate)
                     .expect(status.OK)
-                    .end((err, res) => {
+                    .end((err, res: SuperTestResponse<CreateOfferingResponseDto>) => {
                         if (err) { return done(err); }
                         const event = res.body.event;
                         expect(event.id).to.equal(events[0].id);
@@ -408,14 +409,14 @@ describe('event badge association', () => {
                 request.put('/api/events/' + events[0].id + '/badges/' + offerings[0].badge_id)
                     .set('Authorization', adminToken)
                     .send(offeringUpdate)
-                    .end((err, res) => {
+                    .end((err, res: SuperTestResponse<OfferingResponseDto>) => {
                         if (err) { return done(err); }
                         const offering = res.body.offering;
                         expect(offering.badge_id).to.equal(badges[0].id);
                         expect(offering.duration).to.equal(offeringUpdate.duration);
                         expect(offering.periods).to.deep.equal(offeringUpdate.periods);
                         expect(offering.price).to.equal(offeringUpdate.price);
-                        expect(offering.extra).to.not.exist;
+                        expect((offering as any).extra).to.not.exist;
                         return done();
                     });
             });
@@ -428,7 +429,7 @@ describe('event badge association', () => {
                     .set('Authorization', adminToken)
                     .send(offeringUpdate)
                     .expect(status.OK)
-                    .end((err, res) => {
+                    .end((err, res: SuperTestResponse<OfferingResponseDto>) => {
                         if (err) { return done(err); }
                         const offering = res.body.offering;
                         expect(offering.badge_id).to.equal(badges[0].id);
@@ -473,7 +474,7 @@ describe('event badge association', () => {
                     (cb) => {
                         request.get('/api/events?id=' + events[0].id)
                             .expect(status.OK)
-                            .end((err, res) => {
+                            .end((err, res: SuperTestResponse<EventsResponseDto>) => {
                                 if (err) { return cb(err); }
                                 const event = res.body[0];
                                 expect(event.offerings).to.have.lengthOf(3);
@@ -488,7 +489,7 @@ describe('event badge association', () => {
                     (cb) => {
                         request.get('/api/events?id=' + events[0].id)
                             .expect(status.OK)
-                            .end((err, res) => {
+                            .end((err, res: SuperTestResponse<EventsResponseDto>) => {
                                 if (err) { return cb(err); }
                                 const event = res.body[0];
                                 expect(event.offerings).to.have.lengthOf(2);

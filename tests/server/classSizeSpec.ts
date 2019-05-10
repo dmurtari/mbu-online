@@ -12,7 +12,7 @@ import { Offering } from '@models/offering.model';
 import { Assignment } from '@models/assignment.model';
 import { Registration } from '@models/registration.model';
 import testScouts from './testScouts';
-import { CreateOfferingInterface, OfferingInterface } from '@interfaces/offering.interface';
+import { CreateOfferingDto, OfferingInterface } from '@interfaces/offering.interface';
 import { AssignmentRequestInterface } from '@interfaces/assignment.interface';
 
 const request = supertest(app);
@@ -67,7 +67,7 @@ describe('Class sizes', () => {
     });
 
     describe('when offerings do not exist', () => {
-        let postData: CreateOfferingInterface;
+        let postData: CreateOfferingDto;
 
         beforeEach(() => {
             postData = {
@@ -135,7 +135,7 @@ describe('Class sizes', () => {
         let assignmentData: AssignmentRequestInterface;
 
         beforeEach((done) => {
-            const postData: CreateOfferingInterface = {
+            const postData: CreateOfferingDto = {
                 badge_id: badges[1].id,
                 offering: {
                     duration: 1,
@@ -317,7 +317,7 @@ describe('Class sizes', () => {
         let assignmentData: AssignmentRequestInterface;
 
         beforeEach((done) => {
-            const postData: CreateOfferingInterface = {
+            const postData: CreateOfferingDto = {
                 badge_id: badges[1].id,
                 offering: {
                     duration: 2,
@@ -398,7 +398,7 @@ describe('Class sizes', () => {
         let assignmentData: AssignmentRequestInterface;
 
         beforeEach((done) => {
-            const postData: CreateOfferingInterface = {
+            const postData: CreateOfferingDto = {
                 badge_id: badges[1].id,
                 offering: {
                     duration: 1,

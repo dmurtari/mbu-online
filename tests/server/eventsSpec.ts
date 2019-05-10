@@ -6,8 +6,9 @@ import { expect } from 'chai';
 import app from '@app/app';
 import TestUtils from './testUtils';
 import { Event } from '@models/event.model';
-import { EventInterface, Semester } from '@interfaces/event.interface';
+import { EventCreateDto, Semester, EventResponseDto, SetCurrentEventDto, CurrentEventResponseDto, GetCurrentEventDto, EventsResponseDto } from '@interfaces/event.interface';
 import { UserRole } from '@interfaces/user.interface';
+import { SuperTestResponse } from '@test/helpers/supertest.interface';
 
 const request = supertest(app);
 
@@ -35,7 +36,7 @@ describe('events', () => {
     });
 
     describe('creating an event', () => {
-        const testEvent: EventInterface = {
+        const testEvent: EventCreateDto = {
             year: 2016,
             semester: Semester.SPRING,
             date: new Date(2016, 3, 14),
@@ -73,9 +74,9 @@ describe('events', () => {
                 .set('Authorization', adminToken)
                 .send(postData)
                 .expect(status.CREATED)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<EventResponseDto>) => {
                     if (err) { return done(err); }
-                    expect(res.body.event.extra).not.to.exist;
+                    expect((res.body.event as any).extra).not.to.exist;
                     done();
                 });
         });
@@ -85,7 +86,7 @@ describe('events', () => {
         let id1: string;
         let id2: string;
 
-        const testEvent1: EventInterface = {
+        const testEvent1: EventCreateDto = {
             year: 2016,
             semester: Semester.SPRING,
             date: new Date(2016, 3, 14),
@@ -94,7 +95,7 @@ describe('events', () => {
             price: 10
         };
 
-        const testEvent2: EventInterface = {
+        const testEvent2: EventCreateDto = {
             year: 2015,
             semester: Semester.FALL,
             date: new Date(2015, 11, 11),
@@ -134,9 +135,9 @@ describe('events', () => {
             it('should set the current event', (done) => {
                 request.post('/api/events/current')
                     .set('Authorization', adminToken)
-                    .send({ id: id1 })
+                    .send(<SetCurrentEventDto>{ id: id1 })
                     .expect(status.OK)
-                    .end((err, res) => {
+                    .end((err, res: SuperTestResponse<CurrentEventResponseDto>) => {
                         if (err) { return done(err); }
                         expect(res.body.currentEvent.id).to.equal(id1);
                         done();
@@ -146,13 +147,13 @@ describe('events', () => {
             it('should not set for an invalid id', (done) => {
                 request.post('/api/events/current')
                     .set('Authorization', adminToken)
-                    .send({ id: 10000 })
+                    .send(<SetCurrentEventDto>{ id: 10000 })
                     .expect(status.BAD_REQUEST, done);
             });
 
             it('should not allow teachers to set', (done) => {
                 request.post('/api/events/current')
-                    .send({ id: id1 })
+                    .send(<SetCurrentEventDto>{ id: id1 })
                     .expect(status.UNAUTHORIZED, done);
             });
 
@@ -163,7 +164,7 @@ describe('events', () => {
                             .set('Authorization', adminToken)
                             .send({ id: id1 })
                             .expect(status.OK)
-                            .end((err, res) => {
+                            .end((err, res: SuperTestResponse<CurrentEventResponseDto>) => {
                                 if (err) { return done(err); }
                                 expect(res.body.currentEvent.id).to.equal(id1);
                                 return cb();
@@ -172,7 +173,7 @@ describe('events', () => {
                     (cb) => {
                         request.get('/api/events/current')
                             .expect(status.OK)
-                            .end((err, res) => {
+                            .end((err, res: SuperTestResponse<GetCurrentEventDto>) => {
                                 if (err) { return done(err); }
                                 expect(res.body.id).to.equal(id1);
                                 return cb();
@@ -188,7 +189,7 @@ describe('events', () => {
                             .set('Authorization', adminToken)
                             .send({ id: id1 })
                             .expect(status.OK)
-                            .end((err, res) => {
+                            .end((err, res: SuperTestResponse<CurrentEventResponseDto>) => {
                                 if (err) { return done(err); }
                                 expect(res.body.currentEvent.id).to.equal(id1);
                                 return cb();
@@ -197,7 +198,7 @@ describe('events', () => {
                     (cb) => {
                         request.get('/api/events/current')
                             .expect(status.OK)
-                            .end((err, res) => {
+                            .end((err, res: SuperTestResponse<GetCurrentEventDto>) => {
                                 if (err) { return done(err); }
                                 expect(res.body.id).to.equal(id1);
                                 return cb();
@@ -208,7 +209,7 @@ describe('events', () => {
                             .set('Authorization', adminToken)
                             .send({ id: id2 })
                             .expect(status.OK)
-                            .end((err, res) => {
+                            .end((err, res: SuperTestResponse<CurrentEventResponseDto>) => {
                                 if (err) { return done(err); }
                                 expect(res.body.currentEvent.id).to.equal(id2);
                                 return cb();
@@ -217,7 +218,7 @@ describe('events', () => {
                     (cb) => {
                         request.get('/api/events/current')
                             .expect(status.OK)
-                            .end((err, res) => {
+                            .end((err, res: SuperTestResponse<GetCurrentEventDto>) => {
                                 if (err) { return done(err); }
                                 expect(res.body.id).to.equal(id2);
                                 return cb();
@@ -233,7 +234,7 @@ describe('events', () => {
                     (cb) => {
                         request.get('/api/events?id=' + id1)
                             .expect(status.OK)
-                            .end((err, res) => {
+                            .end((err, res: SuperTestResponse<EventsResponseDto>) => {
                                 if (err) { return done(err); }
                                 const event = res.body[0];
                                 expect(event.id).to.equal(id1);
@@ -243,7 +244,7 @@ describe('events', () => {
                     (cb) => {
                         request.get('/api/events?id=' + id2)
                             .expect(status.OK)
-                            .end((err, res) => {
+                            .end((err, res: SuperTestResponse<EventsResponseDto>) => {
                                 if (err) { return done(err); }
                                 const event = res.body[0];
                                 expect(event.id).to.equal(id2);
@@ -258,7 +259,7 @@ describe('events', () => {
                     (cb) => {
                         request.get('/api/events?year=' + testEvent1.year + '&semester=' + testEvent1.semester)
                             .expect(status.OK)
-                            .end((err, res) => {
+                            .end((err, res: SuperTestResponse<EventsResponseDto>) => {
                                 if (err) { return done(err); }
                                 const event = res.body[0];
                                 expect(event.year).to.equal(testEvent1.year);
@@ -269,7 +270,7 @@ describe('events', () => {
                     (cb) => {
                         request.get('/api/events?year=' + testEvent2.year + '&semester=' + testEvent2.semester)
                             .expect(status.OK)
-                            .end((err, res) => {
+                            .end((err, res: SuperTestResponse<EventsResponseDto>) => {
                                 if (err) { return done(err); }
                                 const event = res.body[0];
                                 expect(event.year).to.equal(testEvent2.year);
@@ -283,7 +284,7 @@ describe('events', () => {
             it('should find events by year', (done) => {
                 request.get('/api/events?year=' + testEvent2.year)
                     .expect(status.OK)
-                    .end((err, res) => {
+                    .end((err, res: SuperTestResponse<EventsResponseDto>) => {
                         if (err) { return done(err); }
                         const event = res.body[0];
                         expect(event.id).to.equal(id2);
@@ -294,7 +295,7 @@ describe('events', () => {
             it('should find events by semester', (done) => {
                 request.get('/api/events?semester=' + testEvent1.semester)
                     .expect(status.OK)
-                    .end((err, res) => {
+                    .end((err, res: SuperTestResponse<EventsResponseDto>) => {
                         if (err) { return done(err); }
                         const event = res.body[0];
                         expect(event.id).to.equal(id1);
@@ -305,7 +306,7 @@ describe('events', () => {
             it('should get all events if none is specified', (done) => {
                 request.get('/api/events')
                     .expect(status.OK)
-                    .end((err, res) => {
+                    .end((err, res: SuperTestResponse<EventsResponseDto>) => {
                         if (err) { return done(err); }
                         const events = res.body;
                         expect(events.length).to.equal(2);
@@ -316,7 +317,7 @@ describe('events', () => {
             it('should return empty if an event is not found by id', (done) => {
                 request.get('/api/events?id=123123')
                     .expect(status.OK)
-                    .end((err, res) => {
+                    .end((err, res: SuperTestResponse<EventsResponseDto>) => {
                         if (err) { return done(err); }
                         const events = res.body;
                         expect(events.length).to.equal(0);
@@ -327,7 +328,7 @@ describe('events', () => {
             it('should return empty if an event is not found by semester', (done) => {
                 request.get('/api/events?semester=Summer')
                     .expect(status.OK)
-                    .end((err, res) => {
+                    .end((err, res: SuperTestResponse<EventsResponseDto>) => {
                         if (err) { return done(err); }
                         const events = res.body;
                         expect(events.length).to.equal(0);
@@ -338,7 +339,7 @@ describe('events', () => {
             it('should return empty if an event is not found by year', (done) => {
                 request.get('/api/events?year=1914')
                     .expect(status.OK)
-                    .end((err, res) => {
+                    .end((err, res: SuperTestResponse<EventsResponseDto>) => {
                         if (err) { return done(err); }
                         const events = res.body;
                         expect(events.length).to.equal(0);
@@ -349,7 +350,7 @@ describe('events', () => {
             it('should return empty if an event is not found by year and semester', (done) => {
                 request.get('/api/events?year=1916&semester=Spring')
                     .expect(status.OK)
-                    .end((err, res) => {
+                    .end((err, res: SuperTestResponse<EventsResponseDto>) => {
                         if (err) { return done(err); }
                         const events = res.body;
                         expect(events.length).to.equal(0);
@@ -402,7 +403,7 @@ describe('events', () => {
         });
 
         describe('updating an event', () => {
-            let eventUpdate: EventInterface;
+            let eventUpdate: EventCreateDto;
 
             beforeEach(() => {
                 eventUpdate = {
@@ -421,7 +422,7 @@ describe('events', () => {
                     .set('Authorization', adminToken)
                     .send(eventUpdate)
                     .expect(status.OK)
-                    .end((err, res) => {
+                    .end((err, res: SuperTestResponse<EventResponseDto>) => {
                         if (err) { return done(err); }
                         const event = res.body.event;
                         expect(event.id).to.equal(id1);
@@ -445,7 +446,7 @@ describe('events', () => {
                     .set('Authorization', adminToken)
                     .send(eventUpdate)
                     .expect(status.OK)
-                    .end((err, res) => {
+                    .end((err, res: SuperTestResponse<EventResponseDto>) => {
                         if (err) { return done(err); }
                         const event = res.body.event;
                         expect(event.id).to.equal(id1);

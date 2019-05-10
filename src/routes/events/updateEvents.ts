@@ -2,11 +2,11 @@ import { Request, Response } from 'express';
 import status from 'http-status-codes';
 
 import { Event } from '@models/event.model';
-import { EventResponseInterface } from '@app/interfaces/event.interface';
+import { EventResponseDto } from '@app/interfaces/event.interface';
 import { ErrorResponseInterface } from '@app/interfaces/shared.interface';
 import { Badge } from '@models/badge.model';
 import { Offering } from '@models/offering.model';
-import { OfferingResponseInterface } from '@interfaces/offering.interface';
+import { OfferingResponseDto } from '@interfaces/offering.interface';
 import { Purchasable } from '@models/purchasable.model';
 import { PurchasableResponseInterface } from '@interfaces/purchasable.interface';
 
@@ -28,7 +28,7 @@ export const updateEvent = async (req: Request, res: Response) => {
 
         await event.update(req.body);
 
-        return res.status(status.OK).json(<EventResponseInterface>{
+        return res.status(status.OK).json(<EventResponseDto>{
             message: 'Event updated successfully',
             event: event
         });
@@ -55,7 +55,7 @@ export const updateOffering = async (req: Request, res: Response) => {
 
         await offering.update(req.body);
 
-        return res.status(status.OK).json(<OfferingResponseInterface> {
+        return res.status(status.OK).json(<OfferingResponseDto> {
             message: 'Offering updated successfully',
             offering: offering
         });

@@ -8,7 +8,8 @@ import app from '@app/app';
 import TestUtils from './testUtils';
 import { Badge } from '@models/badge.model';
 import { UserRole } from '@interfaces/user.interface';
-import { BadgeInterface } from '@interfaces/badge.interface';
+import { CreateUpdateBadgeDto, BadgeResponseDto, BadgesResponseDto } from '@interfaces/badge.interface';
+import { SuperTestResponse } from '@test/helpers/supertest.interface';
 
 const request = supertest(app);
 
@@ -32,14 +33,14 @@ describe('merit badges', () => {
     });
 
     describe('creating merit badges', () => {
-        const testBadge: BadgeInterface = {
+        const testBadge: CreateUpdateBadgeDto = {
             name: 'Test',
             description: 'A very good badge',
             notes: 'Eagle'
         };
 
         it('should create badges with names', (done) => {
-            const postData: BadgeInterface = {
+            const postData: CreateUpdateBadgeDto = {
                 name: 'Test'
             };
 
@@ -58,7 +59,7 @@ describe('merit badges', () => {
         });
 
         it('should require name', (done) => {
-            const postData: BadgeInterface = {
+            const postData: CreateUpdateBadgeDto = {
                 description: 'No name'
             };
 
@@ -69,7 +70,7 @@ describe('merit badges', () => {
         });
 
         it('should not allow blank names', (done) => {
-            const postData: BadgeInterface = {
+            const postData: CreateUpdateBadgeDto = {
                 name: ''
             };
 
@@ -80,7 +81,7 @@ describe('merit badges', () => {
         });
 
         it('should allow long details', (done) => {
-            const postData: BadgeInterface = {
+            const postData: CreateUpdateBadgeDto = {
                 name: 'Swimming',
                 description: 'Swimming is a leisure activity'
             };
@@ -118,10 +119,10 @@ describe('merit badges', () => {
                 .set('Authorization', token)
                 .send(postData)
                 .expect(status.CREATED)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<BadgeResponseDto>) => {
                     if (err) { return done(err); }
                     expect(res.body.badge.name).to.equal(postData.name);
-                    expect(res.body.badge.birthday).not.to.exist;
+                    expect((res.body.badge as any).birthday).not.to.exist;
                     done();
                 });
         });
@@ -129,12 +130,12 @@ describe('merit badges', () => {
 
     describe('getting merit badges', () => {
         let id: number;
-        const test1: BadgeInterface = {
+        const test1: CreateUpdateBadgeDto = {
             name: 'Test',
             description: 'A test',
             notes: 'Notes'
         };
-        const test2: BadgeInterface = {
+        const test2: CreateUpdateBadgeDto = {
             name: 'Test 2',
             description: 'A second test'
         };
@@ -144,7 +145,7 @@ describe('merit badges', () => {
                 .set('Authorization', token)
                 .send(test1)
                 .expect(status.CREATED)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<BadgeResponseDto>) => {
                     if (err) { return done(err); }
                     id = res.body.badge.id;
                     done();
@@ -154,7 +155,7 @@ describe('merit badges', () => {
         it('should be able to get a badge by id', (done) => {
             request.get('/api/badges?id=' + id)
                 .expect(status.OK)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<BadgesResponseDto>) => {
                     if (err) { return done(err); }
                     const badge = res.body[0];
                     expect(badge.name).to.equal(test1.name);
@@ -167,7 +168,7 @@ describe('merit badges', () => {
         it('should be able to get a badge by name', (done) => {
             request.get('/api/badges?name=' + test1.name)
                 .expect(status.OK)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<BadgesResponseDto>) => {
                     if (err) { return done(err); }
                     const badge = res.body[0];
                     expect(badge.name).to.equal(test1.name);
@@ -192,7 +193,7 @@ describe('merit badges', () => {
                 (cb) => {
                     request.get('/api/badges')
                         .expect(status.OK)
-                        .end((err, res) => {
+                        .end((err, res: SuperTestResponse<BadgesResponseDto>) => {
                             if (err) { return done(err); }
                             const badges = res.body;
                             expect(badges.length).to.equal(2);
@@ -217,7 +218,7 @@ describe('merit badges', () => {
         let id: number;
 
         it('should remove a badge with a given id', (done) => {
-            const badge: BadgeInterface = {
+            const badge: CreateUpdateBadgeDto = {
                 name: 'Test'
             };
 
@@ -227,7 +228,7 @@ describe('merit badges', () => {
                         .set('Authorization', token)
                         .send(badge)
                         .expect(status.CREATED)
-                        .end((err, res) => {
+                        .end((err, res: SuperTestResponse<BadgeResponseDto>) => {
                             if (err) { return done(err); }
                             id = res.body.badge.id;
                             cb();
@@ -241,7 +242,7 @@ describe('merit badges', () => {
                 (cb) => {
                     request.get('/api/badges?id=' + id)
                         .expect(status.OK)
-                        .end((err, res) => {
+                        .end((err, res: SuperTestResponse<BadgesResponseDto>) => {
                             if (err) { return done(err); }
                             const badges = res.body;
                             expect(badges.length).to.equal(0);
@@ -272,14 +273,14 @@ describe('merit badges', () => {
 
     describe('editing a merit badge', () => {
         let id: number;
-        const badge: BadgeInterface = {
+        const badge: CreateUpdateBadgeDto = {
             name: 'Test',
             description: 'What',
             notes: 'Note'
         };
 
         it('should update a badge with all fields', (done) => {
-            const badgeUpdate: BadgeInterface = {
+            const badgeUpdate: CreateUpdateBadgeDto = {
                 name: 'Test updated',
                 description: 'New',
                 notes: 'Updated'
@@ -291,7 +292,7 @@ describe('merit badges', () => {
                         .set('Authorization', token)
                         .send(badge)
                         .expect(status.CREATED)
-                        .end((err, res) => {
+                        .end((err, res: SuperTestResponse<BadgeResponseDto>) => {
                             if (err) { return done(err); }
                             id = res.body.badge.id;
                             cb();
@@ -302,7 +303,7 @@ describe('merit badges', () => {
                         .set('Authorization', token)
                         .send(badgeUpdate)
                         .expect(status.OK)
-                        .end((err, res) => {
+                        .end((err, res: SuperTestResponse<BadgeResponseDto>) => {
                             if (err) { return done(err); }
                             expect(res.body.badge.name).to.equal(badgeUpdate.name);
                             expect(res.body.badge.description).to.equal(badgeUpdate.description);
@@ -315,7 +316,7 @@ describe('merit badges', () => {
         });
 
         it('should update a badge with partial fields', (done) => {
-            const badgeUpdate: BadgeInterface = {
+            const badgeUpdate: CreateUpdateBadgeDto = {
                 name: 'Test updated'
             };
 
@@ -325,7 +326,7 @@ describe('merit badges', () => {
                         .set('Authorization', token)
                         .send(badge)
                         .expect(status.CREATED)
-                        .end((err, res) => {
+                        .end((err, res: SuperTestResponse<BadgeResponseDto>) => {
                             if (err) { return done(err); }
                             id = res.body.badge.id;
                             cb();
@@ -336,7 +337,7 @@ describe('merit badges', () => {
                         .set('Authorization', token)
                         .send(badgeUpdate)
                         .expect(status.OK)
-                        .end((err, res) => {
+                        .end((err, res: SuperTestResponse<BadgeResponseDto>) => {
                             if (err) { return done(err); }
                             expect(res.body.badge.name).to.equal(badgeUpdate.name);
                             expect(res.body.badge.id).to.equal(id);
@@ -349,7 +350,7 @@ describe('merit badges', () => {
         });
 
         it('should fail gracefully if required fields are not supplied', (done) => {
-            const badgeUpdate: BadgeInterface = {
+            const badgeUpdate: CreateUpdateBadgeDto = {
                 name: null,
                 description: 'New',
                 notes: 'Updated'
@@ -361,7 +362,7 @@ describe('merit badges', () => {
                         .set('Authorization', token)
                         .send(badge)
                         .expect(status.CREATED)
-                        .end((err, res) => {
+                        .end((err, res: SuperTestResponse<BadgeResponseDto>) => {
                             if (err) { return done(err); }
                             id = res.body.badge.id;
                             cb();
@@ -387,7 +388,7 @@ describe('merit badges', () => {
                         .set('Authorization', token)
                         .send(badge)
                         .expect(status.CREATED)
-                        .end((err, res) => {
+                        .end((err, res: SuperTestResponse<BadgeResponseDto>) => {
                             if (err) { return done(err); }
                             id = res.body.badge.id;
                             cb();
@@ -398,7 +399,7 @@ describe('merit badges', () => {
                         .set('Authorization', token)
                         .send(badge2)
                         .expect(status.CREATED)
-                        .end((err, res) => {
+                        .end((err, res: SuperTestResponse<BadgeResponseDto>) => {
                             if (err) { return done(err); }
                             id2 = res.body.badge.id;
                             cb();
@@ -420,7 +421,7 @@ describe('merit badges', () => {
                         .set('Authorization', token)
                         .send(badge)
                         .expect(status.CREATED)
-                        .end((err, res) => {
+                        .end((err, res: SuperTestResponse<BadgeResponseDto>) => {
                             if (err) { return done(err); }
                             id = res.body.badge.id;
                             cb();
@@ -429,7 +430,7 @@ describe('merit badges', () => {
                 (cb) => {
                     request.put('/api/badges/' + id)
                         .set('Authorization', token)
-                        .send({})
+                        .send(<CreateUpdateBadgeDto>{})
                         .expect(status.OK, (err, res) => {
                             if (err) { return done(err); }
                             expect(res.body.badge.id).to.equal(id);
@@ -449,7 +450,7 @@ describe('merit badges', () => {
                         .set('Authorization', token)
                         .send(badge)
                         .expect(status.CREATED)
-                        .end((err, res) => {
+                        .end((err, res: SuperTestResponse<BadgeResponseDto>) => {
                             if (err) { return done(err); }
                             id = res.body.badge.id;
                             cb();
@@ -458,7 +459,7 @@ describe('merit badges', () => {
                 (cb) => {
                     request.put('/api/badges/123456789012345678901234')
                         .set('Authorization', token)
-                        .send({
+                        .send(<CreateUpdateBadgeDto>{
                             name: 'DNE'
                         })
                         .expect(status.BAD_REQUEST, cb);
@@ -473,7 +474,7 @@ describe('merit badges', () => {
                         .set('Authorization', token)
                         .send(badge)
                         .expect(status.CREATED)
-                        .end((err, res) => {
+                        .end((err, res: SuperTestResponse<BadgeResponseDto>) => {
                             if (err) { return done(err); }
                             id = res.body.badge.id;
                             cb();
@@ -482,7 +483,7 @@ describe('merit badges', () => {
                 (cb) => {
                     request.put('/api/badges/' + id)
                         .set('Authorization', token)
-                        .expect(status.OK, (err, res) => {
+                        .expect(status.OK, (err, res: SuperTestResponse<BadgeResponseDto>) => {
                             if (err) { return done(err); }
                             expect(res.body.badge.id).to.equal(id);
                             expect(res.body.badge.name).to.equal(badge.name);
@@ -507,7 +508,7 @@ describe('merit badges', () => {
                         .set('Authorization', token)
                         .send(badge)
                         .expect(status.CREATED)
-                        .end((err, res) => {
+                        .end((err, res: SuperTestResponse<BadgeResponseDto>) => {
                             if (err) { return done(err); }
                             id = res.body.badge.id;
                             cb();
@@ -516,7 +517,7 @@ describe('merit badges', () => {
                 (cb) => {
                     request.put('/api/badges/' + id)
                         .set('Authorization', token)
-                        .send({
+                        .send(<CreateUpdateBadgeDto>{
                             description: faker.lorem.paragraph(3)
                         })
                         .expect(status.OK, cb);

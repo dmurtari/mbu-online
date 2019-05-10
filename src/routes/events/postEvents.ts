@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import status from 'http-status-codes';
 
 import { Event } from '@models/event.model';
-import { EventResponseInterface, CurrentEventResponseInterface, EventOfferingInterface } from '@interfaces/event.interface';
+import { EventResponseDto, CurrentEventResponseDto, EventOfferingInterface, CreateOfferingResponseDto } from '@interfaces/event.interface';
 import { ErrorResponseInterface } from '@app/interfaces/shared.interface';
 import { CurrentEvent } from '@models/currentEvent.model';
 import { Offering } from '@models/offering.model';
@@ -13,7 +13,7 @@ import { PurchasablesResponseInterface } from '@interfaces/purchasable.interface
 export const createEvent = async (req: Request, res: Response) => {
     try {
         const event: Event = await Event.create(req.body);
-        return res.status(status.CREATED).json(<EventResponseInterface>{
+        return res.status(status.CREATED).json(<EventResponseDto>{
             message: 'Event successfully created',
             event: event
         });
@@ -45,7 +45,7 @@ export const setCurrentEvent = async (req: Request, res: Response) => {
 
         await currentEvent.$set('event', event);
 
-        return res.status(status.OK).json(<CurrentEventResponseInterface>{
+        return res.status(status.OK).json(<CurrentEventResponseDto>{
             message: 'Current event set',
             currentEvent: await Event.findByPk(currentEvent.event_id)
         });
@@ -88,7 +88,7 @@ export const createOffering = async (req: Request, res: Response) => {
             }]
         });
 
-        return res.status(status.CREATED).json(<EventResponseInterface>{
+        return res.status(status.CREATED).json(<CreateOfferingResponseDto>{
             message: 'Offering created successfully',
             event: eventWithOffering
         });

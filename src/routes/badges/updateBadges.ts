@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import status from 'http-status-codes';
 
 import { Badge } from '@models/badge.model';
-import { BadgeResponseInterface } from '@app/interfaces/badge.interface';
+import { BadgeResponseDto } from '@app/interfaces/badge.interface';
 import { ErrorResponseInterface } from '@app/interfaces/shared.interface';
 
 export const updateBadge = async (req: Request, res: Response) => {
@@ -15,7 +15,7 @@ export const updateBadge = async (req: Request, res: Response) => {
 
         await badge.update(req.body);
 
-        return res.status(status.OK).json(<BadgeResponseInterface>{
+        return res.status(status.OK).json(<BadgeResponseDto>{
             message: 'Badge updated successfully',
             badge: badge
         });

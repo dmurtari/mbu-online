@@ -1,4 +1,4 @@
-import { BadgeInterface } from '@interfaces/badge.interface';
+import { BadgeInterface, BadgeDto } from '@interfaces/badge.interface';
 import { Purchasable } from '@models/purchasable.model';
 import { OfferingInterface } from '@interfaces/offering.interface';
 
@@ -8,6 +8,7 @@ export enum Semester {
 }
 
 export interface EventInterface {
+    id?: number;
     year?: number;
     semester?: Semester;
     date?: Date;
@@ -19,7 +20,7 @@ export interface EventInterface {
 }
 
 export interface EventOfferingInterface extends EventInterface {
-    offerings?: BadgeInterface<OfferingInterface>[];
+    offerings?: BadgeDto<OfferingInterface>[];
 }
 
 export interface CurrentEventInterface {
@@ -27,16 +28,31 @@ export interface CurrentEventInterface {
     event?: EventInterface;
 }
 
-export interface EventResponseInterface {
+export interface EventResponseDto {
     message: string;
     event: EventInterface;
 }
 
-export interface CurrentEventResponseInterface {
+export interface CreateOfferingResponseDto {
+    message: string;
+    event: EventOfferingInterface;
+}
+
+export interface CurrentEventResponseDto {
     message: string;
     currentEvent: EventInterface;
 }
 
 export interface IncomeCalculationResponseInterface {
     income: string;
+}
+
+export type EventCreateDto = EventInterface;
+
+export type EventsResponseDto = EventInterface[];
+
+export type GetCurrentEventDto = EventInterface;
+
+export interface SetCurrentEventDto {
+    id: string|number;
 }
