@@ -8,7 +8,7 @@ import { CurrentEvent } from '@models/currentEvent.model';
 import { Offering } from '@models/offering.model';
 import { Badge } from '@models/badge.model';
 import { Purchasable } from '@models/purchasable.model';
-import { PurchasablesResponseInterface } from '@interfaces/purchasable.interface';
+import { CreatePurchasablesResponseDto } from '@interfaces/purchasable.interface';
 
 export const createEvent = async (req: Request, res: Response) => {
     try {
@@ -114,7 +114,7 @@ export const createPurchasable = async (req: Request, res: Response) => {
             }]
         });
 
-        return res.status(status.CREATED).json(<PurchasablesResponseInterface>{
+        return res.status(status.CREATED).json(<CreatePurchasablesResponseDto>{
             message: 'Purchasable successfully created',
             purchasables: event.purchasables
         });

@@ -10,11 +10,19 @@ import { Event } from '@models/event.model';
 import { Scout } from '@models/scout.model';
 import { UserRole } from '@interfaces/user.interface';
 import { Purchasable } from '@models/purchasable.model';
-import { PurchasableInterface } from '@interfaces/purchasable.interface';
+import {
+    CreatePurchasableDto,
+    UpdatePurchasableResponseDto,
+    CreatePurchasablesResponseDto,
+    PurchasablesResponseDto,
+    UpdatePurchasableDto
+} from '@interfaces/purchasable.interface';
 import { Registration } from '@models/registration.model';
 import { Purchase } from '@models/purchase.model';
 import testScouts from './testScouts';
 import { PurchaseRequestInterface, Size } from '@interfaces/purchase.interface';
+import { SuperTestResponse } from '@test/helpers/supertest.interface';
+import { EventsResponseDto } from '@interfaces/event.interface';
 
 const request = supertest(app);
 
@@ -51,7 +59,7 @@ describe('purchasables', () => {
 
     describe('creating a purchasable', () => {
         it('should be able to be created for an event', (done) => {
-            const postData: PurchasableInterface = {
+            const postData: CreatePurchasableDto = {
                 item: 'T-Shirt',
                 description: 'A t-shirt',
                 price: '10.00'
@@ -61,7 +69,7 @@ describe('purchasables', () => {
                 .set('Authorization', generatedUsers.admin.token)
                 .send(postData)
                 .expect(status.CREATED)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<CreatePurchasablesResponseDto>) => {
                     if (err) { return done(err); }
                     const purchasable = res.body.purchasables[0];
                     expect(purchasable.item).to.equal(postData.item);
@@ -72,7 +80,7 @@ describe('purchasables', () => {
         });
 
         it('should not require a description', (done) => {
-            const postData: PurchasableInterface = {
+            const postData: CreatePurchasableDto = {
                 item: 'T-Shirt',
                 price: '10.00'
             };
@@ -81,7 +89,7 @@ describe('purchasables', () => {
                 .set('Authorization', generatedUsers.admin.token)
                 .send(postData)
                 .expect(status.CREATED)
-                .end((err, res) => {
+                .end((err,  res: SuperTestResponse<CreatePurchasablesResponseDto>) => {
                     if (err) { return done(err); }
                     const purchasable = res.body.purchasables[0];
                     expect(purchasable.item).to.equal(postData.item);
@@ -91,7 +99,7 @@ describe('purchasables', () => {
         });
 
         it('should be created with a maximum age', (done) => {
-            const postData: PurchasableInterface = {
+            const postData: CreatePurchasableDto = {
                 item: 'Youth Lunch',
                 price: '10.00',
                 maximum_age: 10
@@ -101,7 +109,7 @@ describe('purchasables', () => {
                 .set('Authorization', generatedUsers.admin.token)
                 .send(postData)
                 .expect(status.CREATED)
-                .end((err, res) => {
+                .end((err,  res: SuperTestResponse<CreatePurchasablesResponseDto>) => {
                     if (err) { return done(err); }
                     const purchasable = res.body.purchasables[0];
                     expect(purchasable.item).to.equal(postData.item);
@@ -138,7 +146,7 @@ describe('purchasables', () => {
         });
 
         it('should be created with whether the item has a size', (done) => {
-            const postData: PurchasableInterface = {
+            const postData: CreatePurchasableDto = {
                 item: 'T-Shirt',
                 price: '10.00',
                 has_size: true
@@ -148,7 +156,7 @@ describe('purchasables', () => {
                 .set('Authorization', generatedUsers.admin.token)
                 .send(postData)
                 .expect(status.CREATED)
-                .end((err, res) => {
+                .end((err,  res: SuperTestResponse<CreatePurchasablesResponseDto>) => {
                     if (err) { return done(err); }
                     const purchasable = res.body.purchasables[0];
                     expect(purchasable.item).to.equal(postData.item);
@@ -172,7 +180,7 @@ describe('purchasables', () => {
         });
 
         it('should be created with a minimum', (done) => {
-            const postData: PurchasableInterface = {
+            const postData: CreatePurchasableDto = {
                 item: 'Adult Lunch',
                 price: '12.00',
                 minimum_age: 10
@@ -182,7 +190,7 @@ describe('purchasables', () => {
                 .set('Authorization', generatedUsers.admin.token)
                 .send(postData)
                 .expect(status.CREATED)
-                .end((err, res) => {
+                .end((err,  res: SuperTestResponse<CreatePurchasablesResponseDto>) => {
                     if (err) { return done(err); }
                     const purchasable = res.body.purchasables[0];
                     expect(purchasable.item).to.equal(postData.item);
@@ -193,7 +201,7 @@ describe('purchasables', () => {
         });
 
         it('should create with an age range', (done) => {
-            const postData: PurchasableInterface = {
+            const postData: CreatePurchasableDto = {
                 item: 'Teen Lunch',
                 price: '12.00',
                 minimum_age: 12,
@@ -204,7 +212,7 @@ describe('purchasables', () => {
                 .set('Authorization', generatedUsers.admin.token)
                 .send(postData)
                 .expect(status.CREATED)
-                .end((err, res) => {
+                .end((err,  res: SuperTestResponse<CreatePurchasablesResponseDto>) => {
                     if (err) { return done(err); }
                     const purchasable = res.body.purchasables[0];
                     expect(purchasable.item).to.equal(postData.item);
@@ -216,7 +224,7 @@ describe('purchasables', () => {
         });
 
         it('should not create with an invalid range', (done) => {
-            const postData: PurchasableInterface = {
+            const postData: CreatePurchasableDto = {
                 item: 'Teen Lunch',
                 price: '12.00',
                 minimum_age: 18,
@@ -265,7 +273,7 @@ describe('purchasables', () => {
     });
 
     describe('when purchasables exist', () => {
-        let purchasableIds: string[];
+        let purchasableIds: number[];
 
         beforeEach(async () => {
             purchasableIds = [];
@@ -283,7 +291,7 @@ describe('purchasables', () => {
                             has_size: true
                         })
                         .expect(status.CREATED)
-                        .end((err, res) => {
+                        .end((err,  res: SuperTestResponse<CreatePurchasablesResponseDto>) => {
                             if (err) { return done(err); }
                             purchasableIds.push(res.body.purchasables[0].id);
                             return cb();
@@ -297,7 +305,7 @@ describe('purchasables', () => {
                             price: '3.50'
                         })
                         .expect(status.CREATED)
-                        .end((err, res) => {
+                        .end((err,  res: SuperTestResponse<CreatePurchasablesResponseDto>) => {
                             if (err) { return done(err); }
                             purchasableIds.push(res.body.purchasables[1].id);
                             return cb();
@@ -312,7 +320,7 @@ describe('purchasables', () => {
                             has_size: true
                         })
                         .expect(status.CREATED)
-                        .end((err, res) => {
+                        .end((err,  res: SuperTestResponse<CreatePurchasablesResponseDto>) => {
                             if (err) { return done(err); }
                             purchasableIds.push(res.body.purchasables[0].id);
                             return cb();
@@ -327,7 +335,7 @@ describe('purchasables', () => {
                             maximum_age: 10
                         })
                         .expect(status.CREATED)
-                        .end((err, res) => {
+                        .end((err,  res: SuperTestResponse<CreatePurchasablesResponseDto>) => {
                             if (err) { return done(err); }
                             purchasableIds.push(res.body.purchasables[1].id);
                             return cb();
@@ -340,7 +348,7 @@ describe('purchasables', () => {
             it('should show purchasables for an event', (done) => {
                 request.get('/api/events/' + events[0].id + '/purchasables')
                     .expect(status.OK)
-                    .end((err, res) => {
+                    .end((err, res: SuperTestResponse<PurchasablesResponseDto>) => {
                         if (err) { return done(err); }
                         const purchasables = res.body;
                         expect(purchasables).to.have.length(2);
@@ -356,7 +364,7 @@ describe('purchasables', () => {
             it('should get different purchasables for a second event', (done) => {
                 request.get('/api/events/' + events[1].id + '/purchasables')
                     .expect(status.OK)
-                    .end((err, res) => {
+                    .end((err, res: SuperTestResponse<PurchasablesResponseDto>) => {
                         if (err) { return done(err); }
                         const purchasables = res.body;
                         expect(purchasables).to.have.length(2);
@@ -373,7 +381,7 @@ describe('purchasables', () => {
             it('should include purchasables for all events', (done) => {
                 request.get('/api/events/')
                     .expect(status.OK)
-                    .end((err, res) => {
+                    .end((err, res: SuperTestResponse<EventsResponseDto>) => {
                         if (err) { return done(err); }
                         const allEvents = res.body;
                         expect(allEvents).to.have.length(2);
@@ -393,13 +401,13 @@ describe('purchasables', () => {
             it('should update an existing purchasable', (done) => {
                 request.put('/api/events/' + events[0].id + '/purchasables/' + purchasableIds[0])
                     .set('Authorization', generatedUsers.admin.token)
-                    .send({
+                    .send(<UpdatePurchasableDto>{
                         item: 'T-Shirt',
                         price: '10.00',
                         has_size: false
                     })
                     .expect(status.OK)
-                    .end((err, res) => {
+                    .end((err, res: SuperTestResponse<UpdatePurchasableResponseDto>) => {
                         if (err) { return done(err); }
                         const purchasable = res.body.purchasable;
                         expect(purchasable.id).to.equal(purchasableIds[0]);
@@ -413,11 +421,11 @@ describe('purchasables', () => {
             it('should update an age requirement', (done) => {
                 request.put('/api/events/' + events[1].id + '/purchasables/' + purchasableIds[3])
                     .set('Authorization', generatedUsers.admin.token)
-                    .send({
+                    .send(<UpdatePurchasableDto>{
                         maximum_age: 8
                     })
                     .expect(status.OK)
-                    .end((err, res) => {
+                    .end((err, res: SuperTestResponse<UpdatePurchasableResponseDto>) => {
                         if (err) { return done(err); }
                         const purchasable = res.body.purchasable;
                         expect(purchasable.id).to.equal(purchasableIds[3]);
@@ -430,13 +438,13 @@ describe('purchasables', () => {
             it('should update with new information', (done) => {
                 request.put('/api/events/' + events[0].id + '/purchasables/' + purchasableIds[0])
                     .set('Authorization', generatedUsers.admin.token)
-                    .send({
+                    .send(<UpdatePurchasableDto>{
                         item: 'T-Shirt',
                         description: 'New description',
                         price: '10.00'
                     })
                     .expect(status.OK)
-                    .end((err, res) => {
+                    .end((err, res: SuperTestResponse<UpdatePurchasableResponseDto>) => {
                         if (err) { return done(err); }
                         const purchasable = res.body.purchasable;
                         expect(purchasable.id).to.equal(purchasableIds[0]);
@@ -451,7 +459,7 @@ describe('purchasables', () => {
             it('should not update without required fields', (done) => {
                 request.put('/api/events/' + events[0].id + '/purchasables/' + purchasableIds[0])
                     .set('Authorization', generatedUsers.admin.token)
-                    .send({
+                    .send(<UpdatePurchasableDto>{
                         item: null,
                         price: '10.00'
                     })
@@ -461,7 +469,7 @@ describe('purchasables', () => {
             it('should not update for an invalid event', (done) => {
                 request.put('/api/events/' + badId + '/purchasables/' + purchasableIds[0])
                     .set('Authorization', generatedUsers.admin.token)
-                    .send({
+                    .send(<UpdatePurchasableDto>{
                         item: 'T-Shirt',
                         price: '10.00'
                     })
@@ -471,7 +479,7 @@ describe('purchasables', () => {
             it('should not update for an invalid purchasable', (done) => {
                 request.put('/api/events/' + events[0].id + '/purchasables/' + badId)
                     .set('Authorization', generatedUsers.admin.token)
-                    .send({
+                    .send(<UpdatePurchasableDto>{
                         item: 'T-Shirt',
                         price: '10.00'
                     })
@@ -487,16 +495,16 @@ describe('purchasables', () => {
             it('should not create invalid fields', (done) => {
                 request.put('/api/events/' + events[0].id + '/purchasables/' + purchasableIds[0])
                     .set('Authorization', generatedUsers.admin.token)
-                    .send({
+                    .send(<UpdatePurchasableDto>{
                         item: 'T-Shirt',
                         invalid: 'invalid',
                         price: '10.00'
                     })
                     .expect(status.OK)
-                    .end((err, res) => {
+                    .end((err, res: SuperTestResponse<UpdatePurchasableResponseDto>) => {
                         if (err) { return done(err); }
                         const purchasable = res.body.purchasable;
-                        expect(purchasable.invalid).to.not.exist;
+                        expect((purchasable as any).invalid).to.not.exist;
                         return done();
                     });
             });
@@ -508,7 +516,7 @@ describe('purchasables', () => {
                     (cb) => {
                         request.get('/api/events/' + events[0].id + '/purchasables')
                             .expect(status.OK)
-                            .end((err, res) => {
+                            .end((err, res: SuperTestResponse<PurchasablesResponseDto>) => {
                                 if (err) { return done(err); }
                                 expect(res.body).to.have.length(2);
                                 return cb();
@@ -522,7 +530,7 @@ describe('purchasables', () => {
                     (cb) => {
                         request.get('/api/events/' + events[0].id + '/purchasables')
                             .expect(status.OK)
-                            .end((err, res) => {
+                            .end((err, res: SuperTestResponse<PurchasablesResponseDto>) => {
                                 if (err) { return done(err); }
                                 expect(res.body).to.have.length(1);
                                 expect(res.body[0].id).to.equal(purchasableIds[1]);
@@ -626,7 +634,7 @@ describe('purchasables', () => {
                     let validPurchaseId: number;
                     async.series([
                         (cb) => {
-                            const postData: PurchasableInterface = {
+                            const postData: CreatePurchasableDto = {
                                 item: 'Adult Lunch With Age',
                                 price: '12.00',
                                 minimum_age: 0
@@ -693,7 +701,7 @@ describe('purchasables', () => {
                     let invalidPurchaseId: number;
                     async.series([
                         (cb) => {
-                            const postData: PurchasableInterface = {
+                            const postData: CreatePurchasableDto = {
                                 item: 'Youth Lunch With Age',
                                 price: '12.00',
                                 maximum_age: 0

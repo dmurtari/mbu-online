@@ -1,4 +1,5 @@
 export interface PurchasableInterface {
+    id?: number;
     item?: string;
     description?: string;
     has_size?: boolean;
@@ -7,12 +8,18 @@ export interface PurchasableInterface {
     minimum_age?: number;
 }
 
-export interface PurchasablesResponseInterface {
+export type CreatePurchasableDto = PurchasableInterface;
+
+export type UpdatePurchasableDto = PurchasableInterface;
+
+export type PurchasablesResponseDto = PurchasableInterface[];
+
+export interface CreatePurchasablesResponseDto {
     purchasables: PurchasableInterface[];
     message: string;
 }
 
-export interface PurchasableResponseInterface {
+export interface UpdatePurchasableResponseDto {
     purchasable: PurchasableInterface;
     message: string;
 }

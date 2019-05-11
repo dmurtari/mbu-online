@@ -8,7 +8,7 @@ import { Badge } from '@models/badge.model';
 import { Offering } from '@models/offering.model';
 import { OfferingResponseDto } from '@interfaces/offering.interface';
 import { Purchasable } from '@models/purchasable.model';
-import { PurchasableResponseInterface } from '@interfaces/purchasable.interface';
+import { UpdatePurchasableResponseDto } from '@interfaces/purchasable.interface';
 
 export const updateEvent = async (req: Request, res: Response) => {
     try {
@@ -82,7 +82,7 @@ export const updatePurchasable = async (req: Request, res: Response) => {
 
         await purchasable.update(req.body);
 
-        return res.status(status.OK).json(<PurchasableResponseInterface>{
+        return res.status(status.OK).json(<UpdatePurchasableResponseDto>{
             message: 'Purchasable updated successfully',
             purchasable: purchasable
         });
