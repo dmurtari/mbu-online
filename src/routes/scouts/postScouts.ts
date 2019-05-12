@@ -4,7 +4,7 @@ import status from 'http-status-codes';
 import { Scout } from '@models/scout.model';
 import { Registration } from '@models/registration.model';
 import { ErrorResponseInterface } from '@interfaces/shared.interface';
-import { RegistrationInterface, RegistrationResponseInterface } from '@interfaces/registration.interface';
+import { RegistrationInterface, CreateRegistrationResponseDto } from '@interfaces/registration.interface';
 import { Event } from '@models/event.model';
 import { Preference } from '@models/preference.model';
 import { PreferenceRequestInterface, PreferenceInterface } from '@interfaces/preference.interface';
@@ -96,7 +96,7 @@ export const createPreference = async (req: Request, res: Response) => {
             }]
         });
 
-        return res.status(status.CREATED).json(<RegistrationResponseInterface>{
+        return res.status(status.CREATED).json(<CreateRegistrationResponseDto>{
             message: 'Preference created',
             registration: createdRegistration
         });
@@ -158,7 +158,7 @@ export const createAssignment = async (req: Request, res: Response) => {
             }],
         });
 
-        return res.status(status.CREATED).json(<RegistrationResponseInterface>{
+        return res.status(status.CREATED).json(<CreateRegistrationResponseDto>{
             message: 'Assignment created successfully',
             registration: createdRegistration
         });
@@ -197,7 +197,7 @@ export const createPurchase = async (req: Request, res: Response) => {
             }]
         });
 
-        return res.status(status.CREATED).json(<RegistrationResponseInterface>{
+        return res.status(status.CREATED).json(<CreateRegistrationResponseDto>{
             message: 'Purchase created' ,
             registration: createdRegistration
         });

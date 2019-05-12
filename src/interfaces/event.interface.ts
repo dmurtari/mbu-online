@@ -19,6 +19,11 @@ export interface EventInterface {
     purchasables?: Purchasable[];
 }
 
+export interface EventDto<T = any> extends EventInterface {
+    event_id?: number;
+    details: T;
+}
+
 export interface EventOfferingInterface extends EventInterface {
     offerings?: BadgeDto<OfferingInterface>[];
 }

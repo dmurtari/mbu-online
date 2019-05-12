@@ -1,3 +1,6 @@
+import { EventDto } from '@interfaces/event.interface';
+import { RegistrationDto } from '@interfaces/registration.interface';
+
 export interface ScoutInterface {
     id?: number;
     firstname?: string;
@@ -12,6 +15,12 @@ export interface ScoutInterface {
 }
 
 export type ScoutRequestDto = ScoutInterface;
+
+export interface ScoutRegistrationDto extends ScoutInterface {
+    registrations: EventDto<RegistrationDto>[];
+}
+
+export type ScoutRegistrationResponseDto = ScoutRegistrationDto[];
 
 export interface ScoutResponseDto {
     message: string;

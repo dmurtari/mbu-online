@@ -9,12 +9,16 @@ export interface RegistrationInterface {
     assignments?: OfferingInterface[];
 }
 
-export interface RegistrationResponseInterface {
-    message: string;
-    registration: RegistrationInterface;
+export interface RegistrationDto extends RegistrationInterface {
+    event_id?: number;
 }
 
-export interface RegistrationRequestInterface {
+export interface CreateRegistrationResponseDto {
+    message: string;
+    registration: RegistrationDto;
+}
+
+export interface RegistrationRequestDto {
     event_id?: string;
     notes?: string;
 }
@@ -22,3 +26,5 @@ export interface RegistrationRequestInterface {
 export interface CostCalculationResponseInterface {
     cost: string;
 }
+
+export type RegistrationsResponseDto = RegistrationDto[];

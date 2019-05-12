@@ -11,7 +11,9 @@ import { Scout } from '@models/scout.model';
 import { UserRole } from '@interfaces/user.interface';
 import { Registration } from '@models/registration.model';
 import testScouts from './testScouts';
-import { RegistrationRequestInterface } from '@interfaces/registration.interface';
+import { RegistrationRequestDto, CreateRegistrationResponseDto, RegistrationsResponseDto } from '@interfaces/registration.interface';
+import { SuperTestResponse } from '@test/helpers/supertest.interface';
+import { ScoutRegistrationDto, ScoutRegistrationResponseDto } from '@interfaces/scout.interface';
 
 const request = supertest(app);
 
@@ -50,11 +52,11 @@ describe('registration', () => {
         it('should create the registration', (done) => {
             request.post('/api/scouts/' + generatedScouts[3].id + '/registrations')
                 .set('Authorization', generatedUsers.coordinator.token)
-                .send(<RegistrationRequestInterface>{
+                .send(<RegistrationRequestDto>{
                     event_id: events[0].id
                 })
                 .expect(status.CREATED)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<CreateRegistrationResponseDto>) => {
                     if (err) { return done(err); }
                     const registration = res.body.registration;
                     expect(registration.scout_id).to.equal(generatedScouts[3].id);
@@ -68,12 +70,12 @@ describe('registration', () => {
 
             request.post('/api/scouts/' + generatedScouts[3].id + '/registrations')
                 .set('Authorization', generatedUsers.coordinator.token)
-                .send(<RegistrationRequestInterface>{
+                .send(<RegistrationRequestDto>{
                     event_id: events[0].id,
                     notes: note
                 })
                 .expect(status.CREATED)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<CreateRegistrationResponseDto>) => {
                     if (err) { return done(err); }
                     const registration = res.body.registration;
                     expect(registration.scout_id).to.equal(generatedScouts[3].id);
@@ -86,7 +88,7 @@ describe('registration', () => {
         it('should check for the correct owner', (done) => {
             request.post('/api/scouts/' + generatedScouts[3].id + '/registrations')
                 .set('Authorization', generatedUsers.coordinator2.token)
-                .send({
+                .send(<RegistrationRequestDto>{
                     event_id: events[0].id
                 })
                 .expect(status.UNAUTHORIZED, done);
@@ -95,7 +97,7 @@ describe('registration', () => {
         it('should allow admins to register', (done) => {
             request.post('/api/scouts/' + generatedScouts[3].id + '/registrations')
                 .set('Authorization', generatedUsers.admin.token)
-                .send({
+                .send(<RegistrationRequestDto>{
                     event_id: events[0].id
                 })
                 .expect(status.CREATED, done);
@@ -104,7 +106,7 @@ describe('registration', () => {
         it('should allow teachers to register', (done) => {
             request.post('/api/scouts/' + generatedScouts[3].id + '/registrations')
                 .set('Authorization', generatedUsers.teacher.token)
-                .send({
+                .send(<RegistrationRequestDto>{
                     event_id: events[0].id
                 })
                 .expect(status.CREATED, done);
@@ -113,7 +115,7 @@ describe('registration', () => {
         it('should not create a registration for a nonexistant scout', (done) => {
             request.post('/api/scouts/' + badId + '/registrations')
                 .set('Authorization', generatedUsers.coordinator.token)
-                .send({
+                .send(<RegistrationRequestDto>{
                     event_id: events[0].id
                 })
                 .expect(status.BAD_REQUEST, done);
@@ -122,7 +124,7 @@ describe('registration', () => {
         it('should not create a registration for a nonexistant event', (done) => {
             request.post('/api/scouts/' + generatedScouts[3].id + '/registrations')
                 .set('Authorization', generatedUsers.coordinator.token)
-                .send({
+                .send(<RegistrationRequestDto>{
                     event_id: badId
                 })
                 .expect(status.BAD_REQUEST, done);
@@ -133,7 +135,7 @@ describe('registration', () => {
                 (cb) => {
                     request.post('/api/scouts/' + generatedScouts[3].id + '/registrations')
                         .set('Authorization', generatedUsers.coordinator.token)
-                        .send({
+                        .send(<RegistrationRequestDto>{
                             event_id: events[0].id
                         })
                         .expect(status.CREATED, cb);
@@ -141,7 +143,7 @@ describe('registration', () => {
                 (cb) => {
                     request.post('/api/scouts/' + generatedScouts[3].id + '/registrations')
                         .set('Authorization', generatedUsers.coordinator.token)
-                        .send({
+                        .send(<RegistrationRequestDto>{
                             event_id: events[0].id
                         })
                         .expect(status.BAD_REQUEST, cb);
@@ -159,7 +161,7 @@ describe('registration', () => {
                 (cb) => {
                     request.post('/api/scouts/' + generatedScouts[1].id + '/registrations')
                         .set('Authorization', generatedUsers.coordinator.token)
-                        .send({
+                        .send(<RegistrationRequestDto>{
                             event_id: events[0].id
                         })
                         .expect(status.CREATED, cb);
@@ -167,7 +169,7 @@ describe('registration', () => {
                 (cb) => {
                     request.post('/api/scouts/' + generatedScouts[1].id + '/registrations')
                         .set('Authorization', generatedUsers.coordinator.token)
-                        .send({
+                        .send(<RegistrationRequestDto>{
                             event_id: events[1].id
                         })
                         .expect(status.CREATED, cb);
@@ -175,7 +177,7 @@ describe('registration', () => {
                 (cb) => {
                     request.post('/api/scouts/' + scoutId + '/registrations')
                         .set('Authorization', generatedUsers.coordinator.token)
-                        .send({
+                        .send(<RegistrationRequestDto>{
                             event_id: events[0].id
                         })
                         .expect(status.CREATED, cb);
@@ -183,7 +185,7 @@ describe('registration', () => {
                 (cb) => {
                     request.post('/api/scouts/' + scoutId + '/registrations')
                         .set('Authorization', generatedUsers.coordinator.token)
-                        .send({
+                        .send(<RegistrationRequestDto>{
                             event_id: events[1].id
                         })
                         .expect(status.CREATED, cb);
@@ -191,7 +193,7 @@ describe('registration', () => {
                 (cb) => {
                     request.post('/api/scouts/' + generatedScouts[2].id + '/registrations')
                         .set('Authorization', generatedUsers.coordinator.token)
-                        .send({
+                        .send(<RegistrationRequestDto>{
                             event_id: events[0].id
                         })
                         .expect(status.CREATED, cb);
@@ -204,7 +206,7 @@ describe('registration', () => {
                 request.get('/api/scouts/' + scoutId + '/registrations')
                     .set('Authorization', generatedUsers.coordinator.token)
                     .expect(status.OK)
-                    .end((err, res) => {
+                    .end((err, res: SuperTestResponse<RegistrationsResponseDto>) => {
                         if (err) { return done(err); }
                         const registrations = res.body;
                         expect(registrations).to.have.lengthOf(2);
@@ -235,7 +237,7 @@ describe('registration', () => {
                         request.get('/api/scouts/' + scoutId + '/registrations')
                             .set('Authorization', generatedUsers.coordinator.token)
                             .expect(status.OK)
-                            .end((err, res) => {
+                            .end((err, res: SuperTestResponse<RegistrationsResponseDto>) => {
                                 if (err) { return cb(err); }
                                 const registrations = res.body;
                                 expect(registrations).to.have.length(1);
@@ -289,7 +291,7 @@ describe('registration', () => {
             async.forEachOfSeries(generatedScouts, (scout, index, cb) => {
                 request.post('/api/scouts/' + scout.id + '/registrations')
                     .set('Authorization', generatedUsers.coordinator.token)
-                    .send({
+                    .send(<RegistrationRequestDto>{
                         event_id: events[0].id
                     })
                     .expect(status.CREATED, cb);
@@ -302,7 +304,7 @@ describe('registration', () => {
             async.forEachOfSeries(generatedScouts, (scout, index, cb) => {
                 request.post('/api/scouts/' + scout.id + '/registrations')
                     .set('Authorization', generatedUsers.coordinator.token)
-                    .send({
+                    .send(<RegistrationRequestDto>{
                         event_id: events[1].id
                     })
                     .expect(status.CREATED, cb);
@@ -315,7 +317,7 @@ describe('registration', () => {
             async.forEachOfSeries(generatedScouts2, (scout, index, cb) => {
                 request.post('/api/scouts/' + scout.id + '/registrations')
                     .set('Authorization', generatedUsers.coordinator2.token)
-                    .send({
+                    .send(<RegistrationRequestDto>{
                         event_id: events[0].id
                     })
                     .expect(status.CREATED, cb);
@@ -328,11 +330,11 @@ describe('registration', () => {
             request.get('/api/users/' + generatedUsers.coordinator.profile.id + '/scouts/registrations')
                 .set('Authorization', generatedUsers.coordinator.token)
                 .expect(status.OK)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<ScoutRegistrationResponseDto>) => {
                     if (err) { return done(err); }
                     const scouts = res.body;
                     expect(scouts).to.have.lengthOf(5);
-                    scouts.forEach((scout: any) => {
+                    scouts.forEach((scout) => {
                         expect(scout.registrations).to.have.lengthOf(2);
                         expect(scout.registrations[0].event_id).to.equal(events[0].id);
                         expect(scout.registrations[1].event_id).to.equal(events[1].id);
@@ -345,7 +347,7 @@ describe('registration', () => {
             request.get('/api/users/' + generatedUsers.coordinator.profile.id + '/events/' + events[0].id + '/registrations')
                 .set('Authorization', generatedUsers.coordinator.token)
                 .expect(status.OK)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<RegistrationsResponseDto[]>) => {
                     if (err) { return done(err); }
                     const registrations = res.body;
                     expect(registrations).to.have.lengthOf(5);
@@ -365,7 +367,7 @@ describe('registration', () => {
             request.get('/api/users/' + generatedUsers.coordinator.profile.id + '/events/' + events[1].id + '/registrations')
                 .set('Authorization', generatedUsers.coordinator.token)
                 .expect(status.OK)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<RegistrationsResponseDto[]>) => {
                     if (err) { return done(err); }
                     const registrations = res.body;
                     expect(registrations).to.have.lengthOf(5);
@@ -385,7 +387,7 @@ describe('registration', () => {
             request.get('/api/users/' + generatedUsers.coordinator2.profile.id + '/events/' + events[0].id + '/registrations')
                 .set('Authorization', generatedUsers.coordinator2.token)
                 .expect(status.OK)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<RegistrationsResponseDto[]>) => {
                     if (err) { return done(err); }
                     const registrations = res.body;
                     expect(registrations).to.have.lengthOf(5);
