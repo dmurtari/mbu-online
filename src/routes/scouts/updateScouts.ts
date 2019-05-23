@@ -4,7 +4,7 @@ import status from 'http-status-codes';
 import { ErrorResponseInterface } from '@interfaces/shared.interface';
 import { Registration } from '@models/registration.model';
 import { Preference } from '@models/preference.model';
-import { PreferenceResponseInterface } from '@interfaces/preference.interface';
+import { UpdatePreferenceResponseDto } from '@interfaces/preference.interface';
 import { Assignment } from '@models/assignment.model';
 import { AssignmentResponseInterface } from '@interfaces/assignment.interface';
 import { Purchase } from '@models/purchase.model';
@@ -37,7 +37,7 @@ export const updatePreference = async (req: Request, res: Response) => {
 
         await preference.update(req.body);
 
-        return res.status(status.OK).json(<PreferenceResponseInterface>{
+        return res.status(status.OK).json(<UpdatePreferenceResponseDto>{
             message: 'Preference updated successfully',
             preference: preference
         });

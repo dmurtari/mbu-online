@@ -7,7 +7,7 @@ import { ErrorResponseInterface } from '@interfaces/shared.interface';
 import { RegistrationInterface, CreateRegistrationResponseDto } from '@interfaces/registration.interface';
 import { Event } from '@models/event.model';
 import { Preference } from '@models/preference.model';
-import { PreferenceRequestInterface, PreferenceInterface } from '@interfaces/preference.interface';
+import { PreferenceRequestDto, PreferenceInterface } from '@interfaces/preference.interface';
 import { Offering } from '@models/offering.model';
 import { Assignment } from '@models/assignment.model';
 import { AssignmentInterface, AssignmentRequestInterface, AssignmentResponseInterface } from '@interfaces/assignment.interface';
@@ -59,7 +59,7 @@ export const createPreference = async (req: Request, res: Response) => {
                 }
             });
 
-            const preferences: PreferenceInterface[] = req.body.map((preference: PreferenceRequestInterface) => ({
+            const preferences: PreferenceInterface[] = req.body.map((preference: PreferenceRequestDto) => ({
                 registration_id: registrationId,
                 offering_id: preference.offering,
                 rank: preference.rank

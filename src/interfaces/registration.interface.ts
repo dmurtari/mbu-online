@@ -1,4 +1,6 @@
-import { OfferingInterface } from '@interfaces/offering.interface';
+import { OfferingInterface, OfferingDto } from '@interfaces/offering.interface';
+import { Preference } from '@models/preference.model';
+import { PreferenceInterface } from '@interfaces/preference.interface';
 
 export interface RegistrationInterface {
     id?: number;
@@ -11,6 +13,10 @@ export interface RegistrationInterface {
 
 export interface RegistrationDto extends RegistrationInterface {
     event_id?: number;
+}
+
+export interface RegistrationPreferenceDto extends RegistrationDto {
+    preferences: OfferingDto<PreferenceInterface>[];
 }
 
 export interface CreateRegistrationResponseDto {

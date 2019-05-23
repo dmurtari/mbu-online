@@ -9,6 +9,11 @@ export interface OfferingInterface {
     size_limit?: number;
 }
 
+export interface OfferingDto<T = any> extends OfferingInterface {
+    offering_id?: number;
+    details: T;
+}
+
 export interface CreateOfferingDto {
     badge_id: number;
     offering: OfferingInterface;

@@ -13,8 +13,15 @@ import { Offering } from '@models/offering.model';
 import { UserRole } from '@interfaces/user.interface';
 import { OfferingInterface } from '@interfaces/offering.interface';
 import { Registration } from '@models/registration.model';
-import { PreferenceRequestInterface } from '@interfaces/preference.interface';
+import {
+    PreferenceRequestDto,
+    CreatePreferenceResponseDto,
+    AllPreferenceResponseDto,
+    UpdatePreferenceRequestDto
+} from '@interfaces/preference.interface';
 import { Preference } from '@models/preference.model';
+import { RegistrationRequestDto, CreateRegistrationResponseDto } from '@interfaces/registration.interface';
+import { SuperTestResponse } from '@test/helpers/supertest.interface';
 
 const request = supertest(app);
 
@@ -59,11 +66,11 @@ describe('preferences', () => {
             (cb) => {
                 request.post('/api/scouts/' + scoutId + '/registrations')
                     .set('Authorization', generatedUsers.coordinator.token)
-                    .send({
+                    .send(<RegistrationRequestDto>{
                         event_id: events[0].id
                     })
                     .expect(status.CREATED)
-                    .end((err, res) => {
+                    .end((err, res: SuperTestResponse<CreateRegistrationResponseDto>) => {
                         if (err) { return done(err); }
                         registrationIds.push(res.body.registration.id);
                         return cb();
@@ -72,11 +79,11 @@ describe('preferences', () => {
             (cb) => {
                 request.post('/api/scouts/' + scoutId + '/registrations')
                     .set('Authorization', generatedUsers.coordinator.token)
-                    .send({
+                    .send(<RegistrationRequestDto>{
                         event_id: events[1].id
                     })
                     .expect(status.CREATED)
-                    .end((err, res) => {
+                    .end((err, res: SuperTestResponse<CreateRegistrationResponseDto>) => {
                         if (err) { return done(err); }
                         registrationIds.push(res.body.registration.id);
                         return cb();
@@ -91,7 +98,7 @@ describe('preferences', () => {
 
     describe('when preferences do not exist', () => {
         it('should be able to be generated', (done) => {
-            const postData: PreferenceRequestInterface = {
+            const postData: PreferenceRequestDto = {
                 offering: generatedOfferings[0].id,
                 rank: 1
             };
@@ -101,7 +108,7 @@ describe('preferences', () => {
                 .set('Authorization', generatedUsers.coordinator.token)
                 .send(postData)
                 .expect(status.CREATED)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<CreatePreferenceResponseDto>) => {
                     if (err) { return done(err); }
                     const registration = res.body.registration;
                     expect(registration.preferences).to.have.length(1);
@@ -114,7 +121,7 @@ describe('preferences', () => {
         });
 
         it('should check for scout owner', (done) => {
-            const postData: PreferenceRequestInterface = {
+            const postData: PreferenceRequestDto = {
                 offering: generatedOfferings[0].id,
                 rank: 1
             };
@@ -127,7 +134,7 @@ describe('preferences', () => {
         });
 
         it('should allow teachers to create', (done) => {
-            const postData: PreferenceRequestInterface = {
+            const postData: PreferenceRequestDto = {
                 offering: generatedOfferings[0].id,
                 rank: 1
             };
@@ -140,7 +147,7 @@ describe('preferences', () => {
         });
 
         it('should allow admins to create', (done) => {
-            const postData: PreferenceRequestInterface = {
+            const postData: PreferenceRequestDto = {
                 offering: generatedOfferings[0].id,
                 rank: 1
             };
@@ -153,7 +160,7 @@ describe('preferences', () => {
         });
 
         it('should not create for a nonexistant offering', (done) => {
-            const postData: PreferenceRequestInterface = {
+            const postData: PreferenceRequestDto = {
                 offering: badId as any,
                 rank: 1
             };
@@ -166,7 +173,7 @@ describe('preferences', () => {
         });
 
         it('should not create for nonexistant registrations', (done) => {
-            const postData: PreferenceRequestInterface = {
+            const postData: PreferenceRequestDto = {
                 offering: generatedOfferings[0].id,
                 rank: 1
             };
@@ -178,7 +185,7 @@ describe('preferences', () => {
         });
 
         it('should not have a maximum rank of 6', (done) => {
-            const postData: PreferenceRequestInterface = {
+            const postData: PreferenceRequestDto = {
                 offering: generatedOfferings[0].id,
                 rank: 7
             };
@@ -191,7 +198,7 @@ describe('preferences', () => {
         });
 
         it('should not have a minimum rank of 1', (done) => {
-            const postData: PreferenceRequestInterface = {
+            const postData: PreferenceRequestDto = {
                 offering: generatedOfferings[0].id,
                 rank: 0
             };
@@ -211,7 +218,7 @@ describe('preferences', () => {
                     request.post('/api/scouts/' + generatedScouts[0].id + '/registrations/' +
                         registrationIds[0] + '/preferences')
                         .set('Authorization', generatedUsers.coordinator.token)
-                        .send({
+                        .send(<PreferenceRequestDto>{
                             offering: generatedOfferings[0].id,
                             rank: 1
                         })
@@ -221,7 +228,7 @@ describe('preferences', () => {
                     request.post('/api/scouts/' + generatedScouts[0].id + '/registrations/' +
                         registrationIds[0] + '/preferences')
                         .set('Authorization', generatedUsers.coordinator.token)
-                        .send({
+                        .send(<PreferenceRequestDto>{
                             offering: generatedOfferings[1].id,
                             rank: 2
                         })
@@ -231,7 +238,7 @@ describe('preferences', () => {
                     request.post('/api/scouts/' + generatedScouts[0].id + '/registrations/' +
                         registrationIds[1] + '/preferences')
                         .set('Authorization', generatedUsers.coordinator.token)
-                        .send({
+                        .send(<PreferenceRequestDto>{
                             offering: generatedOfferings[0].id,
                             rank: 3
                         })
@@ -245,7 +252,7 @@ describe('preferences', () => {
                 request.get('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/preferences')
                     .set('Authorization', generatedUsers.coordinator.token)
                     .expect(status.OK)
-                    .end((err, res) => {
+                    .end((err, res: SuperTestResponse<AllPreferenceResponseDto>) => {
                         if (err) { return done(err); }
                         const preferences = res.body;
                         expect(preferences).to.have.length(2);
@@ -279,9 +286,9 @@ describe('preferences', () => {
                         request.get('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/preferences')
                             .set('Authorization', generatedUsers.coordinator.token)
                             .expect(status.OK)
-                            .end((err, res) => {
+                            .end((err, res: SuperTestResponse<AllPreferenceResponseDto>) => {
                                 if (err) { return done(err); }
-                                const preference = res.body.find((_preference: Preference) => _preference.offering_id === 1);
+                                const preference = res.body.find((_preference) => _preference.offering_id === 1);
                                 expect(preference.details.rank).to.equal(1);
                                 return cb();
                             });
@@ -290,7 +297,7 @@ describe('preferences', () => {
                         // tslint:disable-next-line: max-line-length
                         request.put('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/preferences/' + generatedOfferings[0].id)
                             .set('Authorization', generatedUsers.coordinator.token)
-                            .send({
+                            .send(<UpdatePreferenceRequestDto>{
                                 rank: 3
                             })
                             .expect(status.OK, cb);
@@ -299,9 +306,9 @@ describe('preferences', () => {
                         request.get('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/preferences')
                             .set('Authorization', generatedUsers.coordinator.token)
                             .expect(status.OK)
-                            .end((err, res) => {
+                            .end((err, res: SuperTestResponse<AllPreferenceResponseDto>) => {
                                 if (err) { return done(err); }
-                                const preference = res.body.find((_preference: Preference) => _preference.offering_id === 1);
+                                const preference = res.body.find((_preference) => _preference.offering_id === 1);
                                 expect(preference.details.rank).to.equal(3);
                                 return cb();
                             });
@@ -312,7 +319,7 @@ describe('preferences', () => {
             it('should check for the owner', (done) => {
                 request.put('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/preferences/' + generatedOfferings[0].id)
                     .set('Authorization', generatedUsers.coordinator2.token)
-                    .send({
+                    .send(<UpdatePreferenceRequestDto>{
                         rank: 3
                     })
                     .expect(status.UNAUTHORIZED, done);
@@ -321,7 +328,7 @@ describe('preferences', () => {
             it('should allow teachers to update', (done) => {
                 request.put('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/preferences/' + generatedOfferings[0].id)
                     .set('Authorization', generatedUsers.teacher.token)
-                    .send({
+                    .send(<UpdatePreferenceRequestDto>{
                         rank: 3
                     })
                     .expect(status.OK, done);
@@ -330,7 +337,7 @@ describe('preferences', () => {
             it('should allow admins to update', (done) => {
                 request.put('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/preferences/' + generatedOfferings[0].id)
                     .set('Authorization', generatedUsers.admin.token)
-                    .send({
+                    .send(<UpdatePreferenceRequestDto>{
                         rank: 3
                     })
                     .expect(status.OK, done);
@@ -362,7 +369,7 @@ describe('preferences', () => {
                         request.get('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/preferences')
                             .set('Authorization', generatedUsers.coordinator.token)
                             .expect(status.OK)
-                            .end((err, res) => {
+                            .end((err, res: SuperTestResponse<AllPreferenceResponseDto>) => {
                                 if (err) { return done(err); }
                                 expect(res.body).to.have.length(2);
                                 return cb();
@@ -378,7 +385,7 @@ describe('preferences', () => {
                         request.get('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/preferences')
                             .set('Authorization', generatedUsers.coordinator.token)
                             .expect(status.OK)
-                            .end((err, res) => {
+                            .end((err, res: SuperTestResponse<AllPreferenceResponseDto>) => {
                                 expect(res.body).to.have.length(1);
                                 return cb();
                             });
@@ -427,7 +434,7 @@ describe('preferences', () => {
     describe('batch modifying preferences', () => {
 
         it('should add a batch of preferences', (done) => {
-            const postData: PreferenceRequestInterface[] = [{
+            const postData: PreferenceRequestDto[] = [{
                 offering: generatedOfferings[0].id,
                 rank: 1
             }, {
@@ -439,7 +446,7 @@ describe('preferences', () => {
                 .set('Authorization', generatedUsers.coordinator.token)
                 .send(postData)
                 .expect(status.CREATED)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<CreatePreferenceResponseDto>) => {
                     if (err) { return done(err); }
                     const registration = res.body.registration;
                     expect(registration.preferences).to.have.length(2);
@@ -457,7 +464,7 @@ describe('preferences', () => {
         it('should override existing preferences', (done) => {
             async.series([
                 (cb) => {
-                    const postData: PreferenceRequestInterface[] = [{
+                    const postData: PreferenceRequestDto[] = [{
                         offering: generatedOfferings[0].id,
                         rank: 1
                     }, {
@@ -469,7 +476,7 @@ describe('preferences', () => {
                         .set('Authorization', generatedUsers.coordinator.token)
                         .send(postData)
                         .expect(status.CREATED)
-                        .end((err, res) => {
+                        .end((err, res: SuperTestResponse<CreatePreferenceResponseDto>) => {
                             if (err) { return done(err); }
                             const registration = res.body.registration;
                             expect(registration.preferences).to.have.length(2);
@@ -484,7 +491,7 @@ describe('preferences', () => {
                         });
                 },
                 (cb) => {
-                    const postData: PreferenceRequestInterface[] = [{
+                    const postData: PreferenceRequestDto[] = [{
                         offering: generatedOfferings[2].id,
                         rank: 1
                     }];
@@ -493,7 +500,7 @@ describe('preferences', () => {
                         .set('Authorization', generatedUsers.coordinator.token)
                         .send(postData)
                         .expect(status.CREATED)
-                        .end((err, res) => {
+                        .end((err, res: SuperTestResponse<CreatePreferenceResponseDto>) => {
                             if (err) { return done(err); }
                             const registration = res.body.registration;
                             expect(registration.preferences).to.have.length(1);
@@ -508,7 +515,7 @@ describe('preferences', () => {
         });
 
         it('should not create with an invalid offering', (done) => {
-            const postData: PreferenceRequestInterface[] = [{
+            const postData: PreferenceRequestDto[] = [{
                 offering: 30,
                 rank: 1
             }];
@@ -520,7 +527,7 @@ describe('preferences', () => {
         });
 
         it('should not create with an invalid rank', (done) => {
-            const postData: PreferenceRequestInterface[] = [{
+            const postData: PreferenceRequestDto[] = [{
                 offering: generatedOfferings[0].id,
                 rank: 30
             }];
