@@ -8,6 +8,10 @@ export interface PurchasableInterface {
     minimum_age?: number;
 }
 
+export interface PurchasableDto<T = any> extends PurchasableInterface {
+    details?: T;
+}
+
 export type CreatePurchasableDto = PurchasableInterface;
 
 export type UpdatePurchasableDto = PurchasableInterface;

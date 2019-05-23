@@ -7,12 +7,13 @@ import { Preference } from '@models/preference.model';
 import { Assignment } from '@models/assignment.model';
 import { Purchasable } from '@models/purchasable.model';
 import { Purchase } from '@models/purchase.model';
+import { RegistrationInterface } from '@interfaces/registration.interface';
 
 @Table({
     underscored: true,
     tableName: 'Registration'
 })
-export class Registration extends Model<Registration> {
+export class Registration extends Model<Registration> implements RegistrationInterface {
     @PrimaryKey
     @AutoIncrement
     @Column

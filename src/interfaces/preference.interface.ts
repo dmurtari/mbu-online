@@ -26,4 +26,4 @@ export interface UpdatePreferenceResponseDto {
     message: string;
 }
 
-export type AllPreferenceResponseDto = OfferingDto<PreferenceInterface>[];
+export type ScoutPreferenceResponseDto = OfferingDto<PreferenceInterface>[];

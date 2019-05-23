@@ -7,12 +7,13 @@ import { ErrorResponseInterface } from '@interfaces/shared.interface';
 import { RegistrationInterface, CreateRegistrationResponseDto } from '@interfaces/registration.interface';
 import { Event } from '@models/event.model';
 import { Preference } from '@models/preference.model';
-import { PreferenceRequestDto, PreferenceInterface } from '@interfaces/preference.interface';
+import { PreferenceRequestDto, PreferenceInterface, CreatePreferenceResponseDto } from '@interfaces/preference.interface';
 import { Offering } from '@models/offering.model';
 import { Assignment } from '@models/assignment.model';
-import { AssignmentInterface, AssignmentRequestInterface, AssignmentResponseInterface } from '@interfaces/assignment.interface';
+import { AssignmentInterface, AssignmentRequestInterface } from '@interfaces/assignment.interface';
 import { Badge } from '@models/badge.model';
 import { Purchasable } from '@models/purchasable.model';
+import { CreatePurchaseResponseDto } from '@interfaces/purchase.interface';
 
 export const createRegistration = async (req: Request, res: Response) => {
     try {
@@ -96,7 +97,7 @@ export const createPreference = async (req: Request, res: Response) => {
             }]
         });
 
-        return res.status(status.CREATED).json(<CreateRegistrationResponseDto>{
+        return res.status(status.CREATED).json(<CreatePreferenceResponseDto>{
             message: 'Preference created',
             registration: createdRegistration
         });
@@ -197,7 +198,7 @@ export const createPurchase = async (req: Request, res: Response) => {
             }]
         });
 
-        return res.status(status.CREATED).json(<CreateRegistrationResponseDto>{
+        return res.status(status.CREATED).json(<CreatePurchaseResponseDto>{
             message: 'Purchase created' ,
             registration: createdRegistration
         });

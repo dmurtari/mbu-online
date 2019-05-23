@@ -16,7 +16,7 @@ import { Registration } from '@models/registration.model';
 import {
     PreferenceRequestDto,
     CreatePreferenceResponseDto,
-    AllPreferenceResponseDto,
+    ScoutPreferenceResponseDto,
     UpdatePreferenceRequestDto
 } from '@interfaces/preference.interface';
 import { Preference } from '@models/preference.model';
@@ -252,7 +252,7 @@ describe('preferences', () => {
                 request.get('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/preferences')
                     .set('Authorization', generatedUsers.coordinator.token)
                     .expect(status.OK)
-                    .end((err, res: SuperTestResponse<AllPreferenceResponseDto>) => {
+                    .end((err, res: SuperTestResponse<ScoutPreferenceResponseDto>) => {
                         if (err) { return done(err); }
                         const preferences = res.body;
                         expect(preferences).to.have.length(2);
@@ -286,7 +286,7 @@ describe('preferences', () => {
                         request.get('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/preferences')
                             .set('Authorization', generatedUsers.coordinator.token)
                             .expect(status.OK)
-                            .end((err, res: SuperTestResponse<AllPreferenceResponseDto>) => {
+                            .end((err, res: SuperTestResponse<ScoutPreferenceResponseDto>) => {
                                 if (err) { return done(err); }
                                 const preference = res.body.find((_preference) => _preference.offering_id === 1);
                                 expect(preference.details.rank).to.equal(1);
@@ -306,7 +306,7 @@ describe('preferences', () => {
                         request.get('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/preferences')
                             .set('Authorization', generatedUsers.coordinator.token)
                             .expect(status.OK)
-                            .end((err, res: SuperTestResponse<AllPreferenceResponseDto>) => {
+                            .end((err, res: SuperTestResponse<ScoutPreferenceResponseDto>) => {
                                 if (err) { return done(err); }
                                 const preference = res.body.find((_preference) => _preference.offering_id === 1);
                                 expect(preference.details.rank).to.equal(3);
@@ -369,7 +369,7 @@ describe('preferences', () => {
                         request.get('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/preferences')
                             .set('Authorization', generatedUsers.coordinator.token)
                             .expect(status.OK)
-                            .end((err, res: SuperTestResponse<AllPreferenceResponseDto>) => {
+                            .end((err, res: SuperTestResponse<ScoutPreferenceResponseDto>) => {
                                 if (err) { return done(err); }
                                 expect(res.body).to.have.length(2);
                                 return cb();
@@ -385,7 +385,7 @@ describe('preferences', () => {
                         request.get('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/preferences')
                             .set('Authorization', generatedUsers.coordinator.token)
                             .expect(status.OK)
-                            .end((err, res: SuperTestResponse<AllPreferenceResponseDto>) => {
+                            .end((err, res: SuperTestResponse<ScoutPreferenceResponseDto>) => {
                                 expect(res.body).to.have.length(1);
                                 return cb();
                             });

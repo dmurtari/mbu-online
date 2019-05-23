@@ -20,9 +20,10 @@ import {
 import { Registration } from '@models/registration.model';
 import { Purchase } from '@models/purchase.model';
 import testScouts from './testScouts';
-import { PurchaseRequestInterface, Size } from '@interfaces/purchase.interface';
+import { PurchaseRequestDto, Size, CreatePurchaseResponseDto, ScoutPurchasesResponseDto } from '@interfaces/purchase.interface';
 import { SuperTestResponse } from '@test/helpers/supertest.interface';
 import { EventsResponseDto } from '@interfaces/event.interface';
+import { RegistrationDto, CreateRegistrationResponseDto } from '@interfaces/registration.interface';
 
 const request = supertest(app);
 
@@ -578,11 +579,11 @@ describe('purchasables', () => {
                     (cb) => {
                         request.post('/api/scouts/' + scoutId + '/registrations')
                             .set('Authorization', generatedUsers.coordinator.token)
-                            .send({
+                            .send(<RegistrationDto>{
                                 event_id: events[0].id
                             })
                             .expect(status.CREATED)
-                            .end((err, res) => {
+                            .end((err, res: SuperTestResponse<CreateRegistrationResponseDto>) => {
                                 if (err) { return done(err); }
                                 registrationIds.push(res.body.registration.id);
                                 return cb();
@@ -591,11 +592,11 @@ describe('purchasables', () => {
                     (cb) => {
                         request.post('/api/scouts/' + scoutId + '/registrations')
                             .set('Authorization', generatedUsers.coordinator.token)
-                            .send({
+                            .send(<RegistrationDto>{
                                 event_id: events[1].id
                             })
                             .expect(status.CREATED)
-                            .end((err, res) => {
+                            .end((err, res: SuperTestResponse<CreateRegistrationResponseDto>) => {
                                 if (err) { return done(err); }
                                 registrationIds.push(res.body.registration.id);
                                 return cb();
@@ -610,7 +611,7 @@ describe('purchasables', () => {
 
             describe('creating a purchase', () => {
                 it('should associate the purchasable to an event', (done) => {
-                    const postData: PurchaseRequestInterface = {
+                    const postData: PurchaseRequestDto = {
                         purchasable: purchasables[1].id,
                         quantity: 3
                     };
@@ -619,7 +620,7 @@ describe('purchasables', () => {
                         .set('Authorization', generatedUsers.coordinator.token)
                         .send(postData)
                         .expect(status.CREATED)
-                        .end((err, res) => {
+                        .end((err, res: SuperTestResponse<CreatePurchaseResponseDto>) => {
                             if (err) { return done(err); }
                             expect(res.body.registration.purchases).to.have.length(1);
                             const purchase = res.body.registration.purchases[0];
@@ -644,7 +645,7 @@ describe('purchasables', () => {
                                 .set('Authorization', generatedUsers.admin.token)
                                 .send(postData)
                                 .expect(status.CREATED)
-                                .end((err, res) => {
+                                .end((err, res: SuperTestResponse<CreatePurchasablesResponseDto>) => {
                                     if (err) { return done(err); }
                                     expect(res.body.purchasables[4].item).to.equal(postData.item);
                                     validPurchaseId = res.body.purchasables[4].id;
@@ -652,7 +653,7 @@ describe('purchasables', () => {
                                 });
                         },
                         (cb) => {
-                            const postData: PurchaseRequestInterface = {
+                            const postData: PurchaseRequestDto = {
                                 purchasable: validPurchaseId
                             };
 
@@ -665,7 +666,7 @@ describe('purchasables', () => {
                 });
 
                 xit('should allow scouts to purchase an item multiple times', (done) => {
-                    const postData: PurchaseRequestInterface = {
+                    const postData: PurchaseRequestDto = {
                         purchasable: purchasables[1].id,
                         quantity: 3
                     };
@@ -719,7 +720,7 @@ describe('purchasables', () => {
                                 });
                         },
                         (cb) => {
-                            const postData: PurchaseRequestInterface = {
+                            const postData: PurchaseRequestDto = {
                                 purchasable: invalidPurchaseId
                             };
 
@@ -732,7 +733,7 @@ describe('purchasables', () => {
                 });
 
                 it('should default to 0 for quantity', (done) => {
-                    const postData: PurchaseRequestInterface = {
+                    const postData: PurchaseRequestDto = {
                         purchasable: purchasables[0].id
                     };
 
@@ -740,7 +741,7 @@ describe('purchasables', () => {
                         .set('Authorization', generatedUsers.coordinator.token)
                         .send(postData)
                         .expect(status.CREATED)
-                        .end((err, res) => {
+                        .end((err, res: SuperTestResponse<CreatePurchaseResponseDto>) => {
                             if (err) { return done(err); }
                             expect(res.body.registration.purchases).to.have.length(1);
                             const purchase = res.body.registration.purchases[0];
@@ -752,7 +753,7 @@ describe('purchasables', () => {
                 });
 
                 it('should accept a size', (done) => {
-                    const postData: PurchaseRequestInterface = {
+                    const postData: PurchaseRequestDto = {
                         purchasable: purchasables[0].id,
                         size: Size.L,
                         quantity: 2
@@ -762,7 +763,7 @@ describe('purchasables', () => {
                         .set('Authorization', generatedUsers.coordinator.token)
                         .send(postData)
                         .expect(status.CREATED)
-                        .end((err, res) => {
+                        .end((err, res: SuperTestResponse<CreatePurchaseResponseDto>) => {
                             if (err) { return done(err); }
                             expect(res.body.registration.purchases).to.have.length(1);
                             const purchase = res.body.registration.purchases[0];
@@ -774,7 +775,7 @@ describe('purchasables', () => {
                 });
 
                 it('should check for the scouts owner', (done) => {
-                    const postData: PurchaseRequestInterface = {
+                    const postData: PurchaseRequestDto = {
                         purchasable: purchasables[0].id,
                         size: Size.L,
                         quantity: 2
@@ -787,7 +788,7 @@ describe('purchasables', () => {
                 });
 
                 it('should not allow teachers to create', (done) => {
-                    const postData: PurchaseRequestInterface = {
+                    const postData: PurchaseRequestDto = {
                         purchasable: purchasables[0].id,
                         size: Size.L,
                         quantity: 2
@@ -800,7 +801,7 @@ describe('purchasables', () => {
                 });
 
                 it('should allow admins to create', (done) => {
-                    const postData: PurchaseRequestInterface = {
+                    const postData: PurchaseRequestDto = {
                         purchasable: purchasables[0].id,
                         size: Size.L,
                         quantity: 2
@@ -813,7 +814,7 @@ describe('purchasables', () => {
                 });
 
                 it('should not create for a nonexistant purchasable', (done) => {
-                    const postData: PurchaseRequestInterface = {
+                    const postData: PurchaseRequestDto = {
                         purchasable: TestUtils.badId as any,
                         quantity: 1
                     };
@@ -825,7 +826,7 @@ describe('purchasables', () => {
                 });
 
                 it('should not create for a nonexistant registration', (done) => {
-                    const postData: PurchaseRequestInterface = {
+                    const postData: PurchaseRequestDto = {
                         purchasable: purchasables[0].id,
                         quantity: 1
                     };
@@ -837,7 +838,7 @@ describe('purchasables', () => {
                 });
 
                 it('should not create for a nonexistant scout', (done) => {
-                    const postData: PurchaseRequestInterface = {
+                    const postData: PurchaseRequestDto = {
                         purchasable: purchasables[0].id,
                         quantity: 1
                     };
@@ -855,7 +856,7 @@ describe('purchasables', () => {
                         (cb) => {
                             request.post('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/purchases')
                                 .set('Authorization', generatedUsers.coordinator.token)
-                                .send({
+                                .send(<PurchaseRequestDto>{
                                     purchasable: purchasables[0].id,
                                     size: 'l',
                                     quantity: 2
@@ -865,7 +866,7 @@ describe('purchasables', () => {
                         (cb) => {
                             request.post('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/purchases')
                                 .set('Authorization', generatedUsers.coordinator.token)
-                                .send({
+                                .send(<PurchaseRequestDto>{
                                     purchasable: purchasables[1].id,
                                     quantity: 1
                                 })
@@ -874,7 +875,7 @@ describe('purchasables', () => {
                         (cb) => {
                             request.post('/api/scouts/' + scoutId + '/registrations/' + registrationIds[1] + '/purchases')
                                 .set('Authorization', generatedUsers.coordinator.token)
-                                .send({
+                                .send(<PurchaseRequestDto>{
                                     purchasable: purchasables[3].id,
                                     quantity: 5
                                 })
@@ -888,7 +889,7 @@ describe('purchasables', () => {
                         request.get('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/purchases')
                             .set('Authorization', generatedUsers.coordinator.token)
                             .expect(status.OK)
-                            .end((err, res) => {
+                            .end((err, res: SuperTestResponse<ScoutPurchasesResponseDto>) => {
                                 if (err) { return done(err); }
                                 const purchases = res.body;
                                 expect(purchases).to.have.length(2);
@@ -922,7 +923,7 @@ describe('purchasables', () => {
                                 request.get('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/purchases')
                                     .set('Authorization', generatedUsers.coordinator.token)
                                     .expect(status.OK)
-                                    .end((err, res) => {
+                                    .end((err, res: SuperTestResponse<ScoutPurchasesResponseDto>) => {
                                         if (err) { return done(err); }
                                         expect(res.body[0].details.quantity).to.equal(2);
                                         return cb();
@@ -932,7 +933,7 @@ describe('purchasables', () => {
                                 request.put('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] +
                                     '/purchases/' + purchasables[0].id)
                                     .set('Authorization', generatedUsers.coordinator.token)
-                                    .send({
+                                    .send(<PurchaseRequestDto>{
                                         quantity: 1
                                     })
                                     .expect(status.OK, cb);
@@ -941,7 +942,7 @@ describe('purchasables', () => {
                                 request.get('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/purchases')
                                     .set('Authorization', generatedUsers.coordinator.token)
                                     .expect(status.OK)
-                                    .end((err, res) => {
+                                    .end((err, res: SuperTestResponse<ScoutPurchasesResponseDto>) => {
                                         if (err) { return done(err); }
                                         expect(res.body[0].details.quantity).to.equal(1);
                                         return cb();
@@ -954,7 +955,7 @@ describe('purchasables', () => {
                         request.put('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] +
                             '/purchases/' + purchasables[0].id)
                             .set('Authorization', generatedUsers.coordinator2.token)
-                            .send({
+                            .send(<PurchaseRequestDto>{
                                 quantity: 1
                             })
                             .expect(status.UNAUTHORIZED, done);
@@ -964,7 +965,7 @@ describe('purchasables', () => {
                         request.put('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] +
                             '/purchases/' + purchasables[0].id)
                             .set('Authorization', generatedUsers.teacher.token)
-                            .send({
+                            .send(<PurchaseRequestDto>{
                                 quantity: 1
                             })
                             .expect(status.UNAUTHORIZED, done);
@@ -974,7 +975,7 @@ describe('purchasables', () => {
                         request.put('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] +
                             '/purchases/' + purchasables[0].id)
                             .set('Authorization', generatedUsers.admin.token)
-                            .send({
+                            .send(<PurchaseRequestDto>{
                                 quantity: 1
                             })
                             .expect(status.OK, done);
@@ -984,7 +985,7 @@ describe('purchasables', () => {
                         request.put('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] +
                             '/purchases/' + TestUtils.badId)
                             .set('Authorization', generatedUsers.coordinator.token)
-                            .send({
+                            .send(<PurchaseRequestDto>{
                                 quantity: 1
                             })
                             .expect(status.BAD_REQUEST, done);
@@ -994,7 +995,7 @@ describe('purchasables', () => {
                         request.put('/api/scouts/' + generatedScouts[0].id + '/registrations/' + TestUtils.badId +
                             '/purchases/' + purchasables[0].id)
                             .set('Authorization', generatedUsers.coordinator.token)
-                            .send({
+                            .send(<PurchaseRequestDto>{
                                 quantity: 1
                             })
                             .expect(status.BAD_REQUEST, done);
@@ -1004,7 +1005,7 @@ describe('purchasables', () => {
                         request.put('/api/scouts/' + TestUtils.badId + '/registrations/' + registrationIds[0] +
                             '/purchases/' + purchasables[0].id)
                             .set('Authorization', generatedUsers.coordinator.token)
-                            .send({
+                            .send(<PurchaseRequestDto>{
                                 quantity: 1
                             })
                             .expect(status.BAD_REQUEST, done);
@@ -1014,7 +1015,7 @@ describe('purchasables', () => {
                         request.put('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] +
                             '/purchases/' + purchasables[3].id)
                             .set('Authorization', generatedUsers.coordinator.token)
-                            .send({
+                            .send(<PurchaseRequestDto>{
                                 quantity: 1
                             })
                             .expect(status.BAD_REQUEST, done);
@@ -1024,7 +1025,7 @@ describe('purchasables', () => {
                         request.put('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] +
                             '/purchases/' + purchasables[0].id)
                             .set('Authorization', generatedUsers.coordinator.token)
-                            .send({
+                            .send(<PurchaseRequestDto>{
                                 quantity: null
                             })
                             .expect(status.BAD_REQUEST, done);
@@ -1038,7 +1039,7 @@ describe('purchasables', () => {
                                 request.get('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/purchases')
                                     .set('Authorization', generatedUsers.coordinator.token)
                                     .expect(status.OK)
-                                    .end((err, res) => {
+                                    .end((err, res: SuperTestResponse<ScoutPurchasesResponseDto>) => {
                                         if (err) { return done(err); }
                                         expect(res.body).to.have.length(2);
                                         return cb();
@@ -1054,7 +1055,7 @@ describe('purchasables', () => {
                                 request.get('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/purchases')
                                     .set('Authorization', generatedUsers.coordinator.token)
                                     .expect(status.OK)
-                                    .end((err, res) => {
+                                    .end((err, res: SuperTestResponse<ScoutPurchasesResponseDto>) => {
                                         if (err) { return done(err); }
                                         expect(res.body).to.have.length(1);
                                         return cb();

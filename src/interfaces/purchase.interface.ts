@@ -1,3 +1,6 @@
+import { RegistrationPurchaseDto } from '@interfaces/registration.interface';
+import { PurchasableDto } from '@interfaces/purchasable.interface';
+
 export enum Size {
     XS = 'xs',
     S = 's',
@@ -14,13 +17,20 @@ export interface PurchaseInterface {
     registration_id?: number;
 }
 
-export interface PurchaseRequestInterface {
+export interface PurchaseRequestDto {
     purchasable?: number;
     quantity?: number;
     size?: Size;
+}
+
+export interface CreatePurchaseResponseDto {
+    message: string;
+    registration: RegistrationPurchaseDto;
 }
 
 export interface PurchaseResponseInterface {
     purchase?: PurchaseInterface;
     message?: string;
 }
+
+export type ScoutPurchasesResponseDto = PurchasableDto<PurchaseInterface>[];

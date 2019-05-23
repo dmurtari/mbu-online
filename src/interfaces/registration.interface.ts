@@ -1,6 +1,7 @@
 import { OfferingInterface, OfferingDto } from '@interfaces/offering.interface';
-import { Preference } from '@models/preference.model';
 import { PreferenceInterface } from '@interfaces/preference.interface';
+import { PurchasableDto } from '@interfaces/purchasable.interface';
+import { PurchaseInterface } from '@interfaces/purchase.interface';
 
 export interface RegistrationInterface {
     id?: number;
@@ -17,6 +18,10 @@ export interface RegistrationDto extends RegistrationInterface {
 
 export interface RegistrationPreferenceDto extends RegistrationDto {
     preferences: OfferingDto<PreferenceInterface>[];
+}
+
+export interface RegistrationPurchaseDto extends RegistrationDto {
+    purchases?: PurchasableDto<PurchaseInterface>[];
 }
 
 export interface CreateRegistrationResponseDto {

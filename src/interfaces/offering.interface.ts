@@ -11,7 +11,7 @@ export interface OfferingInterface {
 
 export interface OfferingDto<T = any> extends OfferingInterface {
     offering_id?: number;
-    details: T;
+    details?: T;
 }
 
 export interface CreateOfferingDto {
