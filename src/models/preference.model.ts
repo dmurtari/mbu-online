@@ -6,7 +6,7 @@ import { PreferenceInterface } from '@interfaces/preference.interface';
 
 @Table({
     underscored: true,
-    tableName: 'Preference'
+    tableName: 'Preferences'
 })
 export class Preference extends Model<Preference> implements PreferenceInterface {
     @Min(1)

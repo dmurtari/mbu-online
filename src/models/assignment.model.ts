@@ -6,7 +6,7 @@ import { AssignmentInterface } from '@interfaces/assignment.interface';
 
 @Table({
     underscored: true,
-    tableName: 'Assignment'
+    tableName: 'Assignments'
 })
 export class Assignment extends Model<Assignment> implements AssignmentInterface {
     @BeforeValidate

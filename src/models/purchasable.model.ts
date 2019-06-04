@@ -7,7 +7,7 @@ import { PurchasableInterface } from '@interfaces/purchasable.interface';
 
 @Table({
     underscored: true,
-    tableName: 'Purchasable'
+    tableName: 'Purchasables'
 })
 export class Purchasable extends Model<Purchasable> implements PurchasableInterface {
     @Column({

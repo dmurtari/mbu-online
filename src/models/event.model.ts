@@ -9,7 +9,7 @@ import { Semester, EventInterface } from '@interfaces/event.interface';
 
 @Table({
     underscored: true,
-    tableName: 'Event'
+    tableName: 'Events'
 })
 export class Event extends Model<Event> implements EventInterface {
     @Column({

@@ -27,7 +27,7 @@ import { Preference } from '@models/preference.model';
 
 @Table({
     underscored: true,
-    tableName: 'Offering'
+    tableName: 'Offerings'
 })
 export class Offering extends Model<Offering> implements OfferingInterface {
     @BeforeBulkCreate

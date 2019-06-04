@@ -6,7 +6,7 @@ import { Size, PurchaseInterface } from '@interfaces/purchase.interface';
 
 @Table({
     underscored: true,
-    tableName: 'Purchase'
+    tableName: 'Purchases'
 })
 export class Purchase extends Model<Purchase> implements PurchaseInterface {
     @Default(0)

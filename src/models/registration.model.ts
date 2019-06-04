@@ -11,7 +11,7 @@ import { RegistrationInterface } from '@interfaces/registration.interface';
 
 @Table({
     underscored: true,
-    tableName: 'Registration'
+    tableName: 'Registrations'
 })
 export class Registration extends Model<Registration> implements RegistrationInterface {
     @PrimaryKey

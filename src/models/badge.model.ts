@@ -12,7 +12,7 @@ import { BadgeInterface } from '@interfaces/badge.interface';
         fields: [Sequelize.fn('lower', Sequelize.col('name')) as any]
       }
     ],
-    tableName: 'Badge'
+    tableName: 'Badges'
 })
 export class Badge extends Model<Badge> implements BadgeInterface {
 

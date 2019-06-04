@@ -8,7 +8,7 @@ import { ScoutInterface } from '@interfaces/scout.interface';
 
 @Table({
     underscored: true,
-    tableName: 'Scout'
+    tableName: 'Scouts'
 })
 export class Scout extends Model<Scout> implements ScoutInterface {
     @Column({

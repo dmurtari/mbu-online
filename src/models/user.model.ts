@@ -24,7 +24,7 @@ import { UserInterface, UserRole } from '@app/interfaces/user.interface';
             fields: [Sequelize.fn('lower', Sequelize.col('email')) as any]
         }
     ],
-    tableName: 'User'
+    tableName: 'Users'
 })
 export class User extends Model<User> implements UserInterface {
     @BeforeCreate
