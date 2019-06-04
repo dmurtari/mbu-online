@@ -4,14 +4,14 @@ import status from 'http-status-codes';
 import { Op, WhereOptions, Includeable } from 'sequelize';
 
 import { User } from '@models/user.model';
-import { ErrorResponseInterface } from '@interfaces/shared.interface';
+import { ErrorResponseDto } from '@interfaces/shared.interface';
 import { UserExistsResponseDto, UserProfileResponseDto } from '@interfaces/user.interface';
 import { Scout } from '@models/scout.model';
 import registrationInformation from '@models/queries/registrationInformation';
 import { cloneDeep } from 'lodash';
 import { Registration } from '@models/registration.model';
 import { Event } from '@models/event.model';
-import { CostCalculationResponseInterface } from '@interfaces/registration.interface';
+import { CostCalculationResponseDto } from '@interfaces/registration.interface';
 import { CalculationType } from '@routes/shared/calculationType.enum';
 
 export const byEmail = async (req: Request, res: Response) => {
@@ -26,7 +26,7 @@ export const byEmail = async (req: Request, res: Response) => {
 
         res.status(status.OK).json(<UserExistsResponseDto>{ exists: users.length > 0 });
     } catch (err) {
-        res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+        res.status(status.BAD_REQUEST).json(<ErrorResponseDto>{
             message: 'Failed to find users',
             error: err
         });
@@ -51,7 +51,7 @@ export const byId = (includeScouts: boolean = false) => async (req: Request, res
     } else if (!req.query) {
         query = {};
     } else {
-        return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+        return res.status(status.BAD_REQUEST).json(<ErrorResponseDto>{
             message: 'Invalid query'
         });
     }
@@ -78,7 +78,7 @@ export const byId = (includeScouts: boolean = false) => async (req: Request, res
 
         return res.status(status.OK).json(users);
     } catch (err) {
-        return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+        return res.status(status.BAD_REQUEST).json(<ErrorResponseDto>{
             error: err,
             message: 'Error getting user'
         });
@@ -102,7 +102,7 @@ export const getEventRegistrations = async (req: Request, res: Response) => {
         return res.status(status.OK).json(registrations);
 
     } catch (err) {
-        return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+        return res.status(status.BAD_REQUEST).json(<ErrorResponseDto>{
             error: err,
             message: 'Could not get registrations for event'
         });
@@ -127,7 +127,7 @@ export const getScoutRegistrations = async (req: Request, res: Response) => {
 
         res.status(status.OK).json(scouts);
     } catch (err) {
-        return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+        return res.status(status.BAD_REQUEST).json(<ErrorResponseDto>{
             error: err,
             message: 'Could not get registration for scout'
         });
@@ -166,11 +166,11 @@ async function getCost(req: Request, res: Response, type: CalculationType): Prom
 
         const cost: number = prices.reduce((acc, cur) => acc + cur, 0);
 
-        return res.status(status.OK).json(<CostCalculationResponseInterface>{
+        return res.status(status.OK).json(<CostCalculationResponseDto>{
             cost: String(cost.toFixed(2))
         });
     } catch (err) {
-        return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+        return res.status(status.BAD_REQUEST).json(<ErrorResponseDto>{
             error: err,
             message: `Could not calculate ${type} pricing information`
         });

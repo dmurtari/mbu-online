@@ -6,7 +6,7 @@ import { expect } from 'chai';
 import app from '@app/app';
 import TestUtils, { RoleTokenObjects } from './testUtils';
 import testScouts from './testScouts';
-import { ScoutRequestDto, ScoutResponseDto } from '@interfaces/scout.interface';
+import { CreateScoutRequestDto, ScoutResponseDto } from '@interfaces/scout.interface';
 import { UserRole, UsersResponseDto } from '@interfaces/user.interface';
 import { SuperTestResponse } from '@test/helpers/supertest.interface';
 
@@ -14,7 +14,7 @@ const request = supertest(app);
 
 describe('scouts', () => {
     let generatedUsers: RoleTokenObjects;
-    let exampleScout: ScoutRequestDto;
+    let exampleScout: CreateScoutRequestDto;
     const badId = TestUtils.badId;
 
     before(async () => {
@@ -125,7 +125,7 @@ describe('scouts', () => {
 
     describe('when scouts exist', () => {
         const scoutCount = 5;
-        let scouts: ScoutRequestDto[];
+        let scouts: CreateScoutRequestDto[];
 
         beforeEach(async () => {
             TestUtils.removeScoutsForUser(generatedUsers.coordinator);
@@ -186,7 +186,7 @@ describe('scouts', () => {
         });
 
         describe('updating registered scouts', () => {
-            let scoutUpdate: ScoutRequestDto;
+            let scoutUpdate: CreateScoutRequestDto;
 
             beforeEach(() => {
                 scoutUpdate = Object.assign({}, scouts[0]);

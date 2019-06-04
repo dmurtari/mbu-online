@@ -4,7 +4,8 @@ import { expect } from 'chai';
 
 import app from '@app/app';
 import TestUtils from './testUtils';
-import { SignupRequestDto } from '@interfaces/user.interface';
+import { SignupRequestDto, UserTokenResponseDto } from '@interfaces/user.interface';
+import { SuperTestResponse } from '@test/helpers/supertest.interface';
 
 const request = supertest(app);
 
@@ -29,7 +30,7 @@ describe('authentication', () => {
             request.post('/api/signup')
                 .send(postData)
                 .expect(status.CREATED)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<UserTokenResponseDto>) => {
                     if (err) { return done(err); }
                     const user = res.body.profile;
                     expect(user.email).to.equal(postData.email);
@@ -50,7 +51,7 @@ describe('authentication', () => {
             request.post('/api/signup')
                 .send(postData)
                 .expect(status.CREATED)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<UserTokenResponseDto>) => {
                     if (err) { return done(err); }
                     const user = res.body.profile;
                     expect(user.email).to.equal(postData.email);

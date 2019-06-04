@@ -6,7 +6,7 @@ import status from 'http-status-codes';
 import config from '@config/secrets';
 import { User } from '@models/user.model';
 import { UserTokenResponseDto, UserRole } from '@interfaces/user.interface';
-import { ErrorResponseInterface } from '@interfaces/shared.interface';
+import { ErrorResponseDto } from '@interfaces/shared.interface';
 import { Scout } from '@models/scout.model';
 import { Event } from '@models/event.model';
 
@@ -31,7 +31,7 @@ export const signup = async (req: Request, res: Response) => {
             profile: user
         });
     } catch (err) {
-        return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+        return res.status(status.BAD_REQUEST).json(<ErrorResponseDto>{
             message: 'Failed to create user',
             error: err
         });
@@ -64,7 +64,7 @@ export const authenticate = async (req: Request, res: Response) => {
             throw new Error('Password do no match');
         }
     } catch (err) {
-        return res.status(status.UNAUTHORIZED).json(<ErrorResponseInterface>{
+        return res.status(status.UNAUTHORIZED).json(<ErrorResponseDto>{
             message: 'User authentication failed',
             error: err
         });
@@ -96,7 +96,7 @@ export const addScout = async (req: Request, res: Response) => {
             })
         });
     } catch (err) {
-        return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+        return res.status(status.BAD_REQUEST).json(<ErrorResponseDto>{
             message: 'Error creating scout',
             error: err
         });

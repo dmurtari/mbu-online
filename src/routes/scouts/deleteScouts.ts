@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import status from 'http-status-codes';
 
-import { ErrorResponseInterface } from '@interfaces/shared.interface';
+import { ErrorResponseDto } from '@interfaces/shared.interface';
 import { Scout } from '@models/scout.model';
 import { Event } from '@models/event.model';
 import { Registration } from '@models/registration.model';
@@ -25,7 +25,7 @@ export const deleteRegistration = async (req: Request, res: Response) => {
 
         return res.status(status.OK).end();
     } catch (err) {
-        return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+        return res.status(status.BAD_REQUEST).json(<ErrorResponseDto>{
             message: `Could not unregister ${req.params.scoutId} from event ${req.params.eventId}`,
             error: err
         });
@@ -61,7 +61,7 @@ export const deletePreference = async (req: Request, res: Response) => {
 
         return res.status(status.OK).end();
     } catch (err) {
-        return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+        return res.status(status.BAD_REQUEST).json(<ErrorResponseDto>{
             message: `Could not remove preference ${req.params.offeringId} for registration ${req.params.registrationId}`,
             error: err
         });
@@ -97,7 +97,7 @@ export const deleteAssignment = async (req: Request, res: Response) => {
 
         return res.status(status.OK).end();
     } catch (err) {
-        return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+        return res.status(status.BAD_REQUEST).json(<ErrorResponseDto>{
             message: `Could not remove assignment ${req.params.offeringId} for registration ${req.params.registrationId}`,
             error: err
         });
@@ -133,7 +133,7 @@ export const deletePurchase = async (req: Request, res: Response) => {
 
         return res.status(status.OK).end();
     } catch (err) {
-        return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+        return res.status(status.BAD_REQUEST).json(<ErrorResponseDto>{
             message: `Could not remove purchase ${req.params.purchasableId} for registration ${req.params.registrationId}`,
             error: err
         });

@@ -14,7 +14,7 @@ export interface ScoutInterface {
     registrations?: any[];
 }
 
-export type ScoutRequestDto = ScoutInterface;
+export type CreateScoutRequestDto = ScoutInterface;
 
 export interface ScoutRegistrationDto extends ScoutInterface {
     registrations: EventDto<RegistrationDto>[];

@@ -1,12 +1,12 @@
 import { Request, Response } from 'express';
 import status from 'http-status-codes';
 
-import { ErrorResponseInterface } from '@interfaces/shared.interface';
+import { ErrorResponseDto } from '@interfaces/shared.interface';
 import { Registration } from '@models/registration.model';
 import { Preference } from '@models/preference.model';
 import { UpdatePreferenceResponseDto } from '@interfaces/preference.interface';
 import { Assignment } from '@models/assignment.model';
-import { AssignmentResponseInterface } from '@interfaces/assignment.interface';
+import { UpdateAssignmentResponseDto } from '@interfaces/assignment.interface';
 import { Purchase } from '@models/purchase.model';
 import { PurchaseResponseInterface } from '@interfaces/purchase.interface';
 
@@ -43,7 +43,7 @@ export const updatePreference = async (req: Request, res: Response) => {
         });
 
     } catch (err) {
-        return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+        return res.status(status.BAD_REQUEST).json(<ErrorResponseDto>{
             message: 'Error updating preference',
             error: err
         });
@@ -78,12 +78,12 @@ export const updateAssignment = async (req: Request, res: Response) => {
 
         await assignment.update(req.body);
 
-        return res.status(status.OK).json(<AssignmentResponseInterface>{
+        return res.status(status.OK).json(<UpdateAssignmentResponseDto>{
             message: 'Assignment updated successfully',
             assignment: assignment
         });
     } catch (err) {
-        return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+        return res.status(status.BAD_REQUEST).json(<ErrorResponseDto>{
             message: 'Error updating assignment',
             error: err
         });
@@ -122,7 +122,7 @@ export const updatePurchase = async (req: Request, res: Response) => {
             purchase: purchase
         });
     } catch (err) {
-        return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+        return res.status(status.BAD_REQUEST).json(<ErrorResponseDto>{
             message: 'Error updating purchase',
             error: 'err'
         });

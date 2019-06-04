@@ -7,7 +7,7 @@ import { MailData } from '@sendgrid/helpers/classes/mail';
 
 import { User } from '@models/user.model';
 import secrets from '@config/secrets';
-import { MessageResponseInterface, ErrorResponseInterface } from '@interfaces/shared.interface';
+import { MessageResponseDto, ErrorResponseDto } from '@interfaces/shared.interface';
 
 export const forgot = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -51,10 +51,10 @@ export const forgot = async (req: Request, res: Response, next: NextFunction) =>
         };
 
         await mailer.send(message)
-            .then(() => res.status(status.OK).json(<MessageResponseInterface>{
+            .then(() => res.status(status.OK).json(<MessageResponseDto>{
                 message: `An e-email has been sent to ${user.email} with further instructions`
             }))
-            .catch((err) => res.status(status.INTERNAL_SERVER_ERROR).json(<ErrorResponseInterface>{
+            .catch((err) => res.status(status.INTERNAL_SERVER_ERROR).json(<ErrorResponseDto>{
                 error: err,
                 message: 'Failed to send email'
             }));
@@ -105,15 +105,15 @@ export const reset = async (req: Request, res: Response) => {
         };
 
         await mailer.send(message)
-            .then(() => res.status(status.OK).json(<MessageResponseInterface>{
+            .then(() => res.status(status.OK).json(<MessageResponseDto>{
                 message: `Password change confirmation sent to ${user.email}`
             }))
-            .catch((err) => res.status(status.INTERNAL_SERVER_ERROR).json(<ErrorResponseInterface>{
+            .catch((err) => res.status(status.INTERNAL_SERVER_ERROR).json(<ErrorResponseDto>{
                 error: err,
                 message: 'Failed to send confirmation email'
             }));
     } catch (err) {
-        return res.status(status.INTERNAL_SERVER_ERROR).json(<ErrorResponseInterface>{
+        return res.status(status.INTERNAL_SERVER_ERROR).json(<ErrorResponseDto>{
             error: err,
             message: 'Reset password failed'
         });

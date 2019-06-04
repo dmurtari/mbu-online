@@ -48,7 +48,7 @@ export interface CurrentEventResponseDto {
     currentEvent: EventInterface;
 }
 
-export interface IncomeCalculationResponseInterface {
+export interface IncomeCalculationResponseDto {
     income: string;
 }
 

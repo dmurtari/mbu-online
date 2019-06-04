@@ -1,5 +1,3 @@
-/* eslint no-console: "off" */
-
 import 'module-alias/register';
 import '@config/passport';
 

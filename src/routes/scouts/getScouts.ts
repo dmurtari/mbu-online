@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 import status from 'http-status-codes';
 import { cloneDeep } from 'lodash';
 
-import { ErrorResponseInterface } from '@interfaces/shared.interface';
+import { ErrorResponseDto } from '@interfaces/shared.interface';
 import registrationInformation from '@models/queries/registrationInformation';
 import { Registration } from '@models/registration.model';
 import { Offering } from '@models/offering.model';
@@ -11,7 +11,7 @@ import { Purchasable } from '@models/purchasable.model';
 import { Scout } from '@models/scout.model';
 import { Event } from '@models/event.model';
 import { User } from '@models/user.model';
-import { CostCalculationResponseInterface } from '@interfaces/registration.interface';
+import { CostCalculationResponseDto } from '@interfaces/registration.interface';
 import { CalculationType } from '@routes/shared/calculationType.enum';
 
 const scoutQuery: FindOptions = {
@@ -67,7 +67,7 @@ export const getRegistrations = async (req: Request, res: Response) => {
 
         return res.status(status.OK).json(registrations);
     } catch (err) {
-        res.status(status.BAD_REQUEST).send(<ErrorResponseInterface>{
+        res.status(status.BAD_REQUEST).send(<ErrorResponseDto>{
             message: 'Could not get registration',
             error: err
         });
@@ -100,7 +100,7 @@ export const getAll = async (_req: Request, res: Response) => {
 
         return res.status(status.OK).json(scouts);
     } catch (err) {
-        return res.status(status.BAD_REQUEST).send(<ErrorResponseInterface>{
+        return res.status(status.BAD_REQUEST).send(<ErrorResponseDto>{
             message: `Failed to get all scouts`,
             error: err
         });
@@ -113,7 +113,7 @@ export const getScout = async (req: Request, res: Response) => {
 
         return res.status(status.OK).json(scout);
     } catch (err) {
-        return res.status(status.BAD_REQUEST).send(<ErrorResponseInterface>{
+        return res.status(status.BAD_REQUEST).send(<ErrorResponseDto>{
             message: `Failed to get scout`,
             error: err
         });
@@ -157,7 +157,7 @@ async function getRegistrationDetails(req: Request, res: Response, target: 'pref
 
         return res.status(status.OK).send(registration[target]);
     } catch (err) {
-        return res.status(status.BAD_REQUEST).send(<ErrorResponseInterface>{
+        return res.status(status.BAD_REQUEST).send(<ErrorResponseDto>{
             message: `Failed to get ${target}`,
             error: err
         });
@@ -175,11 +175,11 @@ async function getCost(req: Request, res: Response, type: CalculationType): Prom
 
         const cost: number = await (type === CalculationType.Actual ? registration.actualCost() : registration.projectedCost());
 
-        return res.status(status.OK).json(<CostCalculationResponseInterface>{
+        return res.status(status.OK).json(<CostCalculationResponseDto>{
             cost: String(cost.toFixed(2))
         });
     } catch (err) {
-        res.status(status.BAD_REQUEST).send(<ErrorResponseInterface>{
+        res.status(status.BAD_REQUEST).send(<ErrorResponseDto>{
             message: 'Failed to calculate costs',
             error: err
         });

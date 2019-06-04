@@ -13,7 +13,8 @@ import { OfferingInterface } from '@interfaces/offering.interface';
 import { Registration } from '@models/registration.model';
 import { Assignment } from '@models/assignment.model';
 import testScouts from './testScouts';
-import { AssignmentRequestInterface } from '@interfaces/assignment.interface';
+import { CreateAssignmentRequestDto, CreateAssignmentResponseDto, ScoutAssignmentResponseDto, UpdateAssignmentResponseDto } from '@interfaces/assignment.interface';
+import { SuperTestResponse } from '@test/helpers/supertest.interface';
 
 const request = supertest(app);
 
@@ -92,7 +93,7 @@ describe('assignments', () => {
 
     describe('when assignments do not exist', () => {
         it('should be able to assign a scout to an offering', (done) => {
-            const postData: AssignmentRequestInterface = {
+            const postData: CreateAssignmentRequestDto = {
                 periods: [1],
                 offering: generatedOfferings[1].id
             };
@@ -101,7 +102,7 @@ describe('assignments', () => {
                 .set('Authorization', generatedUsers.teacher.token)
                 .send(postData)
                 .expect(status.CREATED)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<CreateAssignmentResponseDto>) => {
                     if (err) { return done(err); }
                     const registration = res.body.registration;
                     expect(registration.assignments).to.have.length(1);
@@ -113,7 +114,7 @@ describe('assignments', () => {
         });
 
         it('should create a blank object of completions', (done) => {
-            const postData: AssignmentRequestInterface = {
+            const postData: CreateAssignmentRequestDto = {
                 periods: [1],
                 offering: generatedOfferings[1].id
             };
@@ -122,7 +123,7 @@ describe('assignments', () => {
                 .set('Authorization', generatedUsers.teacher.token)
                 .send(postData)
                 .expect(status.CREATED)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<CreateAssignmentResponseDto>) => {
                     if (err) { return done(err); }
                     const registration = res.body.registration;
                     expect(registration.assignments).to.have.length(1);
@@ -135,7 +136,7 @@ describe('assignments', () => {
         });
 
         it('should be able to batch assign to offerings', (done) => {
-            const postData: AssignmentRequestInterface[] = [{
+            const postData: CreateAssignmentRequestDto[] = [{
                 periods: [1],
                 offering: generatedOfferings[0].id
             }, {
@@ -150,7 +151,7 @@ describe('assignments', () => {
                 .set('Authorization', generatedUsers.admin.token)
                 .send(postData)
                 .expect(status.CREATED)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<CreateAssignmentResponseDto>) => {
                     if (err) { return done(err); }
                     const registration = res.body.registration;
                     expect(registration.assignments).to.have.lengthOf(3);
@@ -165,7 +166,7 @@ describe('assignments', () => {
         });
 
         it('should allow an empty period', (done) => {
-            const postData: AssignmentRequestInterface[] = [{
+            const postData: CreateAssignmentRequestDto[] = [{
                 periods: [2],
                 offering: generatedOfferings[1].id
             }, {
@@ -177,7 +178,7 @@ describe('assignments', () => {
                 .set('Authorization', generatedUsers.admin.token)
                 .send(postData)
                 .expect(status.CREATED)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<CreateAssignmentResponseDto>) => {
                     if (err) { return done(err); }
                     const registration = res.body.registration;
                     expect(registration.assignments).to.have.lengthOf(2);
@@ -192,7 +193,7 @@ describe('assignments', () => {
         });
 
         it('should not allow coordinators to access', (done) => {
-            const postData: AssignmentRequestInterface = {
+            const postData: CreateAssignmentRequestDto = {
                 periods: [1],
                 offering: generatedOfferings[1].id
             };
@@ -217,7 +218,7 @@ describe('assignments', () => {
         });
 
         it('should not create for nonexistant registrations', (done) => {
-            const postData: AssignmentRequestInterface = {
+            const postData: CreateAssignmentRequestDto = {
                 offering: generatedOfferings[0].id,
                 periods: [1]
             };
@@ -237,7 +238,7 @@ describe('assignments', () => {
                     request.post('/api/scouts/' + generatedScouts[0].id + '/registrations/' +
                         registrationIds[0] + '/assignments')
                         .set('Authorization', generatedUsers.teacher.token)
-                        .send({
+                        .send(<CreateAssignmentRequestDto>{
                             offering: generatedOfferings[0].id,
                             periods: [1]
                         })
@@ -247,7 +248,7 @@ describe('assignments', () => {
                     request.post('/api/scouts/' + generatedScouts[0].id + '/registrations/' +
                         registrationIds[0] + '/assignments')
                         .set('Authorization', generatedUsers.teacher.token)
-                        .send({
+                        .send(<CreateAssignmentRequestDto>{
                             offering: generatedOfferings[1].id,
                             periods: [2, 3]
                         })
@@ -257,7 +258,7 @@ describe('assignments', () => {
                     request.post('/api/scouts/' + generatedScouts[0].id + '/registrations/' +
                         registrationIds[1] + '/assignments')
                         .set('Authorization', generatedUsers.teacher.token)
-                        .send({
+                        .send(<CreateAssignmentRequestDto>{
                             offering: generatedOfferings[0].id,
                             periods: [3]
                         })
@@ -271,7 +272,7 @@ describe('assignments', () => {
                 request.get('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/assignments')
                     .set('Authorization', generatedUsers.teacher.token)
                     .expect(status.OK)
-                    .end((err, res) => {
+                    .end((err, res: SuperTestResponse<ScoutAssignmentResponseDto>) => {
                         if (err) { return done(err); }
                         const assignments = res.body;
                         expect(assignments).to.have.length(2);
@@ -305,7 +306,7 @@ describe('assignments', () => {
                         request.get('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/assignments')
                             .set('Authorization', generatedUsers.teacher.token)
                             .expect(status.OK)
-                            .end((err, res) => {
+                            .end((err, res: SuperTestResponse<ScoutAssignmentResponseDto>) => {
                                 if (err) { return done(err); }
                                 expect(res.body[0].offering_id).to.exist;
                                 expect(res.body[0].details.periods).to.deep.equal([1]);
@@ -320,7 +321,7 @@ describe('assignments', () => {
                                 periods: [2]
                             })
                             .expect(status.OK)
-                            .end((err, res) => {
+                            .end((err, res: SuperTestResponse<UpdateAssignmentResponseDto>) => {
                                 if (err) { return done(err); }
                                 expect(res.body.assignment.periods).to.deep.equal([2]);
                                 return cb();
@@ -330,7 +331,7 @@ describe('assignments', () => {
                         request.get('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/assignments')
                             .set('Authorization', generatedUsers.teacher.token)
                             .expect(status.OK)
-                            .end((err, res) => {
+                            .end((err, res: SuperTestResponse<ScoutAssignmentResponseDto>) => {
                                 expect(res.body[0].offering_id).to.exist;
                                 expect(res.body[0].details.periods).to.deep.equal([2]);
                                 return cb();
@@ -340,7 +341,7 @@ describe('assignments', () => {
             });
 
             it('should overwrite assignments with a batch', (done) => {
-                const postData: AssignmentRequestInterface[] = [{
+                const postData: CreateAssignmentRequestDto[] = [{
                     periods: [1],
                     offering: generatedOfferings[0].id
                 }, {
@@ -355,7 +356,7 @@ describe('assignments', () => {
                     .set('Authorization', generatedUsers.admin.token)
                     .send(postData)
                     .expect(status.CREATED)
-                    .end((err, res) => {
+                    .end((err, res: SuperTestResponse<CreateAssignmentResponseDto>) => {
                         if (err) { return done(err); }
                         const registration = res.body.registration;
                         expect(registration.assignments).to.have.lengthOf(3);
@@ -370,7 +371,7 @@ describe('assignments', () => {
             });
 
             it('should allow overwriting with empty values for a period', (done) => {
-                const postData: AssignmentRequestInterface[] = [{
+                const postData: CreateAssignmentRequestDto[] = [{
                     periods: [2],
                     offering: generatedOfferings[1].id
                 }, {
@@ -382,7 +383,7 @@ describe('assignments', () => {
                     .set('Authorization', generatedUsers.admin.token)
                     .send(postData)
                     .expect(status.CREATED)
-                    .end((err, res) => {
+                    .end((err, res: SuperTestResponse<CreateAssignmentResponseDto>) => {
                         if (err) { return done(err); }
                         const registration = res.body.registration;
                         expect(registration.assignments).to.have.lengthOf(2);
@@ -422,7 +423,7 @@ describe('assignments', () => {
                         request.get('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/assignments')
                             .set('Authorization', generatedUsers.teacher.token)
                             .expect(status.OK)
-                            .end((err, res) => {
+                            .end((err, res: SuperTestResponse<ScoutAssignmentResponseDto>) => {
                                 if (err) { return done(err); }
                                 expect(res.body).to.have.length(2);
                                 return cb();
@@ -438,7 +439,7 @@ describe('assignments', () => {
                         request.get('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/assignments')
                             .set('Authorization', generatedUsers.teacher.token)
                             .expect(status.OK)
-                            .end((err, res) => {
+                            .end((err, res: SuperTestResponse<ScoutAssignmentResponseDto>) => {
                                 expect(res.body).to.have.length(1);
                                 return cb();
                             });

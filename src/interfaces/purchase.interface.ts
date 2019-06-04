@@ -17,7 +17,7 @@ export interface PurchaseInterface {
     registration_id?: number;
 }
 
-export interface PurchaseRequestDto {
+export interface CreatePurchaseRequestDto {
     purchasable?: number;
     quantity?: number;
     size?: Size;

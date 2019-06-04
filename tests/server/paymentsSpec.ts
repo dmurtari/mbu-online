@@ -1,4 +1,4 @@
-import supertest from 'supertest';
+import supertest, { SuperTest } from 'supertest';
 import * as async from 'async';
 import status from 'http-status-codes';
 import { expect } from 'chai';
@@ -11,6 +11,14 @@ import { Badge } from '@models/badge.model';
 import testScouts from './testScouts';
 import { ScoutInterface } from '@interfaces/scout.interface';
 import { UserRole } from '@interfaces/user.interface';
+import { CreateOfferingDto } from '@interfaces/offering.interface';
+import { SuperTestResponse } from '@test/helpers/supertest.interface';
+import { CreateOfferingResponseDto, IncomeCalculationResponseDto } from '@interfaces/event.interface';
+import { CreatePurchasableDto, CreatePurchasablesResponseDto } from '@interfaces/purchasable.interface';
+import { RegistrationRequestDto, CreateRegistrationResponseDto, CostCalculationResponseDto } from '@interfaces/registration.interface';
+import { CreatePreferenceRequestDto } from '@interfaces/preference.interface';
+import { CreatePurchaseRequestDto } from '@interfaces/purchase.interface';
+import { CreateAssignmentRequestDto } from '@interfaces/assignment.interface';
 
 const request = supertest(app);
 
@@ -53,7 +61,7 @@ describe('payments', () => {
             (cb) => {
                 request.post('/api/events/' + generatedEvents[0].id + '/badges')
                     .set('Authorization', generatedUsers.admin.token)
-                    .send({
+                    .send(<CreateOfferingDto>{
                         badge_id: generatedBadges[0].id,
                         offering: {
                             duration: 1,
@@ -62,7 +70,7 @@ describe('payments', () => {
                         }
                     })
                     .expect(status.CREATED)
-                    .end((err, res) => {
+                    .end((err, res: SuperTestResponse<CreateOfferingResponseDto>) => {
                         if (err) { return cb(err); }
                         offeringIds.push(res.body.event.offerings[0].details.id);
                         return cb();
@@ -71,7 +79,7 @@ describe('payments', () => {
             (cb) => {
                 request.post('/api/events/' + generatedEvents[0].id + '/badges')
                     .set('Authorization', generatedUsers.admin.token)
-                    .send({
+                    .send(<CreateOfferingDto>{
                         badge_id: generatedBadges[1].id,
                         offering: {
                             duration: 2,
@@ -79,7 +87,7 @@ describe('payments', () => {
                         }
                     })
                     .expect(status.CREATED)
-                    .end((err, res) => {
+                    .end((err, res: SuperTestResponse<CreateOfferingResponseDto>) => {
                         if (err) { return cb(err); }
                         offeringIds.push(res.body.event.offerings[1].details.id);
                         return cb();
@@ -88,7 +96,7 @@ describe('payments', () => {
             (cb) => {
                 request.post('/api/events/' + generatedEvents[1].id + '/badges')
                     .set('Authorization', generatedUsers.admin.token)
-                    .send({
+                    .send(<CreateOfferingDto>{
                         badge_id: generatedBadges[1].id,
                         offering: {
                             duration: 2,
@@ -97,7 +105,7 @@ describe('payments', () => {
                         }
                     })
                     .expect(status.CREATED)
-                    .end((err, res) => {
+                    .end((err, res: SuperTestResponse<CreateOfferingResponseDto>) => {
                         if (err) { return cb(err); }
                         offeringIds.push(res.body.event.offerings[0].details.id);
                         return cb();
@@ -107,12 +115,12 @@ describe('payments', () => {
             (cb) => {
                 request.post('/api/events/' + generatedEvents[0].id + '/purchasables')
                     .set('Authorization', generatedUsers.admin.token)
-                    .send({
+                    .send(<CreatePurchasableDto>{
                         item: 'T-Shirt',
                         price: tShirtCost
                     })
                     .expect(status.CREATED)
-                    .end((err, res) => {
+                    .end((err, res: SuperTestResponse<CreatePurchasablesResponseDto>) => {
                         if (err) { return cb(err); }
                         purchasableIds.push(res.body.purchasables[0].id);
                         return cb();
@@ -121,12 +129,12 @@ describe('payments', () => {
             (cb) => {
                 request.post('/api/events/' + generatedEvents[0].id + '/purchasables')
                     .set('Authorization', generatedUsers.admin.token)
-                    .send({
+                    .send(<CreatePurchasableDto>{
                         item: 'Lunch',
                         price: lunchCost
                     })
                     .expect(status.CREATED)
-                    .end((err, res) => {
+                    .end((err, res: SuperTestResponse<CreatePurchasablesResponseDto>) => {
                         if (err) { return cb(err); }
                         purchasableIds.push(res.body.purchasables[1].id);
                         return cb();
@@ -136,11 +144,11 @@ describe('payments', () => {
             (cb) => {
                 request.post('/api/scouts/' + generatedTroop1[0].id + '/registrations')
                     .set('Authorization', generatedUsers.coordinator.token)
-                    .send({
+                    .send(<RegistrationRequestDto>{
                         event_id: generatedEvents[0].id
                     })
                     .expect(status.CREATED)
-                    .end((err, res) => {
+                    .end((err, res: SuperTestResponse<CreateRegistrationResponseDto>) => {
                         if (err) { return cb(err); }
                         registrationIds.push(res.body.registration.id);
                         return cb();
@@ -150,7 +158,7 @@ describe('payments', () => {
             (cb) => {
                 request.post('/api/scouts/' + generatedTroop1[0].id + '/registrations/' + registrationIds[0] + '/preferences')
                     .set('Authorization', generatedUsers.coordinator.token)
-                    .send({
+                    .send(<CreatePreferenceRequestDto>{
                         offering: offeringIds[1],
                         rank: 1
                     })
@@ -159,7 +167,7 @@ describe('payments', () => {
             (cb) => {
                 request.post('/api/scouts/' + generatedTroop1[0].id + '/registrations/' + registrationIds[0] + '/preferences')
                     .set('Authorization', generatedUsers.coordinator.token)
-                    .send({
+                    .send(<CreatePreferenceRequestDto>{
                         offering: offeringIds[0],
                         rank: 2
                     })
@@ -168,7 +176,7 @@ describe('payments', () => {
             (cb) => {
                 request.post('/api/scouts/' + generatedTroop1[0].id + '/registrations/' + registrationIds[0] + '/purchases')
                     .set('Authorization', generatedUsers.coordinator.token)
-                    .send({
+                    .send(<CreatePurchaseRequestDto>{
                         // T-Shirt
                         purchasable: purchasableIds[0],
                         quantity: 3
@@ -178,7 +186,7 @@ describe('payments', () => {
             (cb) => {
                 request.post('/api/scouts/' + generatedTroop1[0].id + '/registrations/' + registrationIds[0] + '/purchases')
                     .set('Authorization', generatedUsers.coordinator.token)
-                    .send({
+                    .send(<CreatePurchaseRequestDto>{
                         // Lunch
                         purchasable: purchasableIds[1],
                         quantity: 1
@@ -189,11 +197,11 @@ describe('payments', () => {
             (cb) => {
                 request.post('/api/scouts/' + generatedTroop1[1].id + '/registrations')
                     .set('Authorization', generatedUsers.coordinator.token)
-                    .send({
+                    .send(<RegistrationRequestDto>{
                         event_id: generatedEvents[0].id
                     })
                     .expect(status.CREATED)
-                    .end((err, res) => {
+                    .end((err, res: SuperTestResponse<CreateRegistrationResponseDto>) => {
                         if (err) { return cb(err); }
                         registrationIds.push(res.body.registration.id);
                         return cb();
@@ -203,7 +211,7 @@ describe('payments', () => {
             (cb) => {
                 request.post('/api/scouts/' + generatedTroop1[1].id + '/registrations/' + registrationIds[1] + '/preferences')
                     .set('Authorization', generatedUsers.coordinator.token)
-                    .send({
+                    .send(<CreatePreferenceRequestDto>{
                         offering: offeringIds[1],
                         rank: 1
                     })
@@ -212,7 +220,7 @@ describe('payments', () => {
             (cb) => {
                 request.post('/api/scouts/' + generatedTroop1[1].id + '/registrations/' + registrationIds[1] + '/preferences')
                     .set('Authorization', generatedUsers.coordinator.token)
-                    .send({
+                    .send(<CreatePreferenceRequestDto>{
                         offering: offeringIds[0],
                         rank: 2
                     })
@@ -221,7 +229,7 @@ describe('payments', () => {
             (cb) => {
                 request.post('/api/scouts/' + generatedTroop1[1].id + '/registrations/' + registrationIds[1] + '/purchases')
                     .set('Authorization', generatedUsers.coordinator.token)
-                    .send({
+                    .send(<CreatePurchaseRequestDto>{
                         // T-Shirt
                         purchasable: purchasableIds[0],
                         quantity: 1
@@ -231,7 +239,7 @@ describe('payments', () => {
             (cb) => {
                 request.post('/api/scouts/' + generatedTroop1[1].id + '/registrations/' + registrationIds[1] + '/purchases')
                     .set('Authorization', generatedUsers.coordinator.token)
-                    .send({
+                    .send(<CreatePurchaseRequestDto>{
                         // Lunch
                         purchasable: purchasableIds[1],
                         quantity: 3
@@ -242,11 +250,11 @@ describe('payments', () => {
             (cb) => {
                 request.post('/api/scouts/' + generatedTroop1[1].id + '/registrations')
                     .set('Authorization', generatedUsers.coordinator.token)
-                    .send({
+                    .send(<RegistrationRequestDto>{
                         event_id: generatedEvents[1].id
                     })
                     .expect(status.CREATED)
-                    .end((err, res) => {
+                    .end((err, res: SuperTestResponse<CreateRegistrationResponseDto>) => {
                         if (err) { return cb(err); }
                         registrationIds.push(res.body.registration.id);
                         return cb();
@@ -255,7 +263,7 @@ describe('payments', () => {
             (cb) => {
                 request.post('/api/scouts/' + generatedTroop1[1].id + '/registrations/' + registrationIds[2] + '/preferences')
                     .set('Authorization', generatedUsers.coordinator.token)
-                    .send({
+                    .send(<CreatePreferenceRequestDto>{
                         offering: offeringIds[2],
                         rank: 1
                     })
@@ -265,11 +273,11 @@ describe('payments', () => {
             (cb) => {
                 request.post('/api/scouts/' + generatedTroop2[1].id + '/registrations')
                     .set('Authorization', generatedUsers.coordinator2.token)
-                    .send({
+                    .send(<RegistrationRequestDto>{
                         event_id: generatedEvents[0].id
                     })
                     .expect(status.CREATED)
-                    .end((err, res) => {
+                    .end((err, res: SuperTestResponse<CreateRegistrationResponseDto>) => {
                         if (err) { return cb(err); }
                         registrationIds.push(res.body.registration.id);
                         return cb();
@@ -278,7 +286,7 @@ describe('payments', () => {
             (cb) => {
                 request.post('/api/scouts/' + generatedTroop2[1].id + '/registrations/' + registrationIds[3] + '/preferences')
                     .set('Authorization', generatedUsers.coordinator2.token)
-                    .send({
+                    .send(<CreatePreferenceRequestDto>{
                         offering: offeringIds[2],
                         rank: 1
                     })
@@ -292,7 +300,7 @@ describe('payments', () => {
             request.get('/api/scouts/' + generatedTroop1[0].id + '/registrations/' + registrationIds[0] + '/projectedCost')
                 .set('Authorization', generatedUsers.coordinator.token)
                 .expect(status.OK)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<CostCalculationResponseDto>) => {
                     if (err) { return done(err); }
                     expect(res.body.cost).to.equal('59.75');
                     return done();
@@ -303,7 +311,7 @@ describe('payments', () => {
             request.get('/api/scouts/' + generatedTroop1[1].id + '/registrations/' + registrationIds[1] + '/projectedCost')
                 .set('Authorization', generatedUsers.coordinator.token)
                 .expect(status.OK)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<CostCalculationResponseDto>) => {
                     if (err) { return done(err); }
                     expect(res.body.cost).to.equal('65.25');
                     return done();
@@ -314,7 +322,7 @@ describe('payments', () => {
             request.get('/api/scouts/' + generatedTroop1[1].id + '/registrations/' + registrationIds[2] + '/projectedCost')
                 .set('Authorization', generatedUsers.coordinator.token)
                 .expect(status.OK)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<CostCalculationResponseDto>) => {
                     if (err) { return done(err); }
                     expect(res.body.cost).to.equal('20.00');
                     return done();
@@ -325,7 +333,7 @@ describe('payments', () => {
             request.get('/api/users/' + generatedUsers.coordinator.profile.id + '/events/' + generatedEvents[0].id + '/projectedCost')
                 .set('Authorization', generatedUsers.coordinator.token)
                 .expect(status.OK)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<CostCalculationResponseDto>) => {
                     if (err) { return done(err); }
                     expect(res.body.cost).to.equal('125.00');
                     return done();
@@ -336,7 +344,7 @@ describe('payments', () => {
             request.get('/api/users/' + generatedUsers.coordinator.profile.id + '/events/' + generatedEvents[1].id + '/projectedCost')
                 .set('Authorization', generatedUsers.coordinator.token)
                 .expect(status.OK)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<CostCalculationResponseDto>) => {
                     if (err) { return done(err); }
                     expect(res.body.cost).to.equal('20.00');
                     return done();
@@ -347,7 +355,7 @@ describe('payments', () => {
             request.get('/api/users/' + generatedUsers.coordinator2.profile.id + '/events/' + generatedEvents[0].id + '/projectedCost')
                 .set('Authorization', generatedUsers.coordinator2.token)
                 .expect(status.OK)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<CostCalculationResponseDto>) => {
                     if (err) { return done(err); }
                     expect(res.body.cost).to.equal('20.00');
                     return done();
@@ -358,7 +366,7 @@ describe('payments', () => {
             request.get('/api/events/' + generatedEvents[0].id + '/potentialIncome')
                 .set('Authorization', generatedUsers.admin.token)
                 .expect(status.OK)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<IncomeCalculationResponseDto>) => {
                     if (err) { return done(err); }
                     expect(res.body.income).to.equal('145.00');
                     return done();
@@ -369,7 +377,7 @@ describe('payments', () => {
             request.get('/api/events/' + generatedEvents[1].id + '/potentialIncome')
                 .set('Authorization', generatedUsers.admin.token)
                 .expect(status.OK)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<IncomeCalculationResponseDto>) => {
                     if (err) { return done(err); }
                     expect(res.body.income).to.equal('20.00');
                     return done();
@@ -413,7 +421,7 @@ describe('payments', () => {
                 (cb) => {
                     request.post('/api/scouts/' + generatedTroop1[0].id + '/registrations/' + registrationIds[0] + '/assignments')
                         .set('Authorization', generatedUsers.teacher.token)
-                        .send({
+                        .send(<CreateAssignmentRequestDto>{
                             periods: [2, 3],
                             offering: offeringIds[1]
                         })
@@ -422,7 +430,7 @@ describe('payments', () => {
                 (cb) => {
                     request.post('/api/scouts/' + generatedTroop1[1].id + '/registrations/' + registrationIds[1] + '/assignments')
                         .set('Authorization', generatedUsers.teacher.token)
-                        .send({
+                        .send(<CreateAssignmentRequestDto>{
                             periods: [1],
                             offering: offeringIds[0]
                         })
@@ -431,7 +439,7 @@ describe('payments', () => {
                 (cb) => {
                     request.post('/api/scouts/' + generatedTroop1[1].id + '/registrations/' + registrationIds[2] + '/assignments')
                         .set('Authorization', generatedUsers.teacher.token)
-                        .send({
+                        .send(<CreateAssignmentRequestDto>{
                             periods: [1],
                             offering: offeringIds[0]
                         })
@@ -440,7 +448,7 @@ describe('payments', () => {
                 (cb) => {
                     request.post('/api/scouts/' + generatedTroop2[1].id + '/registrations/' + registrationIds[3] + '/assignments')
                         .set('Authorization', generatedUsers.teacher.token)
-                        .send({
+                        .send(<CreateAssignmentRequestDto>{
                             offering: offeringIds[2],
                             periods: [1]
                         })
@@ -453,7 +461,7 @@ describe('payments', () => {
             request.get('/api/scouts/' + generatedTroop1[0].id + '/registrations/' + registrationIds[0] + '/cost')
                 .set('Authorization', generatedUsers.coordinator.token)
                 .expect(status.OK)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<CostCalculationResponseDto>) => {
                     if (err) { return done(err); }
                     expect(res.body.cost).to.equal('49.75');
                     return done();
@@ -464,7 +472,7 @@ describe('payments', () => {
             request.get('/api/scouts/' + generatedTroop1[1].id + '/registrations/' + registrationIds[1] + '/cost')
                 .set('Authorization', generatedUsers.coordinator.token)
                 .expect(status.OK)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<CostCalculationResponseDto>) => {
                     if (err) { return done(err); }
                     expect(res.body.cost).to.equal('65.25');
                     return done();
@@ -475,7 +483,7 @@ describe('payments', () => {
             request.get('/api/scouts/' + generatedTroop1[1].id + '/registrations/' + registrationIds[2] + '/cost')
                 .set('Authorization', generatedUsers.coordinator.token)
                 .expect(status.OK)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<CostCalculationResponseDto>) => {
                     if (err) { return done(err); }
                     expect(res.body.cost).to.equal('20.00');
                     return done();
@@ -486,7 +494,7 @@ describe('payments', () => {
             request.get('/api/users/' + generatedUsers.coordinator.profile.id + '/events/' + generatedEvents[0].id + '/cost')
                 .set('Authorization', generatedUsers.coordinator.token)
                 .expect(status.OK)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<CostCalculationResponseDto>) => {
                     if (err) { return done(err); }
                     expect(res.body.cost).to.equal('115.00');
                     return done();
@@ -497,7 +505,7 @@ describe('payments', () => {
             request.get('/api/users/' + generatedUsers.coordinator.profile.id + '/events/' + generatedEvents[1].id + '/cost')
                 .set('Authorization', generatedUsers.coordinator.token)
                 .expect(status.OK)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<CostCalculationResponseDto>) => {
                     if (err) { return done(err); }
                     expect(res.body.cost).to.equal('20.00');
                     return done();
@@ -508,7 +516,7 @@ describe('payments', () => {
             request.get('/api/users/' + generatedUsers.coordinator2.profile.id + '/events/' + generatedEvents[0].id + '/cost')
                 .set('Authorization', generatedUsers.coordinator2.token)
                 .expect(status.OK)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<CostCalculationResponseDto>) => {
                     if (err) { return done(err); }
                     expect(res.body.cost).to.equal('20.00');
                     return done();
@@ -519,7 +527,7 @@ describe('payments', () => {
             request.get('/api/events/' + generatedEvents[0].id + '/income')
                 .set('Authorization', generatedUsers.admin.token)
                 .expect(status.OK)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<IncomeCalculationResponseDto>) => {
                     if (err) { return done(err); }
                     expect(res.body.income).to.equal('135.00');
                     return done();
@@ -530,7 +538,7 @@ describe('payments', () => {
             request.get('/api/events/' + generatedEvents[1].id + '/income')
                 .set('Authorization', generatedUsers.admin.token)
                 .expect(status.OK)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<IncomeCalculationResponseDto>) => {
                     if (err) { return done(err); }
                     expect(res.body.income).to.equal('20.00');
                     return done();

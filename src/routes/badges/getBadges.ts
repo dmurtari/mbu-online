@@ -3,7 +3,7 @@ import status from 'http-status-codes';
 import { WhereOptions } from 'sequelize';
 
 import { Badge } from '@models/badge.model';
-import { ErrorResponseInterface } from '@app/interfaces/shared.interface';
+import { ErrorResponseDto } from '@app/interfaces/shared.interface';
 
 export const getBadges = async (req: Request, res: Response) => {
     try {
@@ -20,7 +20,7 @@ export const getBadges = async (req: Request, res: Response) => {
 
         return res.status(status.OK).json(badges);
     } catch (err) {
-        return res.status(status.BAD_REQUEST).send(<ErrorResponseInterface>{
+        return res.status(status.BAD_REQUEST).send(<ErrorResponseDto>{
             message: 'Failed to get badges',
             error: err
         });

@@ -1,8 +1,8 @@
-export interface ErrorResponseInterface {
+export interface ErrorResponseDto {
     message: string;
     error: any;
 }
 
-export interface MessageResponseInterface {
+export interface MessageResponseDto {
     message: string;
 }

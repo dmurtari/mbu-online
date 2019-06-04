@@ -3,7 +3,7 @@ import status from 'http-status-codes';
 
 import { Event } from '@models/event.model';
 import { EventResponseDto } from '@app/interfaces/event.interface';
-import { ErrorResponseInterface } from '@app/interfaces/shared.interface';
+import { ErrorResponseDto } from '@app/interfaces/shared.interface';
 import { Badge } from '@models/badge.model';
 import { Offering } from '@models/offering.model';
 import { OfferingResponseDto } from '@interfaces/offering.interface';
@@ -33,7 +33,7 @@ export const updateEvent = async (req: Request, res: Response) => {
             event: event
         });
     } catch (err) {
-        return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+        return res.status(status.BAD_REQUEST).json(<ErrorResponseDto>{
             message: 'Error updating event' ,
             error: err
         });
@@ -60,7 +60,7 @@ export const updateOffering = async (req: Request, res: Response) => {
             offering: offering
         });
     } catch (err) {
-        return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+        return res.status(status.BAD_REQUEST).json(<ErrorResponseDto>{
             message: 'Error updating offering' ,
             error: err
         });
@@ -87,7 +87,7 @@ export const updatePurchasable = async (req: Request, res: Response) => {
             purchasable: purchasable
         });
     } catch (err) {
-        return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+        return res.status(status.BAD_REQUEST).json(<ErrorResponseDto>{
             message: 'Error updating purchasable',
             error: err
         });

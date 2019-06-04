@@ -3,7 +3,7 @@ import status from 'http-status-codes';
 
 import { Event } from '@models/event.model';
 import { EventResponseDto, CurrentEventResponseDto, EventOfferingInterface, CreateOfferingResponseDto } from '@interfaces/event.interface';
-import { ErrorResponseInterface } from '@app/interfaces/shared.interface';
+import { ErrorResponseDto } from '@app/interfaces/shared.interface';
 import { CurrentEvent } from '@models/currentEvent.model';
 import { Offering } from '@models/offering.model';
 import { Badge } from '@models/badge.model';
@@ -18,7 +18,7 @@ export const createEvent = async (req: Request, res: Response) => {
             event: event
         });
     } catch (err) {
-        return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+        return res.status(status.BAD_REQUEST).json(<ErrorResponseDto>{
             message: 'Event creation failed',
             error: err
         });
@@ -50,7 +50,7 @@ export const setCurrentEvent = async (req: Request, res: Response) => {
             currentEvent: await Event.findByPk(currentEvent.event_id)
         });
     } catch (err) {
-        res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+        res.status(status.BAD_REQUEST).json(<ErrorResponseDto>{
             message: 'Setting current event failed',
             error: err
         });
@@ -93,7 +93,7 @@ export const createOffering = async (req: Request, res: Response) => {
             event: eventWithOffering
         });
     } catch (err) {
-        return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+        return res.status(status.BAD_REQUEST).json(<ErrorResponseDto>{
             message: 'Failed to create offering',
             error: err
         });
@@ -119,7 +119,7 @@ export const createPurchasable = async (req: Request, res: Response) => {
             purchasables: event.purchasables
         });
     } catch (err) {
-        return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+        return res.status(status.BAD_REQUEST).json(<ErrorResponseDto>{
             message: 'Failed to create purchasable',
             error: err
         });

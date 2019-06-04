@@ -14,6 +14,9 @@ import { Registration } from '@models/registration.model';
 import { UserRole } from '@interfaces/user.interface';
 import { OfferingInterface } from '@interfaces/offering.interface';
 import testScouts from './testScouts';
+import { RegistrationRequestDto, CreateRegistrationResponseDto } from '@interfaces/registration.interface';
+import { SuperTestResponse } from '@test/helpers/supertest.interface';
+import { ScoutRegistrationResponseDto } from '@interfaces/scout.interface';
 
 const request = supertest(app);
 
@@ -70,11 +73,11 @@ describe('Assignments and registrations', () => {
             async.forEachOfSeries(generatedTroop1, (scout, index, cb) => {
                 request.post('/api/scouts/' + scout.id + '/registrations')
                     .set('Authorization', generatedUsers.coordinator.token)
-                    .send({
+                    .send(<RegistrationRequestDto>{
                         event_id: events[0].id
                     })
                     .expect(status.CREATED)
-                    .end((err, res) => {
+                    .end((err, res: SuperTestResponse<CreateRegistrationResponseDto>) => {
                         if (err) { return done(err); }
                         troop1Registrations.push(res.body.registration.id);
                         return cb();
@@ -88,7 +91,7 @@ describe('Assignments and registrations', () => {
             request.get('/api/events/' + events[0].id + '/registrations')
                 .set('Authorization', generatedUsers.admin.token)
                 .expect(status.OK)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<ScoutRegistrationResponseDto>) => {
                     if (err) { return done(err); }
                     expect(res.body).to.have.lengthOf(5);
                     return done();
@@ -100,11 +103,11 @@ describe('Assignments and registrations', () => {
                 async.forEachOfSeries(generatedTroop2, (scout, index, cb) => {
                     request.post('/api/scouts/' + scout.id + '/registrations')
                         .set('Authorization', generatedUsers.coordinator1.token)
-                        .send({
+                        .send(<RegistrationRequestDto>{
                             event_id: events[0].id
                         })
                         .expect(status.CREATED)
-                        .end((err, res) => {
+                        .end((err, res: SuperTestResponse<CreateRegistrationResponseDto>) => {
                             if (err) { return done(err); }
                             troop2Registrations.push(res.body.registration.id);
                             return cb();
@@ -118,7 +121,7 @@ describe('Assignments and registrations', () => {
                 request.get('/api/events/' + events[0].id + '/registrations')
                     .set('Authorization', generatedUsers.admin.token)
                     .expect(status.OK)
-                    .end((err, res) => {
+                    .end((err, res: SuperTestResponse<ScoutRegistrationResponseDto>) => {
                         if (err) { return done(err); }
                         expect(res.body).to.have.lengthOf(10);
                         return done();
@@ -136,7 +139,7 @@ describe('Assignments and registrations', () => {
                     request.get('/api/events/' + events[0].id + '/registrations')
                         .set('Authorization', generatedUsers.admin.token)
                         .expect(status.OK)
-                        .end((err, res) => {
+                        .end((err, res: SuperTestResponse<ScoutRegistrationResponseDto>) => {
                             if (err) { return done(err); }
                             expect(res.body).to.have.lengthOf(10);
                             return done();
@@ -151,7 +154,7 @@ describe('Assignments and registrations', () => {
                     request.post('/api/scouts/' + scout.id + '/registrations/' +
                         troop1Registrations[index] + '/assignments')
                         .set('Authorization', generatedUsers.teacher.token)
-                        .send({
+                        .send(<RegistrationRequestDto>{
                             offering: generatedOfferings[0].id,
                             periods: [1]
                         })
@@ -165,7 +168,7 @@ describe('Assignments and registrations', () => {
                 request.get('/api/events/' + events[0].id + '/registrations')
                     .set('Authorization', generatedUsers.admin.token)
                     .expect(status.OK)
-                    .end((err, res) => {
+                    .end((err, res: SuperTestResponse<ScoutRegistrationResponseDto>) => {
                         if (err) { return done(err); }
                         expect(res.body).to.have.lengthOf(5);
                         return done();
@@ -177,11 +180,11 @@ describe('Assignments and registrations', () => {
                     async.forEachOfSeries(generatedTroop2, (scout, index, cb) => {
                         request.post('/api/scouts/' + scout.id + '/registrations')
                             .set('Authorization', generatedUsers.coordinator1.token)
-                            .send({
+                            .send(<RegistrationRequestDto>{
                                 event_id: events[0].id
                             })
                             .expect(status.CREATED)
-                            .end((err, res) => {
+                            .end((err, res: SuperTestResponse<CreateRegistrationResponseDto>) => {
                                 if (err) { return done(err); }
                                 troop2Registrations.push(res.body.registration.id);
                                 return cb();
@@ -195,7 +198,7 @@ describe('Assignments and registrations', () => {
                     request.get('/api/events/' + events[0].id + '/registrations')
                         .set('Authorization', generatedUsers.admin.token)
                         .expect(status.OK)
-                        .end((err, res) => {
+                        .end((err, res: SuperTestResponse<ScoutRegistrationResponseDto>) => {
                             if (err) { return done(err); }
                             expect(res.body).to.have.lengthOf(10);
                             return done();

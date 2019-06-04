@@ -7,7 +7,7 @@ export interface PreferenceInterface {
     registration_id?: number;
 }
 
-export interface PreferenceRequestDto {
+export interface CreatePreferenceRequestDto {
     rank: number;
     offering: number;
 }

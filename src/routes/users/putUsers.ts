@@ -6,7 +6,7 @@ import { User } from '@models/user.model';
 import config from '@config/secrets';
 
 import { EditUserResponseDto } from '@app/interfaces/user.interface';
-import { ErrorResponseInterface } from '@app/interfaces/shared.interface';
+import { ErrorResponseDto } from '@app/interfaces/shared.interface';
 import { Scout } from '@models/scout.model';
 import { ScoutResponseDto } from '@interfaces/scout.interface';
 
@@ -34,7 +34,7 @@ export const updateProfile = async (req: Request, res: Response) => {
 
         return res.status(status.OK).json(response);
     } catch (err) {
-        return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+        return res.status(status.BAD_REQUEST).json(<ErrorResponseDto>{
             message: 'Error updating user',
             error: err
         });
@@ -51,7 +51,7 @@ export const updateScout = async (req: Request, res: Response) => {
             scout: scout
         });
     } catch (err) {
-        return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+        return res.status(status.BAD_REQUEST).json(<ErrorResponseDto>{
             message: 'Error updating scout',
             error: err
         });

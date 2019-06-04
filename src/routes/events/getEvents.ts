@@ -5,10 +5,10 @@ import { cloneDeep } from 'lodash';
 
 import { CurrentEvent } from '@models/currentEvent.model';
 import { Event } from '@models/event.model';
-import { ErrorResponseInterface } from '@app/interfaces/shared.interface';
+import { ErrorResponseDto } from '@app/interfaces/shared.interface';
 import { Badge } from '@models/badge.model';
 import { Purchasable } from '@models/purchasable.model';
-import { EventInterface, IncomeCalculationResponseInterface } from '@interfaces/event.interface';
+import { EventInterface, IncomeCalculationResponseDto } from '@interfaces/event.interface';
 import { Offering } from '@models/offering.model';
 import registrationInformation from '@models/queries/registrationInformation';
 import { Registration } from '@models/registration.model';
@@ -57,7 +57,7 @@ export const getCurrentEvent = async (_req: Request, res: Response) => {
 
         return res.status(status.OK).send(currentEvent.event);
     } catch (err) {
-        res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+        res.status(status.BAD_REQUEST).json(<ErrorResponseDto>{
             message: 'Failed to get the current event',
             error: err
         });
@@ -71,7 +71,7 @@ export const getPurchasables = async (req: Request, res: Response) => {
 
         return res.status(status.OK).json(purchasables);
     } catch (err) {
-        res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+        res.status(status.BAD_REQUEST).json(<ErrorResponseDto>{
             message: 'Failed to get purchasables',
             error: err
         });
@@ -89,7 +89,7 @@ export const getClassSize = async (req: Request, res: Response) => {
 
         return res.status(status.OK).send(await offering.getClassSizes());
     } catch (err) {
-        res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+        res.status(status.BAD_REQUEST).json(<ErrorResponseDto>{
             message: 'Failed to get class size',
             error: err
         });
@@ -108,7 +108,7 @@ export const getRegistrations = async (req: Request, res: Response) => {
 
         return res.status(status.OK).json(registrations);
     } catch (err) {
-        res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+        res.status(status.BAD_REQUEST).json(<ErrorResponseDto>{
             message: 'Failed to get registrations',
             error: err
         });
@@ -169,7 +169,7 @@ export const getAssignees = async (req: Request, res: Response) => {
 
         return res.status(status.OK).json(offerings);
     } catch (err) {
-        res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+        res.status(status.BAD_REQUEST).json(<ErrorResponseDto>{
             message: 'Failed to get assignees',
             error: err
         });
@@ -223,7 +223,7 @@ export const getStats = async (req: Request, res: Response) => {
 
         return res.status(status.OK).send(statsResult);
     } catch (err) {
-        return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+        return res.status(status.BAD_REQUEST).json(<ErrorResponseDto>{
             message: 'Failed to get stats',
             error: err
         });
@@ -248,11 +248,11 @@ async function income(req: Request, res: Response, type: CalculationType): Promi
 
         const cost: number = prices.reduce((acc, cur) => acc + cur, 0);
 
-        return res.status(status.OK).json(<IncomeCalculationResponseInterface>{
+        return res.status(status.OK).json(<IncomeCalculationResponseDto>{
             income: String(cost.toFixed(2))
         });
     } catch (err) {
-        return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+        return res.status(status.BAD_REQUEST).json(<ErrorResponseDto>{
             message: `Failed to get ${type} event income`,
             error: err
         });

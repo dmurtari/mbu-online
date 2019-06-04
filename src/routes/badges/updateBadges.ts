@@ -3,7 +3,7 @@ import status from 'http-status-codes';
 
 import { Badge } from '@models/badge.model';
 import { BadgeResponseDto } from '@app/interfaces/badge.interface';
-import { ErrorResponseInterface } from '@app/interfaces/shared.interface';
+import { ErrorResponseDto } from '@app/interfaces/shared.interface';
 
 export const updateBadge = async (req: Request, res: Response) => {
     try {
@@ -20,7 +20,7 @@ export const updateBadge = async (req: Request, res: Response) => {
             badge: badge
         });
     } catch (err) {
-        return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+        return res.status(status.BAD_REQUEST).json(<ErrorResponseDto>{
             message: 'Error updating badge',
             error: err
         });

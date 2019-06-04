@@ -1,6 +1,5 @@
 import supertest from 'supertest';
 import { Sequelize } from 'sequelize';
-import * as async from 'async';
 import status from 'http-status-codes';
 import _ from 'lodash';
 
@@ -10,7 +9,7 @@ import { sequelize } from '@app/sequelize';
 import testEvents from './testEvents';
 import testBadges from './testBadges';
 import testPurchasables from './testPurchasables';
-import { UserInterface, SignupRequestDto, UserRole } from '@interfaces/user.interface';
+import { UserInterface, SignupRequestDto, UserRole, UserTokenResponseDto } from '@interfaces/user.interface';
 import { Model } from 'sequelize-typescript';
 import { ScoutInterface } from '@interfaces/scout.interface';
 import { Scout } from '@models/scout.model';
@@ -21,6 +20,7 @@ import { Event } from '@models/event.model';
 import { Offering } from '@models/offering.model';
 import { OfferingInterface } from '@interfaces/offering.interface';
 import { Purchasable } from '@models/purchasable.model';
+import { SuperTestResponse } from '@test/helpers/supertest.interface';
 
 const request = supertest(app);
 
@@ -77,7 +77,7 @@ export default class TestUtils {
         await request.post('/api/signup')
             .send(postData)
             .expect(status.CREATED)
-            .expect((res) => {
+            .expect((res: SuperTestResponse<UserTokenResponseDto>) => {
                 profile = res.body.profile;
                     token = res.body.token;
                 });
@@ -152,59 +152,4 @@ export default class TestUtils {
 
         return createdPurchasables;
     }
-
-    // createPurchasablesForEvent: function (eventId, done) {
-    //     var purchasables = [];
-    //     async.forEachOfSeries(testPurchasables, function (item, index, cb) {
-    //         var purchasable;
-    //         Models.Purchasable.create(item)
-    //             .then(function (createdPurchasable) {
-    //                 purchasable = createdPurchasable;
-    //                 return Models.Event.findById(eventId);
-    //             })
-    //             .then(function (event) {
-    //                 return event.addPurchasable(purchasable);
-    //             })
-    //             .then(function () {
-    //                 return cb();
-    //             })
-    //             .catch(function (err) {
-    //                 return done(err);
-    //             });
-    //     }, function (err) {
-    //         if (err) return done(err);
-    //         return Models.Event.findById(eventId, {
-    //             include: [{
-    //                 model: Models.Purchasable,
-    //                 as: 'purchasables'
-    //             }]
-    //         })
-    //             .then(function (event) {
-    //                 _.forEach(event.purchasables, function (purchasable) {
-    //                     purchasables.push(purchasable.toJSON());
-    //                 });
-    //                 return done(null, purchasables);
-    //             });
-    //     });
-    // },
-
-    // registerScoutsForEvent: function (eventId, scoutIds, token, done) {
-    //     var registrationIds = [];
-    //     async.forEachOfSeries(scoutIds, function (scoutId, index, cb) {
-    //         request.post('/api/scouts/' + scoutId + '/registrations')
-    //             .set('Authorization', token)
-    //             .send({
-    //                 event_id: eventId
-    //             })
-    //             .expect(status.CREATED)
-    //             .end(function (err, res) {
-    //                 if (err) return cb(err);
-    //                 registrationIds.push(res.body.registration.id);
-    //                 return cb();
-    //             });
-    //     }, function (err) {
-    //         done(err, registrationIds);
-    //     });
-    // },
-    // }
 }

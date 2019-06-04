@@ -14,8 +14,8 @@ import { Preference } from '@models/preference.model';
 import { UserRole } from '@interfaces/user.interface';
 import { OfferingInterface } from '@interfaces/offering.interface';
 import testScouts from './testScouts';
-import { PreferenceRequestDto } from '@interfaces/preference.interface';
-import { AssignmentRequestInterface } from '@interfaces/assignment.interface';
+import { CreatePreferenceRequestDto } from '@interfaces/preference.interface';
+import { CreateAssignmentRequestDto } from '@interfaces/assignment.interface';
 
 const request = supertest(app);
 
@@ -36,7 +36,7 @@ describe('using preference and assignments', () => {
 
     before(async () => {
         const defaultPostData: OfferingInterface = {
-            price: 10,
+        price: 10,
             periods: [1, 2, 3],
             duration: 1
         };
@@ -58,7 +58,7 @@ describe('using preference and assignments', () => {
     });
 
     before((done) => {
-        const postData: PreferenceRequestDto[] = [{
+        const postData: CreatePreferenceRequestDto[] = [{
             offering: generatedOfferings[0].id,
             rank: 1
         }, {
@@ -103,7 +103,7 @@ describe('using preference and assignments', () => {
                         });
                 },
                 (next) => {
-                    const assignmentPost: AssignmentRequestInterface[] = [{
+                    const assignmentPost: CreateAssignmentRequestDto[] = [{
                         periods: [1],
                         offering: generatedOfferings[0].id
                     }, {

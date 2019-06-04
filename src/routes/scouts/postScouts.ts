@@ -3,14 +3,14 @@ import status from 'http-status-codes';
 
 import { Scout } from '@models/scout.model';
 import { Registration } from '@models/registration.model';
-import { ErrorResponseInterface } from '@interfaces/shared.interface';
+import { ErrorResponseDto } from '@interfaces/shared.interface';
 import { RegistrationInterface, CreateRegistrationResponseDto } from '@interfaces/registration.interface';
 import { Event } from '@models/event.model';
 import { Preference } from '@models/preference.model';
-import { PreferenceRequestDto, PreferenceInterface, CreatePreferenceResponseDto } from '@interfaces/preference.interface';
+import { CreatePreferenceRequestDto, PreferenceInterface, CreatePreferenceResponseDto } from '@interfaces/preference.interface';
 import { Offering } from '@models/offering.model';
 import { Assignment } from '@models/assignment.model';
-import { AssignmentInterface, AssignmentRequestInterface } from '@interfaces/assignment.interface';
+import { AssignmentInterface, CreateAssignmentRequestDto, CreateAssignmentResponseDto } from '@interfaces/assignment.interface';
 import { Badge } from '@models/badge.model';
 import { Purchasable } from '@models/purchasable.model';
 import { CreatePurchaseResponseDto } from '@interfaces/purchase.interface';
@@ -41,7 +41,7 @@ export const createRegistration = async (req: Request, res: Response) => {
             registration: registration
         });
     } catch (err) {
-        return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+        return res.status(status.BAD_REQUEST).json(<ErrorResponseDto>{
             message: 'Registration could not be created',
             error: 'err'
         });
@@ -60,7 +60,7 @@ export const createPreference = async (req: Request, res: Response) => {
                 }
             });
 
-            const preferences: PreferenceInterface[] = req.body.map((preference: PreferenceRequestDto) => ({
+            const preferences: PreferenceInterface[] = req.body.map((preference: CreatePreferenceRequestDto) => ({
                 registration_id: registrationId,
                 offering_id: preference.offering,
                 rank: preference.rank
@@ -102,7 +102,7 @@ export const createPreference = async (req: Request, res: Response) => {
             registration: createdRegistration
         });
     } catch (err) {
-        return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+        return res.status(status.BAD_REQUEST).json(<ErrorResponseDto>{
             message: 'Preference could not be created',
             error: 'err'
         });
@@ -121,7 +121,7 @@ export const createAssignment = async (req: Request, res: Response) => {
                 }
             });
 
-            assignments = req.body.map((assignment: AssignmentRequestInterface) => ({
+            assignments = req.body.map((assignment: CreateAssignmentRequestDto) => ({
                 registration_id: registrationId,
                 offering_id: assignment.offering,
                 periods: assignment.periods,
@@ -159,12 +159,12 @@ export const createAssignment = async (req: Request, res: Response) => {
             }],
         });
 
-        return res.status(status.CREATED).json(<CreateRegistrationResponseDto>{
+        return res.status(status.CREATED).json(<CreateAssignmentResponseDto>{
             message: 'Assignment created successfully',
             registration: createdRegistration
         });
     } catch (err) {
-        return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+        return res.status(status.BAD_REQUEST).json(<ErrorResponseDto>{
             message: 'Assignment could not be created',
             error: 'err'
         });
@@ -203,7 +203,7 @@ export const createPurchase = async (req: Request, res: Response) => {
             registration: createdRegistration
         });
     } catch (err) {
-        return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+        return res.status(status.BAD_REQUEST).json(<ErrorResponseDto>{
             message: 'Purchase could not be created',
             error: 'err'
         });

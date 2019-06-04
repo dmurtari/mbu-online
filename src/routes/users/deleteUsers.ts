@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import status from 'http-status-codes';
 
 import { User } from '@models/user.model';
-import { ErrorResponseInterface } from '@app/interfaces/shared.interface';
+import { ErrorResponseDto } from '@app/interfaces/shared.interface';
 import { Scout } from '@models/scout.model';
 
 export const deleteUser = async (req: Request, res: Response) => {
@@ -11,7 +11,7 @@ export const deleteUser = async (req: Request, res: Response) => {
         await user.destroy();
         return res.status(status.OK).end();
     } catch (err) {
-        return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface> {
+        return res.status(status.BAD_REQUEST).json(<ErrorResponseDto> {
             message: 'Failed to delete user',
             error: err
         });
@@ -31,7 +31,7 @@ export const deleteScout = async (req: Request, res: Response) => {
 
         return res.status(status.OK).end();
     } catch (err) {
-        return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface> {
+        return res.status(status.BAD_REQUEST).json(<ErrorResponseDto> {
             message: 'Failed to delete scout' ,
             error: err
         });

@@ -3,7 +3,7 @@ import passport from 'passport';
 import status from 'http-status-codes';
 
 import { User } from '@models/user.model';
-import { MessageResponseInterface } from '@app/interfaces/shared.interface';
+import { MessageResponseDto } from '@app/interfaces/shared.interface';
 import { UserRole } from '@interfaces/user.interface';
 
 export const canUpdateRole = (req: Request, res: Response, next: NextFunction) => {
@@ -13,7 +13,7 @@ export const canUpdateRole = (req: Request, res: Response, next: NextFunction) =
             (req.body.approved && user.role !== UserRole.ADMIN) ||
             (req.body.password && (!(user.role === UserRole.ADMIN)) && Number(req.params.userId) !== user.id)
         ) {
-            return res.status(status.UNAUTHORIZED).json(<MessageResponseInterface>{
+            return res.status(status.UNAUTHORIZED).json(<MessageResponseDto>{
                 message: 'Only admins are allowed to update roles'
             });
         } else {

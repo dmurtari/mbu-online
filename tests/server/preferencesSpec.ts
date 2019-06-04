@@ -14,7 +14,7 @@ import { UserRole } from '@interfaces/user.interface';
 import { OfferingInterface } from '@interfaces/offering.interface';
 import { Registration } from '@models/registration.model';
 import {
-    PreferenceRequestDto,
+    CreatePreferenceRequestDto,
     CreatePreferenceResponseDto,
     ScoutPreferenceResponseDto,
     UpdatePreferenceRequestDto
@@ -98,7 +98,7 @@ describe('preferences', () => {
 
     describe('when preferences do not exist', () => {
         it('should be able to be generated', (done) => {
-            const postData: PreferenceRequestDto = {
+            const postData: CreatePreferenceRequestDto = {
                 offering: generatedOfferings[0].id,
                 rank: 1
             };
@@ -121,7 +121,7 @@ describe('preferences', () => {
         });
 
         it('should check for scout owner', (done) => {
-            const postData: PreferenceRequestDto = {
+            const postData: CreatePreferenceRequestDto = {
                 offering: generatedOfferings[0].id,
                 rank: 1
             };
@@ -134,7 +134,7 @@ describe('preferences', () => {
         });
 
         it('should allow teachers to create', (done) => {
-            const postData: PreferenceRequestDto = {
+            const postData: CreatePreferenceRequestDto = {
                 offering: generatedOfferings[0].id,
                 rank: 1
             };
@@ -147,7 +147,7 @@ describe('preferences', () => {
         });
 
         it('should allow admins to create', (done) => {
-            const postData: PreferenceRequestDto = {
+            const postData: CreatePreferenceRequestDto = {
                 offering: generatedOfferings[0].id,
                 rank: 1
             };
@@ -160,7 +160,7 @@ describe('preferences', () => {
         });
 
         it('should not create for a nonexistant offering', (done) => {
-            const postData: PreferenceRequestDto = {
+            const postData: CreatePreferenceRequestDto = {
                 offering: badId as any,
                 rank: 1
             };
@@ -173,7 +173,7 @@ describe('preferences', () => {
         });
 
         it('should not create for nonexistant registrations', (done) => {
-            const postData: PreferenceRequestDto = {
+            const postData: CreatePreferenceRequestDto = {
                 offering: generatedOfferings[0].id,
                 rank: 1
             };
@@ -185,7 +185,7 @@ describe('preferences', () => {
         });
 
         it('should not have a maximum rank of 6', (done) => {
-            const postData: PreferenceRequestDto = {
+            const postData: CreatePreferenceRequestDto = {
                 offering: generatedOfferings[0].id,
                 rank: 7
             };
@@ -198,7 +198,7 @@ describe('preferences', () => {
         });
 
         it('should not have a minimum rank of 1', (done) => {
-            const postData: PreferenceRequestDto = {
+            const postData: CreatePreferenceRequestDto = {
                 offering: generatedOfferings[0].id,
                 rank: 0
             };
@@ -218,7 +218,7 @@ describe('preferences', () => {
                     request.post('/api/scouts/' + generatedScouts[0].id + '/registrations/' +
                         registrationIds[0] + '/preferences')
                         .set('Authorization', generatedUsers.coordinator.token)
-                        .send(<PreferenceRequestDto>{
+                        .send(<CreatePreferenceRequestDto>{
                             offering: generatedOfferings[0].id,
                             rank: 1
                         })
@@ -228,7 +228,7 @@ describe('preferences', () => {
                     request.post('/api/scouts/' + generatedScouts[0].id + '/registrations/' +
                         registrationIds[0] + '/preferences')
                         .set('Authorization', generatedUsers.coordinator.token)
-                        .send(<PreferenceRequestDto>{
+                        .send(<CreatePreferenceRequestDto>{
                             offering: generatedOfferings[1].id,
                             rank: 2
                         })
@@ -238,7 +238,7 @@ describe('preferences', () => {
                     request.post('/api/scouts/' + generatedScouts[0].id + '/registrations/' +
                         registrationIds[1] + '/preferences')
                         .set('Authorization', generatedUsers.coordinator.token)
-                        .send(<PreferenceRequestDto>{
+                        .send(<CreatePreferenceRequestDto>{
                             offering: generatedOfferings[0].id,
                             rank: 3
                         })
@@ -434,7 +434,7 @@ describe('preferences', () => {
     describe('batch modifying preferences', () => {
 
         it('should add a batch of preferences', (done) => {
-            const postData: PreferenceRequestDto[] = [{
+            const postData: CreatePreferenceRequestDto[] = [{
                 offering: generatedOfferings[0].id,
                 rank: 1
             }, {
@@ -464,7 +464,7 @@ describe('preferences', () => {
         it('should override existing preferences', (done) => {
             async.series([
                 (cb) => {
-                    const postData: PreferenceRequestDto[] = [{
+                    const postData: CreatePreferenceRequestDto[] = [{
                         offering: generatedOfferings[0].id,
                         rank: 1
                     }, {
@@ -491,7 +491,7 @@ describe('preferences', () => {
                         });
                 },
                 (cb) => {
-                    const postData: PreferenceRequestDto[] = [{
+                    const postData: CreatePreferenceRequestDto[] = [{
                         offering: generatedOfferings[2].id,
                         rank: 1
                     }];
@@ -515,7 +515,7 @@ describe('preferences', () => {
         });
 
         it('should not create with an invalid offering', (done) => {
-            const postData: PreferenceRequestDto[] = [{
+            const postData: CreatePreferenceRequestDto[] = [{
                 offering: 30,
                 rank: 1
             }];
@@ -527,7 +527,7 @@ describe('preferences', () => {
         });
 
         it('should not create with an invalid rank', (done) => {
-            const postData: PreferenceRequestDto[] = [{
+            const postData: CreatePreferenceRequestDto[] = [{
                 offering: generatedOfferings[0].id,
                 rank: 30
             }];

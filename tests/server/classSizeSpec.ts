@@ -13,7 +13,7 @@ import { Assignment } from '@models/assignment.model';
 import { Registration } from '@models/registration.model';
 import testScouts from './testScouts';
 import { CreateOfferingDto, OfferingInterface } from '@interfaces/offering.interface';
-import { AssignmentRequestInterface } from '@interfaces/assignment.interface';
+import { CreateAssignmentRequestDto } from '@interfaces/assignment.interface';
 
 const request = supertest(app);
 
@@ -132,7 +132,7 @@ describe('Class sizes', () => {
 
     describe('when an offering exists with a size limit of 1', () => {
         let offering: OfferingInterface;
-        let assignmentData: AssignmentRequestInterface;
+        let assignmentData: CreateAssignmentRequestDto;
 
         beforeEach((done) => {
             const postData: CreateOfferingDto = {
@@ -314,7 +314,7 @@ describe('Class sizes', () => {
 
     describe('when a 2 period offering exists', () => {
         let offering: OfferingInterface;
-        let assignmentData: AssignmentRequestInterface;
+        let assignmentData: CreateAssignmentRequestDto;
 
         beforeEach((done) => {
             const postData: CreateOfferingDto = {
@@ -395,7 +395,7 @@ describe('Class sizes', () => {
 
     describe('when an offering exists with a limit of 3', () => {
         let offering: OfferingInterface;
-        let assignmentData: AssignmentRequestInterface;
+        let assignmentData: CreateAssignmentRequestDto;
 
         beforeEach((done) => {
             const postData: CreateOfferingDto = {

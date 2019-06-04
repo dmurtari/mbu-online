@@ -2,12 +2,13 @@ import { Table, Model, Column, Min, Max, ForeignKey } from 'sequelize-typescript
 
 import { Offering } from '@models/offering.model';
 import { Registration } from '@models/registration.model';
+import { PreferenceInterface } from '@interfaces/preference.interface';
 
 @Table({
     underscored: true,
     tableName: 'Preference'
 })
-export class Preference extends Model<Preference> {
+export class Preference extends Model<Preference> implements PreferenceInterface {
     @Min(1)
     @Max(6)
     @Column({

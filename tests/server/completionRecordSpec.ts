@@ -11,7 +11,7 @@ import { Scout } from '@models/scout.model';
 import { Offering } from '@models/offering.model';
 import { OfferingInterface } from '@interfaces/offering.interface';
 import testScouts from './testScouts';
-import { AssignmentRequestInterface, AssignmentResponseInterface } from '@interfaces/assignment.interface';
+import { CreateAssignmentRequestDto, UpdateAssignmentResponseDto } from '@interfaces/assignment.interface';
 
 const request = supertest(app);
 
@@ -88,7 +88,7 @@ describe('completion records', () => {
 
     describe('adding completion records', () => {
         beforeEach((done) => {
-            const postData: AssignmentRequestInterface[] = [{
+            const postData: CreateAssignmentRequestDto[] = [{
                 periods: [1],
                 offering: generatedOfferings[0].id
             }, {
@@ -125,7 +125,7 @@ describe('completion records', () => {
                 .expect(status.OK)
                 .end((err, res) => {
                     if (err) { return done(err); }
-                    const assignment = (res.body as AssignmentResponseInterface).assignment;
+                    const assignment = (res.body as UpdateAssignmentResponseDto).assignment;
                     expect(assignment.offering_id).to.equal(generatedOfferings[0].id);
                     expect(assignment.completions).to.deep.equal(['1', '2']);
                     return done();

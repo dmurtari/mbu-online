@@ -3,7 +3,7 @@ import passport from 'passport';
 import status from 'http-status-codes';
 
 import { User } from '@models/user.model';
-import { MessageResponseInterface } from '@app/interfaces/shared.interface';
+import { MessageResponseDto } from '@app/interfaces/shared.interface';
 import { UserRole } from '@interfaces/user.interface';
 
 export const currentUser = (otherAuthorizedRoles: UserRole[] = []) => (req: Request, res: Response, next: NextFunction) => {
@@ -15,7 +15,7 @@ export const currentUser = (otherAuthorizedRoles: UserRole[] = []) => (req: Requ
         }
 
         if ((req.params.userId && Number(req.params.userId) !== user.id) || (req.query.id && Number(req.query.id) !== user.id)) {
-            return res.status(status.UNAUTHORIZED).json(<MessageResponseInterface>{
+            return res.status(status.UNAUTHORIZED).json(<MessageResponseDto>{
                 message: 'Not the current user'
             });
         } else {

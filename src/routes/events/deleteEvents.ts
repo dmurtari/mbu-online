@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import status from 'http-status-codes';
 
 import { Event } from '@models/event.model';
-import { ErrorResponseInterface } from '@app/interfaces/shared.interface';
+import { ErrorResponseDto } from '@app/interfaces/shared.interface';
 import { Badge } from '@models/badge.model';
 import { Purchasable } from '@models/purchasable.model';
 
@@ -13,7 +13,7 @@ export const deleteEvent = async (req: Request, res: Response) => {
 
         return res.status(status.OK).end();
     } catch (err) {
-        return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+        return res.status(status.BAD_REQUEST).json(<ErrorResponseDto>{
             message: 'Failed to delete event',
             error: err
         });
@@ -35,7 +35,7 @@ export const deleteOffering = async (req: Request, res: Response) => {
 
         return res.status(status.OK).end();
     } catch (err) {
-        return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+        return res.status(status.BAD_REQUEST).json(<ErrorResponseDto>{
             message: 'Failed to delete offering',
             error: err
         });
@@ -57,7 +57,7 @@ export const deletePurchasable = async (req: Request, res: Response) => {
 
         return res.status(status.OK).end();
     } catch (err) {
-        return res.status(status.BAD_REQUEST).json(<ErrorResponseInterface>{
+        return res.status(status.BAD_REQUEST).json(<ErrorResponseDto>{
             message: 'Failed to delete purchasable',
             error: err
         });
