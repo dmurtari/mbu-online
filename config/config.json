@@ -1,0 +1,20 @@
+{
+    "development": {
+        "username": "mbu",
+        "password": null,
+        "database": "mbu",
+        "host": "localhost",
+        "dialect": "postgres"
+    },
+    "test": {
+        "username": "mbu",
+        "password": null,
+        "database": "mbutest",
+        "host": "localhost",
+        "dialect": "postgres"
+    },
+    "production": {
+        "use_env_variable": "DATABASE_URL",
+        "dialect": "postgres"
+    }
+}
