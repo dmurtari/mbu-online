@@ -1,4 +1,4 @@
-import { Model, Table, Column, Validator, ForeignKey, BelongsTo, BelongsToMany } from 'sequelize-typescript';
+import { Model, Table, Column, Validator, ForeignKey, BelongsTo, BelongsToMany, DataType } from 'sequelize-typescript';
 import moment from 'moment';
 
 import { User } from '@models/user.model';
@@ -49,12 +49,12 @@ export class Scout extends Model<Scout> implements ScoutInterface {
     })
     public emergency_phone!: string;
 
-    @Column
+    @Column(DataType.VIRTUAL)
     public get fullname(): string {
         return `${(this.firstname || '').trim()} ${(this.lastname || '').trim()}`;
     }
 
-    @Column
+    @Column(DataType.VIRTUAL)
     public get age(): number {
         return moment().diff(moment(this.birthday), 'years');
     }
