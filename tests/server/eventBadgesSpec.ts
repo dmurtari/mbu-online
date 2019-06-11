@@ -1,4 +1,4 @@
-import supertest, { SuperTest } from 'supertest';
+import supertest from 'supertest';
 import * as async from 'async';
 import status from 'http-status-codes';
 import { expect } from 'chai';
@@ -10,7 +10,7 @@ import { Event } from '@models/event.model';
 import { UserRole } from '@interfaces/user.interface';
 import { Offering } from '@models/offering.model';
 import { CreateOfferingDto, OfferingInterface, OfferingResponseDto } from '@interfaces/offering.interface';
-import { EventInterface, Semester, EventOfferingInterface, CreateOfferingResponseDto, EventsResponseDto } from '@interfaces/event.interface';
+import { EventInterface, Semester, EventOfferingInterface, CreateOfferingResponseDto, EventsResponseDto, EventStatisticsDto } from '@interfaces/event.interface';
 import { SuperTestResponse } from '@test/helpers/supertest.interface';
 
 const request = supertest(app);
@@ -294,6 +294,20 @@ describe('event badge association', () => {
                         expect(event.offerings.map(offering => offering.id)).to.have.same.members(badges.map(badge => badge.id));
                         return done();
                     });
+            });
+
+            it('should get offerings as part of the event stats', (done) => {
+                request.get('/api/events/' + events[0].id + '/stats')
+                .set('Authorization', adminToken)
+                .expect(status.OK)
+                .end((err, res: SuperTestResponse<EventStatisticsDto>) => {
+                    if (err) { return done(err) }
+                    const stats = res.body;
+                    expect(stats.registrations).to.have.length(0);
+                    expect(stats.scouts).to.have.length(0);
+                    expect(stats.offerings).to.have.length(3);
+                    return done();
+                });
             });
         });
 

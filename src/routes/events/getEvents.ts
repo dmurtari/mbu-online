@@ -8,7 +8,7 @@ import { Event } from '@models/event.model';
 import { ErrorResponseDto } from '@app/interfaces/shared.interface';
 import { Badge } from '@models/badge.model';
 import { Purchasable } from '@models/purchasable.model';
-import { EventInterface, IncomeCalculationResponseDto } from '@interfaces/event.interface';
+import { EventInterface, IncomeCalculationResponseDto, EventStatisticsDto } from '@interfaces/event.interface';
 import { Offering } from '@models/offering.model';
 import registrationInformation from '@models/queries/registrationInformation';
 import { Registration } from '@models/registration.model';
@@ -186,7 +186,7 @@ export const getActualIncome = async (req: Request, res: Response) => {
 
 export const getStats = async (req: Request, res: Response) => {
     try {
-        const statsResult: any = {};
+        const statsResult: EventStatisticsDto = {};
 
         const [event, registrations]: [Event, Registration[]] = await Promise.all([
             Event.findByPk(req.params.id, {
@@ -209,10 +209,10 @@ export const getStats = async (req: Request, res: Response) => {
                     model: Purchasable,
                     as: 'purchases',
                     attributes: ['id', 'price', 'has_size'],
-                    through: <any>[{
+                    through: <any>{
                         as: 'details',
                         attributes: ['quantity', 'size']
-                    }]
+                    }
                 }]
             })
         ]);

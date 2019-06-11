@@ -1,6 +1,8 @@
 import { BadgeInterface, BadgeDto } from '@interfaces/badge.interface';
 import { Purchasable } from '@models/purchasable.model';
 import { OfferingInterface } from '@interfaces/offering.interface';
+import { ScoutInterface } from '@interfaces/scout.interface';
+import { RegistrationPurchaseDto } from '@interfaces/registration.interface';
 
 export enum Semester {
     SPRING = 'Spring',
@@ -60,4 +62,10 @@ export type GetCurrentEventDto = EventInterface;
 
 export interface SetCurrentEventDto {
     id: string|number;
+}
+
+export interface EventStatisticsDto {
+    scouts?: ScoutInterface[];
+    offerings?: BadgeDto[];
+    registrations?: RegistrationPurchaseDto[]
 }

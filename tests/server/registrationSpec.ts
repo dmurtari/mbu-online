@@ -13,7 +13,8 @@ import { Registration } from '@models/registration.model';
 import testScouts from './testScouts';
 import { RegistrationRequestDto, CreateRegistrationResponseDto, RegistrationsResponseDto } from '@interfaces/registration.interface';
 import { SuperTestResponse } from '@test/helpers/supertest.interface';
-import { ScoutRegistrationDto, ScoutRegistrationResponseDto } from '@interfaces/scout.interface';
+import { ScoutRegistrationResponseDto } from '@interfaces/scout.interface';
+import { EventStatisticsDto } from '@interfaces/event.interface';
 
 const request = supertest(app);
 
@@ -419,6 +420,20 @@ describe('registration', () => {
             request.get('/api/users/' + generatedUsers.coordinator.profile.id + '/scouts/registrations')
                 .set('Authorization', generatedUsers.coordinator2.token)
                 .expect(status.UNAUTHORIZED, done);
+        });
+
+        it('should get registrations and offerings as parts of the event stats', (done) => {
+            request.get('/api/events/' + events[0].id + '/stats')
+                .set('Authorization', generatedUsers.admin.token)
+                .expect(status.OK)
+                .end((err, res: SuperTestResponse<EventStatisticsDto>) => {
+                    if (err) { return done(err) }
+                    const stats = res.body;
+                    expect(stats.registrations).to.have.length(10);
+                    expect(stats.scouts).to.have.length(10);
+                    expect(stats.offerings).to.have.length(0);
+                    return done();
+                });
         });
     });
 });
