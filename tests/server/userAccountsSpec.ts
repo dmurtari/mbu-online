@@ -224,6 +224,17 @@ describe('user profiles', () => {
                 });
         });
 
+        it('should get a list of users', (done) => {
+            request.get('/api/users/')
+                .set('Authorization', generatedUsers.admin.token)
+                .expect(status.OK)
+                .end((err, res: SuperTestResponse<UsersResponseDto>) => {
+                    if (err) { return done(err); }
+                    expect(res.body).to.have.length(5);
+                    return done();
+                });
+        });
+
         it('should get details for a user with a teacher token', (done) => {
             request.get('/api/users/' + user1.id)
                 .set('Authorization', generatedUsers.teacher.token)

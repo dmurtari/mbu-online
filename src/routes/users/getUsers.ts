@@ -48,7 +48,7 @@ export const byId = (includeScouts: boolean = false) => async (req: Request, res
         query = { id: req.params.userId };
     } else if (req.params.id) {
         query = { id: req.params.id };
-    } else if (!req.query) {
+    } else if (Object.keys(req.query).length < 1) {
         query = {};
     } else {
         return res.status(status.BAD_REQUEST).json(<ErrorResponseDto>{
