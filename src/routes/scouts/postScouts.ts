@@ -14,6 +14,7 @@ import { AssignmentInterface, CreateAssignmentRequestDto, CreateAssignmentRespon
 import { Badge } from '@models/badge.model';
 import { Purchasable } from '@models/purchasable.model';
 import { CreatePurchaseResponseDto } from '@interfaces/purchase.interface';
+import { Purchase } from '@models/purchase.model';
 
 export const createRegistration = async (req: Request, res: Response) => {
     try {
@@ -180,12 +181,14 @@ export const createPurchase = async (req: Request, res: Response) => {
             }
         });
 
-        await registration.$add('purchase', req.body.purchasable, {
-            through: {
-                quantity: req.body.quantity,
-                size: req.body.size
-            }
+        const purchase: Purchase = await Purchase.create({
+            quantity: req.body.quantity,
+            size: req.body.size,
+            purchasable_id: req.body.purchasable,
+            registration_id: req.params.registrationId
         });
+
+        // await registration.$add('purchase', purchase);
 
         const createdRegistration: Registration = await Registration.findByPk(req.params.registrationId, {
             include: [{

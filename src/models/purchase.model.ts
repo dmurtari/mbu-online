@@ -1,4 +1,4 @@
-import { Table, Model, Column, Default, Min, Max, ForeignKey } from 'sequelize-typescript';
+import { Table, Model, Column, Default, Min, ForeignKey, BeforeValidate } from 'sequelize-typescript';
 
 import { Purchasable } from '@models/purchasable.model';
 import { Registration } from '@models/registration.model';
@@ -9,6 +9,24 @@ import { Size, PurchaseInterface } from '@interfaces/purchase.interface';
     tableName: 'Purchases'
 })
 export class Purchase extends Model<Purchase> implements PurchaseInterface {
+    @BeforeValidate
+    public static async ensurePurchaseLimit(purchase: Purchase): Promise<void> {
+        try {
+            const purchasable: Purchasable = await Purchasable.findByPk(purchase.purchasable_id);
+            const currentPurchaserCount: number = await purchasable.getPurchaserCount();
+
+            if (!purchasable.purchaser_limit) {
+                return;
+            }
+
+            if (currentPurchaserCount + purchase.quantity > purchasable.purchaser_limit) {
+                throw new Error(`Purchaser limit has been met`);
+            }
+        } catch {
+            throw new Error(`Purchaser limit has been met`);
+        }
+    }
+
     @Default(0)
     @Min(0)
     @Column({

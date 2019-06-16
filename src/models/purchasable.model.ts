@@ -55,4 +55,12 @@ export class Purchasable extends Model<Purchasable> implements PurchasableInterf
             throw new Error('Max age must be greater than min');
         }
     }
+
+    public async getPurchaserCount(): Promise<number> {
+        return await Purchase.count({
+            where: {
+                purchasable_id: this.id
+            }
+        });
+    }
 }

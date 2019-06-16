@@ -18,7 +18,7 @@ import { CreatePurchaseRequestDto } from '@interfaces/purchase.interface';
 
 const request = supertest(app);
 
-describe.only('purchasable purchaser limits', () => {
+describe('purchasable purchaser limits', () => {
     let generatedUsers: RoleTokenObjects;
     let generatedEvents: Event[];
     let generatedScouts: Scout[];
@@ -32,7 +32,7 @@ describe.only('purchasable purchaser limits', () => {
         generatedUsers = await TestUtils.generateTokens();
     });
 
-    beforeEach(async ()=> {
+    beforeEach(async () => {
         await TestUtils.dropTable([Scout, Event, Purchasable, Purchase, Registration]);
     });
 
@@ -71,7 +71,7 @@ describe.only('purchasable purchaser limits', () => {
             postData = {
                 item: 'Test Item',
                 price: 10
-            }
+            };
         });
 
         it('should not create a purchaser limit by default', async () => {
@@ -159,6 +159,34 @@ describe.only('purchasable purchaser limits', () => {
                     quantity: 1
                 })
                 .expect(status.CREATED);
+        });
+
+        it('should prevent adding a purchase if the limit has been met', async () => {
+            await request.post(`/api/scouts/${generatedScouts[0].id}/registrations/${registrationIds.get(generatedScouts[0].id)}/purchases`)
+                .set('Authorization', generatedUsers.coordinator.token)
+                .send(<CreatePurchaseRequestDto>{
+                    purchasable: purchasableId,
+                    quantity: 1
+                })
+                .expect(status.CREATED);
+
+            await request.post(`/api/scouts/${generatedScouts[1].id}/registrations/${registrationIds.get(generatedScouts[1].id)}/purchases`)
+                .set('Authorization', generatedUsers.coordinator.token)
+                .send(<CreatePurchaseRequestDto>{
+                    purchasable: purchasableId,
+                    quantity: 1
+                })
+                .expect(status.BAD_REQUEST);
+        });
+
+        it('should prevent purchasing a quantity that exceeds the limit', async () => {
+            await request.post(`/api/scouts/${generatedScouts[0].id}/registrations/${registrationIds.get(generatedScouts[0].id)}/purchases`)
+                .set('Authorization', generatedUsers.coordinator.token)
+                .send(<CreatePurchaseRequestDto>{
+                    purchasable: purchasableId,
+                    quantity: 2
+                })
+                .expect(status.BAD_REQUEST);
         });
     });
 });
