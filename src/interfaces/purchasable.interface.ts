@@ -6,6 +6,7 @@ export interface PurchasableInterface {
     price?: number|string;
     maximum_age?: number;
     minimum_age?: number;
+    purchaser_limit?: number;
 }
 
 export interface PurchasableDto<T = any> extends PurchasableInterface {

@@ -1,4 +1,4 @@
-import { Model, Column, Default, DataType, Table, Validator, ForeignKey, HasMany, BelongsToMany } from 'sequelize-typescript';
+import { Model, Column, Default, DataType, Table, Validator, ForeignKey, HasMany, BelongsToMany, Min } from 'sequelize-typescript';
 
 import { Purchase } from '@models/purchase.model';
 import { Registration } from '@models/registration.model';
@@ -33,6 +33,10 @@ export class Purchasable extends Model<Purchasable> implements PurchasableInterf
 
     @Column
     public minimum_age: number;
+
+    @Min(0)
+    @Column
+    public purchaser_limit: number;
 
     @HasMany(() => Purchase, 'purchasable_id')
     public sold: Purchase[];

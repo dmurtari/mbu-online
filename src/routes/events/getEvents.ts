@@ -127,7 +127,7 @@ export const getAssignees = async (req: Request, res: Response) => {
                 'periods',
                 'requirements'
             ],
-            include: [{
+            include: <any>[{
                 model: Badge,
                 as: 'badge',
                 attributes: [
