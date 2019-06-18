@@ -2,7 +2,7 @@ import { BadgeInterface, BadgeDto } from '@interfaces/badge.interface';
 import { OfferingInterface } from '@interfaces/offering.interface';
 import { ScoutInterface } from '@interfaces/scout.interface';
 import { RegistrationPurchaseDto } from '@interfaces/registration.interface';
-import { PurchasableInterface } from '@interfaces/purchasable.interface';
+import { PurchasableInterface, PurchasableDto } from '@interfaces/purchasable.interface';
 
 export enum Semester {
     SPRING = 'Spring',
@@ -23,7 +23,8 @@ export interface EventInterface {
 
 export interface EventDto<T = any> extends EventInterface {
     event_id?: number;
-    details: T;
+    purchasables?: PurchasableDto[];
+    details?: T;
 }
 
 export interface EventOfferingInterface extends EventInterface {
@@ -56,7 +57,7 @@ export interface IncomeCalculationResponseDto {
 
 export type EventCreateDto = EventInterface;
 
-export type EventsResponseDto = EventInterface[];
+export type EventsResponseDto = EventDto[];
 
 export type GetCurrentEventDto = EventInterface;
 

@@ -12,13 +12,18 @@ import { Purchase } from '@models/purchase.model';
 import { Registration } from '@models/registration.model';
 import { RegistrationRequestDto, CreateRegistrationResponseDto } from '@interfaces/registration.interface';
 import { SuperTestResponse } from '@test/helpers/supertest.interface';
-import { CreatePurchasableDto, CreatePurchasablesResponseDto, PurchasablesResponseDto, PurchasableDto, PurchasableInterface } from '@interfaces/purchasable.interface';
+import {
+    CreatePurchasableDto,
+    CreatePurchasablesResponseDto,
+    PurchasablesResponseDto,
+    PurchasableDto
+} from '@interfaces/purchasable.interface';
 import { EventsResponseDto } from '@interfaces/event.interface';
 import { CreatePurchaseRequestDto } from '@interfaces/purchase.interface';
 
 const request = supertest(app);
 
-describe.only('purchasable purchaser limits', () => {
+describe('purchasable purchaser limits', () => {
     let generatedUsers: RoleTokenObjects;
     let generatedEvents: Event[];
     let generatedScouts: Scout[];
@@ -128,7 +133,7 @@ describe.only('purchasable purchaser limits', () => {
             const postData: CreatePurchasableDto = {
                 item: 'Test Item',
                 price: 10,
-                purchaser_limit: 1
+                purchaser_limit: 2
             };
 
             await request.post(`/api/events/${generatedEvents[0].id}/purchasables`)
@@ -140,25 +145,25 @@ describe.only('purchasable purchaser limits', () => {
                 });
         });
 
-        it('should get the purchaser limit', async () => {
+        it('should get the purchaser limit and count for an event', async () => {
             await request.get(`/api/events?id=${generatedEvents[0].id}`)
                 .expect(status.OK)
                 .then((res: SuperTestResponse<EventsResponseDto>) => {
                     const event = res.body[0];
 
                     expect(event.purchasables.length).to.equal(1);
-                    expect(event.purchasables[0].purchaser_limit).to.equal(1);
+                    expect(event.purchasables[0].purchaser_limit).to.equal(2);
                     expect(event.purchasables[0].purchaser_count).to.equal(0);
                 });
         });
 
-        it('should get the number of purchasers', async() => {
+        it('should get the purchaser limit and count for a specific item', async() => {
             await request.get(`/api/events/${generatedEvents[0].id}/purchasables`)
                 .expect(status.OK)
                 .then((res: SuperTestResponse<PurchasablesResponseDto>) => {
                     expect(res.body).to.have.length(1);
-                    const purchasable: PurchasableInterface = res.body[0];
-                    expect(purchasable.purchaser_limit).to.equal(1);
+                    const purchasable: PurchasableDto = res.body[0];
+                    expect(purchasable.purchaser_limit).to.equal(2);
                     expect(purchasable.purchaser_count).to.equal(0);
                 });
         });
@@ -178,7 +183,7 @@ describe.only('purchasable purchaser limits', () => {
                 .set('Authorization', generatedUsers.coordinator.token)
                 .send(<CreatePurchaseRequestDto>{
                     purchasable: purchasableId,
-                    quantity: 1
+                    quantity: 2
                 })
                 .expect(status.CREATED);
 
@@ -196,7 +201,7 @@ describe.only('purchasable purchaser limits', () => {
                 .set('Authorization', generatedUsers.coordinator.token)
                 .send(<CreatePurchaseRequestDto>{
                     purchasable: purchasableId,
-                    quantity: 2
+                    quantity: 3
                 })
                 .expect(status.BAD_REQUEST);
         });
@@ -233,7 +238,7 @@ describe.only('purchasable purchaser limits', () => {
                 .expect(status.OK)
                 .then((res: SuperTestResponse<PurchasablesResponseDto>) => {
                     expect(res.body).to.have.length(1);
-                    const purchasable: PurchasableInterface = res.body[0];
+                    const purchasable: PurchasableDto = res.body[0];
                     expect(purchasable.purchaser_limit).to.equal(2);
                     expect(purchasable.purchaser_count).to.equal(1);
                 });
@@ -251,7 +256,7 @@ describe.only('purchasable purchaser limits', () => {
                 .expect(status.OK)
                 .then((res: SuperTestResponse<PurchasablesResponseDto>) => {
                     expect(res.body).to.have.length(1);
-                    const purchasable: PurchasableInterface = res.body[0];
+                    const purchasable: PurchasableDto = res.body[0];
                     expect(purchasable.purchaser_limit).to.equal(2);
                     expect(purchasable.purchaser_count).to.equal(2);
                 });

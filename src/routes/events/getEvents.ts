@@ -8,12 +8,13 @@ import { Event } from '@models/event.model';
 import { ErrorResponseDto } from '@app/interfaces/shared.interface';
 import { Badge } from '@models/badge.model';
 import { Purchasable } from '@models/purchasable.model';
-import { EventInterface, IncomeCalculationResponseDto, EventStatisticsDto } from '@interfaces/event.interface';
+import { EventInterface, IncomeCalculationResponseDto, EventStatisticsDto, EventsResponseDto, EventDto } from '@interfaces/event.interface';
 import { Offering } from '@models/offering.model';
 import registrationInformation from '@models/queries/registrationInformation';
 import { Registration } from '@models/registration.model';
 import { Scout } from '@models/scout.model';
 import { CalculationType } from '@routes/shared/calculationType.enum';
+import { PurchasableDto } from '@interfaces/purchasable.interface';
 
 export const getEvent = async (req: Request, res: Response) => {
     try {
@@ -26,7 +27,7 @@ export const getEvent = async (req: Request, res: Response) => {
             return _query;
         }, {});
 
-        const events: EventInterface[] = await Event.findAll({
+        const events: Event[] = await Event.findAll({
             where: query,
             include: [{
                 model: Badge,
@@ -40,7 +41,19 @@ export const getEvent = async (req: Request, res: Response) => {
             }]
         });
 
-        return res.status(status.OK).json(events);
+        const result: EventsResponseDto = await Promise.all(events.map(async event => {
+            const plainEvent: EventDto = event.get({ plain: true });
+
+            plainEvent.purchasables = await Promise.all(event.purchasables.map(async purchasable => {
+                const purchasableDto: PurchasableDto = purchasable.get({ plain: true });
+                purchasableDto.purchaser_count = await purchasable.getPurchaserCount();
+                return purchasableDto;
+            }));
+
+            return plainEvent;
+        }));
+
+        return res.status(status.OK).json(result);
     } catch (err) {
         return res.status(status.BAD_REQUEST).json({
             message: 'Error getting events',
@@ -69,7 +82,13 @@ export const getPurchasables = async (req: Request, res: Response) => {
         const event: Event = await Event.findByPk(req.params.id);
         const purchasables: Purchasable[] = await event.$get('purchasables') as Purchasable[];
 
-        return res.status(status.OK).json(purchasables);
+        const result: PurchasableDto[] = await Promise.all(purchasables.map(async purchasable => {
+            const purchasableDto: PurchasableDto = purchasable.get({ plain: true });
+            purchasableDto.purchaser_count = await purchasable.getPurchaserCount();
+            return purchasableDto;
+        }));
+
+        return res.status(status.OK).json(result);
     } catch (err) {
         res.status(status.BAD_REQUEST).json(<ErrorResponseDto>{
             message: 'Failed to get purchasables',

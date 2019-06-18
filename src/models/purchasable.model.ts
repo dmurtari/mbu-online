@@ -57,10 +57,12 @@ export class Purchasable extends Model<Purchasable> implements PurchasableInterf
     }
 
     public async getPurchaserCount(): Promise<number> {
-        return await Purchase.count({
+        const purchases: Purchase[] = await Purchase.findAll({
             where: {
                 purchasable_id: this.id
             }
         });
+
+        return purchases.reduce((acc, cur) => acc += cur.quantity, 0);
     }
 }
