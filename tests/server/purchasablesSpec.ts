@@ -90,7 +90,7 @@ describe('purchasables', () => {
                 .set('Authorization', generatedUsers.admin.token)
                 .send(postData)
                 .expect(status.CREATED)
-                .end((err,  res: SuperTestResponse<CreatePurchasablesResponseDto>) => {
+                .end((err, res: SuperTestResponse<CreatePurchasablesResponseDto>) => {
                     if (err) { return done(err); }
                     const purchasable = res.body.purchasables[0];
                     expect(purchasable.item).to.equal(postData.item);
@@ -110,7 +110,7 @@ describe('purchasables', () => {
                 .set('Authorization', generatedUsers.admin.token)
                 .send(postData)
                 .expect(status.CREATED)
-                .end((err,  res: SuperTestResponse<CreatePurchasablesResponseDto>) => {
+                .end((err, res: SuperTestResponse<CreatePurchasablesResponseDto>) => {
                     if (err) { return done(err); }
                     const purchasable = res.body.purchasables[0];
                     expect(purchasable.item).to.equal(postData.item);
@@ -157,7 +157,7 @@ describe('purchasables', () => {
                 .set('Authorization', generatedUsers.admin.token)
                 .send(postData)
                 .expect(status.CREATED)
-                .end((err,  res: SuperTestResponse<CreatePurchasablesResponseDto>) => {
+                .end((err, res: SuperTestResponse<CreatePurchasablesResponseDto>) => {
                     if (err) { return done(err); }
                     const purchasable = res.body.purchasables[0];
                     expect(purchasable.item).to.equal(postData.item);
@@ -191,7 +191,7 @@ describe('purchasables', () => {
                 .set('Authorization', generatedUsers.admin.token)
                 .send(postData)
                 .expect(status.CREATED)
-                .end((err,  res: SuperTestResponse<CreatePurchasablesResponseDto>) => {
+                .end((err, res: SuperTestResponse<CreatePurchasablesResponseDto>) => {
                     if (err) { return done(err); }
                     const purchasable = res.body.purchasables[0];
                     expect(purchasable.item).to.equal(postData.item);
@@ -213,7 +213,7 @@ describe('purchasables', () => {
                 .set('Authorization', generatedUsers.admin.token)
                 .send(postData)
                 .expect(status.CREATED)
-                .end((err,  res: SuperTestResponse<CreatePurchasablesResponseDto>) => {
+                .end((err, res: SuperTestResponse<CreatePurchasablesResponseDto>) => {
                     if (err) { return done(err); }
                     const purchasable = res.body.purchasables[0];
                     expect(purchasable.item).to.equal(postData.item);
@@ -292,7 +292,7 @@ describe('purchasables', () => {
                             has_size: true
                         })
                         .expect(status.CREATED)
-                        .end((err,  res: SuperTestResponse<CreatePurchasablesResponseDto>) => {
+                        .end((err, res: SuperTestResponse<CreatePurchasablesResponseDto>) => {
                             if (err) { return done(err); }
                             purchasableIds.push(res.body.purchasables[0].id);
                             return cb();
@@ -306,7 +306,7 @@ describe('purchasables', () => {
                             price: '3.50'
                         })
                         .expect(status.CREATED)
-                        .end((err,  res: SuperTestResponse<CreatePurchasablesResponseDto>) => {
+                        .end((err, res: SuperTestResponse<CreatePurchasablesResponseDto>) => {
                             if (err) { return done(err); }
                             purchasableIds.push(res.body.purchasables[1].id);
                             return cb();
@@ -321,7 +321,7 @@ describe('purchasables', () => {
                             has_size: true
                         })
                         .expect(status.CREATED)
-                        .end((err,  res: SuperTestResponse<CreatePurchasablesResponseDto>) => {
+                        .end((err, res: SuperTestResponse<CreatePurchasablesResponseDto>) => {
                             if (err) { return done(err); }
                             purchasableIds.push(res.body.purchasables[0].id);
                             return cb();
@@ -336,7 +336,7 @@ describe('purchasables', () => {
                             maximum_age: 10
                         })
                         .expect(status.CREATED)
-                        .end((err,  res: SuperTestResponse<CreatePurchasablesResponseDto>) => {
+                        .end((err, res: SuperTestResponse<CreatePurchasablesResponseDto>) => {
                             if (err) { return done(err); }
                             purchasableIds.push(res.body.purchasables[1].id);
                             return cb();
@@ -884,7 +884,7 @@ describe('purchasables', () => {
                     ], done);
                 });
 
-                describe('getting purchases', () => {
+                describe.only('getting purchases', () => {
                     it('should get all purchases for a registration', (done) => {
                         request.get('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/purchases')
                             .set('Authorization', generatedUsers.coordinator.token)
@@ -913,6 +913,27 @@ describe('purchasables', () => {
                         request.get('/api/scouts/' + generatedScouts[0].id + '/registrations/' + badId + '/purchases')
                             .set('Authorization', generatedUsers.coordinator.token)
                             .expect(status.BAD_REQUEST, done);
+                    });
+
+                    it('should get the buyers of an item', async () => {
+                        await request.get(`/api/events/${events[0].id}/purchasables/${purchasables[0].id}/buyers`)
+                            .set('Authorization', generatedUsers.admin.token)
+                            .expect(status.OK)
+                            .then((res: SuperTestResponse<any>) => {
+
+                            });
+                    });
+
+                    it('should not get buyers for an invalid item', async () => {
+                        await request.get(`/api/events/${events[0].id}/purchasables/${badId}/buyers`)
+                            .set('Authorization', generatedUsers.admin.token)
+                            .expect(status.BAD_REQUEST);
+                    });
+
+                    it('should not allow coordinators to get buyers', async () => {
+                        await request.get(`/api/events/${events[0].id}/purchasables/${purchasables[0].id}/buyers`)
+                            .set('Authorization', generatedUsers.coordinator.token)
+                            .expect(status.UNAUTHORIZED);
                     });
                 });
 
