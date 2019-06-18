@@ -12,13 +12,13 @@ import { Purchase } from '@models/purchase.model';
 import { Registration } from '@models/registration.model';
 import { RegistrationRequestDto, CreateRegistrationResponseDto } from '@interfaces/registration.interface';
 import { SuperTestResponse } from '@test/helpers/supertest.interface';
-import { CreatePurchasableDto, CreatePurchasablesResponseDto } from '@interfaces/purchasable.interface';
+import { CreatePurchasableDto, CreatePurchasablesResponseDto, PurchasablesResponseDto, PurchasableDto, PurchasableInterface } from '@interfaces/purchasable.interface';
 import { EventsResponseDto } from '@interfaces/event.interface';
 import { CreatePurchaseRequestDto } from '@interfaces/purchase.interface';
 
 const request = supertest(app);
 
-describe('purchasable purchaser limits', () => {
+describe.only('purchasable purchaser limits', () => {
     let generatedUsers: RoleTokenObjects;
     let generatedEvents: Event[];
     let generatedScouts: Scout[];
@@ -148,6 +148,18 @@ describe('purchasable purchaser limits', () => {
 
                     expect(event.purchasables.length).to.equal(1);
                     expect(event.purchasables[0].purchaser_limit).to.equal(1);
+                    expect(event.purchasables[0].purchaser_count).to.equal(0);
+                });
+        });
+
+        it('should get the number of purchasers', async() => {
+            await request.get(`/api/events/${generatedEvents[0].id}/purchasables`)
+                .expect(status.OK)
+                .then((res: SuperTestResponse<PurchasablesResponseDto>) => {
+                    expect(res.body).to.have.length(1);
+                    const purchasable: PurchasableInterface = res.body[0];
+                    expect(purchasable.purchaser_limit).to.equal(1);
+                    expect(purchasable.purchaser_count).to.equal(0);
                 });
         });
 
@@ -187,6 +199,62 @@ describe('purchasable purchaser limits', () => {
                     quantity: 2
                 })
                 .expect(status.BAD_REQUEST);
+        });
+    });
+
+    describe('when purchasers exist', () => {
+        let purchasableId: number;
+
+        beforeEach(async () => {
+            const postData: CreatePurchasableDto = {
+                item: 'Test Item',
+                price: 10,
+                purchaser_limit: 2
+            };
+
+            await request.post(`/api/events/${generatedEvents[0].id}/purchasables`)
+                .set('Authorization', generatedUsers.admin.token)
+                .send(postData)
+                .expect(status.CREATED)
+                .then((res: SuperTestResponse<CreatePurchasablesResponseDto>) => {
+                    purchasableId = res.body.purchasables[0].id;
+                });
+        });
+
+        it('should count a single purchaser', async() => {
+            await request.post(`/api/scouts/${generatedScouts[0].id}/registrations/${registrationIds.get(generatedScouts[0].id)}/purchases`)
+                .set('Authorization', generatedUsers.coordinator.token)
+                .send(<CreatePurchaseRequestDto>{
+                    purchasable: purchasableId,
+                    quantity: 1
+                })
+                .expect(status.CREATED);
+            await request.get(`/api/events/${generatedEvents[0].id}/purchasables`)
+                .expect(status.OK)
+                .then((res: SuperTestResponse<PurchasablesResponseDto>) => {
+                    expect(res.body).to.have.length(1);
+                    const purchasable: PurchasableInterface = res.body[0];
+                    expect(purchasable.purchaser_limit).to.equal(2);
+                    expect(purchasable.purchaser_count).to.equal(1);
+                });
+        });
+
+        it('should count a purchase with more than one quantity', async () => {
+            await request.post(`/api/scouts/${generatedScouts[0].id}/registrations/${registrationIds.get(generatedScouts[0].id)}/purchases`)
+                .set('Authorization', generatedUsers.coordinator.token)
+                .send(<CreatePurchaseRequestDto>{
+                    purchasable: purchasableId,
+                    quantity: 2
+                })
+                .expect(status.CREATED);
+            await request.get(`/api/events/${generatedEvents[0].id}/purchasables`)
+                .expect(status.OK)
+                .then((res: SuperTestResponse<PurchasablesResponseDto>) => {
+                    expect(res.body).to.have.length(1);
+                    const purchasable: PurchasableInterface = res.body[0];
+                    expect(purchasable.purchaser_limit).to.equal(2);
+                    expect(purchasable.purchaser_count).to.equal(2);
+                });
         });
     });
 });
