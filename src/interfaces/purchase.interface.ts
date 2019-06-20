@@ -34,3 +34,5 @@ export interface PurchaseResponseInterface {
 }
 
 export type ScoutPurchasesResponseDto = PurchasableDto<PurchaseInterface>[];
+
+export type BuyersResponseDto = RegistrationPurchaseDto[];

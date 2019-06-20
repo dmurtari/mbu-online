@@ -12,7 +12,8 @@ import {
     getAssignees,
     getPotentialIncome,
     getActualIncome,
-    getStats
+    getStats,
+    getBuyers
 } from '@routes/events/getEvents';
 import { deleteEvent, deleteOffering, deletePurchasable } from '@routes/events/deleteEvents';
 import { updateEvent, updateOffering, updatePurchasable } from '@routes/events/updateEvents';
@@ -38,6 +39,7 @@ eventRoutes.get('/:id/purchasables', getPurchasables);
 eventRoutes.get('/:id/registrations', isAuthorized([UserRole.TEACHER]), getRegistrations);
 eventRoutes.put('/:eventId/purchasables/:purchasableId', isAuthorized([UserRole.ADMIN]), updatePurchasable);
 eventRoutes.delete('/:eventId/purchasables/:purchasableId', isAuthorized([UserRole.ADMIN]), deletePurchasable);
+eventRoutes.get('/:eventId/purchasables/:purchasableId/buyers', isAuthorized([UserRole.ADMIN, UserRole.TEACHER]), getBuyers);
 
 // // Event income
 eventRoutes.get('/:id/potentialIncome', isAuthorized([UserRole.ADMIN]), getPotentialIncome);

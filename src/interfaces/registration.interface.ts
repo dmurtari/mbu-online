@@ -3,6 +3,7 @@ import { PreferenceInterface } from '@interfaces/preference.interface';
 import { PurchasableDto } from '@interfaces/purchasable.interface';
 import { PurchaseInterface } from '@interfaces/purchase.interface';
 import { AssignmentInterface } from '@interfaces/assignment.interface';
+import { ScoutInterface } from '@interfaces/scout.interface';
 
 export interface RegistrationInterface {
     id?: number;
@@ -15,6 +16,7 @@ export interface RegistrationInterface {
 
 export interface RegistrationDto extends RegistrationInterface {
     event_id?: number;
+    scout?: ScoutInterface;
 }
 
 export interface RegistrationPreferenceDto extends RegistrationDto {

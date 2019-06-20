@@ -8,13 +8,14 @@ import { Event } from '@models/event.model';
 import { ErrorResponseDto } from '@app/interfaces/shared.interface';
 import { Badge } from '@models/badge.model';
 import { Purchasable } from '@models/purchasable.model';
-import { EventInterface, IncomeCalculationResponseDto, EventStatisticsDto, EventsResponseDto, EventDto } from '@interfaces/event.interface';
+import { IncomeCalculationResponseDto, EventStatisticsDto, EventsResponseDto, EventDto } from '@interfaces/event.interface';
 import { Offering } from '@models/offering.model';
 import registrationInformation from '@models/queries/registrationInformation';
 import { Registration } from '@models/registration.model';
 import { Scout } from '@models/scout.model';
 import { CalculationType } from '@routes/shared/calculationType.enum';
 import { PurchasableDto } from '@interfaces/purchasable.interface';
+import { Purchase } from '@models/purchase.model';
 
 export const getEvent = async (req: Request, res: Response) => {
     try {
@@ -92,6 +93,36 @@ export const getPurchasables = async (req: Request, res: Response) => {
     } catch (err) {
         res.status(status.BAD_REQUEST).json(<ErrorResponseDto>{
             message: 'Failed to get purchasables',
+            error: err
+        });
+    }
+};
+
+export const getBuyers = async (req: Request, res: Response) => {
+    try {
+        const buyers: Registration[] = await Registration.findAll({
+            where: {
+                event_id: req.params.eventId
+            },
+            include: [{
+                model: Scout,
+                as: 'scout'
+            }, {
+                model: Purchasable,
+                as: 'purchases',
+                where: {
+                    id: req.params.purchasableId
+                },
+                through: <any>{
+                    as: 'details'
+                }
+            }]
+        });
+
+        return res.status(status.OK).json(buyers);
+    } catch (err) {
+        res.status(status.BAD_REQUEST).json(<ErrorResponseDto>{
+            message: 'Failed to get buyers',
             error: err
         });
     }

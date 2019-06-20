@@ -1,4 +1,3 @@
-
 import supertest from 'supertest';
 import * as async from 'async';
 import status from 'http-status-codes';
@@ -20,7 +19,7 @@ import {
 import { Registration } from '@models/registration.model';
 import { Purchase } from '@models/purchase.model';
 import testScouts from './testScouts';
-import { CreatePurchaseRequestDto, Size, CreatePurchaseResponseDto, ScoutPurchasesResponseDto } from '@interfaces/purchase.interface';
+import { CreatePurchaseRequestDto, Size, CreatePurchaseResponseDto, ScoutPurchasesResponseDto, BuyersResponseDto } from '@interfaces/purchase.interface';
 import { SuperTestResponse } from '@test/helpers/supertest.interface';
 import { EventsResponseDto } from '@interfaces/event.interface';
 import { RegistrationDto, CreateRegistrationResponseDto } from '@interfaces/registration.interface';
@@ -601,6 +600,19 @@ describe('purchasables', () => {
                                 registrationIds.push(res.body.registration.id);
                                 return cb();
                             });
+                    },
+                    (cb) => {
+                        request.post('/api/scouts/' + generatedScouts[1].id + '/registrations')
+                            .set('Authorization', generatedUsers.coordinator.token)
+                            .send(<RegistrationDto>{
+                                event_id: events[0].id
+                            })
+                            .expect(status.CREATED)
+                            .end((err, res: SuperTestResponse<CreateRegistrationResponseDto>) => {
+                                if (err) { return done(err); }
+                                registrationIds.push(res.body.registration.id);
+                                return cb();
+                            });
                     }
                 ], done);
             });
@@ -880,11 +892,29 @@ describe('purchasables', () => {
                                     quantity: 5
                                 })
                                 .expect(status.CREATED, cb);
+                        },
+                        (cb) => {
+                            request.post('/api/scouts/' + generatedScouts[1].id + '/registrations/' + registrationIds[2] + '/purchases')
+                                .set('Authorization', generatedUsers.coordinator.token)
+                                .send(<CreatePurchaseRequestDto>{
+                                    purchasable: purchasables[0].id,
+                                    quantity: 5
+                                })
+                                .expect(status.CREATED, cb);
+                        },
+                        (cb) => {
+                            request.post('/api/scouts/' + generatedScouts[1].id + '/registrations/' + registrationIds[2] + '/purchases')
+                                .set('Authorization', generatedUsers.coordinator.token)
+                                .send(<CreatePurchaseRequestDto>{
+                                    purchasable: purchasables[3].id,
+                                    quantity: 5
+                                })
+                                .expect(status.CREATED, cb);
                         }
                     ], done);
                 });
 
-                describe.only('getting purchases', () => {
+                describe('getting purchases', () => {
                     it('should get all purchases for a registration', (done) => {
                         request.get('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/purchases')
                             .set('Authorization', generatedUsers.coordinator.token)
@@ -919,15 +949,40 @@ describe('purchasables', () => {
                         await request.get(`/api/events/${events[0].id}/purchasables/${purchasables[0].id}/buyers`)
                             .set('Authorization', generatedUsers.admin.token)
                             .expect(status.OK)
-                            .then((res: SuperTestResponse<any>) => {
-
+                            .then((res: SuperTestResponse<BuyersResponseDto>) => {
+                                expect(res.body).to.have.length(2);
+                                const buyers = res.body;
+                                expect(buyers[0].scout.firstname).to.equal(generatedScouts[0].firstname);
+                                expect(buyers[0].purchases).to.have.length(1);
+                                expect(buyers[0].purchases[0].item).to.equal(purchasables[0].item);
+                                expect(buyers[0].purchases[0].details.quantity).to.equal(2);
+                                expect(buyers[1].scout.firstname).to.equal(generatedScouts[1].firstname);
+                                expect(buyers[1].purchases).to.have.length(1);
+                                expect(buyers[1].purchases[0].item).to.equal(purchasables[0].item);
+                                expect(buyers[1].purchases[0].details.quantity).to.equal(5);
                             });
+
+                        await request.get(`/api/events/${events[0].id}/purchasables/${purchasables[1].id}/buyers`)
+                            .set('Authorization', generatedUsers.admin.token)
+                            .expect(status.OK)
+                            .then((res: SuperTestResponse<BuyersResponseDto>) => {
+                                expect(res.body).to.have.length(1);
+                                const buyers = res.body;
+                                expect(buyers[0].scout.firstname).to.equal(generatedScouts[0].firstname);
+                                expect(buyers[0].purchases).to.have.length(1);
+                                expect(buyers[0].purchases[0].item).to.equal(purchasables[1].item);
+                                expect(buyers[0].purchases[0].details.quantity).to.equal(1);
+                            });
+
                     });
 
                     it('should not get buyers for an invalid item', async () => {
                         await request.get(`/api/events/${events[0].id}/purchasables/${badId}/buyers`)
                             .set('Authorization', generatedUsers.admin.token)
-                            .expect(status.BAD_REQUEST);
+                            .expect(status.OK)
+                            .then((res: SuperTestResponse<BuyersResponseDto>) => {
+                                expect(res.body).to.have.length(0);
+                            });
                     });
 
                     it('should not allow coordinators to get buyers', async () => {
