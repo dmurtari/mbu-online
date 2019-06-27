@@ -1,4 +1,4 @@
-import { RegistrationPreferenceDto } from '@interfaces/registration.interface';
+import { RegistrationPreferencesDto } from '@interfaces/registration.interface';
 import { OfferingDto } from '@interfaces/offering.interface';
 
 export interface PreferenceInterface {
@@ -18,7 +18,7 @@ export interface UpdatePreferenceRequestDto {
 
 export interface CreatePreferenceResponseDto {
     message: string;
-    registration: RegistrationPreferenceDto;
+    registration: RegistrationPreferencesDto;
 }
 
 export interface UpdatePreferenceResponseDto {

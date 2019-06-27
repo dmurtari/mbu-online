@@ -24,6 +24,7 @@ import { Assignment } from '@models/assignment.model';
 import { durationValidator } from '@models/validators';
 import { OfferingInterface } from '@interfaces/offering.interface';
 import { Preference } from '@models/preference.model';
+import { ClassSizeDto } from '@interfaces/event.interface';
 
 @Table({
     underscored: true,
@@ -110,16 +111,16 @@ export class Offering extends Model<Offering> implements OfferingInterface {
         }
     }
 
-    public async getClassSizes(): Promise<ClassSizeInformation> {
+    public async getClassSizes(): Promise<ClassSizeDto> {
         const assignees: Registration[] = await this.$get('assignees') as Registration[];
         const assignments: Assignment[] = await Assignment.findAll({ where: { offering_id: this.id }});
 
-        return assignments.reduce((result: ClassSizeInformation, assignment: Assignment) => {
+        return assignments.reduce((result: ClassSizeDto, assignment: Assignment) => {
             assignment.periods.forEach((period: number) => {
                 (<any>result)[period] += 1;
             });
             return result;
-        }, <ClassSizeInformation>{
+        }, <ClassSizeDto>{
             size_limit: this.size_limit,
             total: assignees.length,
             1: 0,
@@ -127,12 +128,4 @@ export class Offering extends Model<Offering> implements OfferingInterface {
             3: 0
         });
     }
-}
-
-export interface ClassSizeInformation {
-    size_limit: number;
-    total: number;
-    1: number;
-    2: number;
-    3: number;
 }

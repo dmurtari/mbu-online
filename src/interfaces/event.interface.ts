@@ -1,7 +1,7 @@
 import { BadgeInterface, BadgeDto } from '@interfaces/badge.interface';
-import { OfferingInterface } from '@interfaces/offering.interface';
+import { OfferingInterface, OfferingDto } from '@interfaces/offering.interface';
 import { ScoutInterface } from '@interfaces/scout.interface';
-import { RegistrationPurchaseDto } from '@interfaces/registration.interface';
+import { RegistrationPurchasesDto, AssignmentRegistrationDto } from '@interfaces/registration.interface';
 import { PurchasableInterface, PurchasableDto } from '@interfaces/purchasable.interface';
 
 export enum Semester {
@@ -21,10 +21,11 @@ export interface EventInterface {
     purchasables?: PurchasableInterface[];
 }
 
-export interface EventDto<T = any> extends EventInterface {
+export interface EventDto<T = any, K = any> extends EventInterface {
     event_id?: number;
     purchasables?: PurchasableDto[];
     details?: T;
+    offerings?: BadgeDto<K>[];
 }
 
 export interface EventOfferingInterface extends EventInterface {
@@ -55,9 +56,16 @@ export interface IncomeCalculationResponseDto {
     income: string;
 }
 
+export interface AssigneeDto extends OfferingDto {
+    badge?: BadgeDto;
+    assignees?: AssignmentRegistrationDto[];
+}
+
+export type AssigneesResponseDto = AssigneeDto[];
+
 export type EventCreateDto = EventInterface;
 
-export type EventsResponseDto = EventDto[];
+export type EventsResponseDto = EventDto<undefined, OfferingDto>[];
 
 export type GetCurrentEventDto = EventInterface;
 
@@ -68,5 +76,13 @@ export interface SetCurrentEventDto {
 export interface EventStatisticsDto {
     scouts?: ScoutInterface[];
     offerings?: BadgeDto[];
-    registrations?: RegistrationPurchaseDto[]
+    registrations?: RegistrationPurchasesDto[];
+}
+
+export interface ClassSizeDto {
+    size_limit: number;
+    total: number;
+    1: number;
+    2: number;
+    3: number;
 }

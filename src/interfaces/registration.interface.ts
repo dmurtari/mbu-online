@@ -1,6 +1,6 @@
 import { OfferingInterface, OfferingDto } from '@interfaces/offering.interface';
 import { PreferenceInterface } from '@interfaces/preference.interface';
-import { PurchasableDto } from '@interfaces/purchasable.interface';
+import { PurchasableDto, PurchasableInterface } from '@interfaces/purchasable.interface';
 import { PurchaseInterface } from '@interfaces/purchase.interface';
 import { AssignmentInterface } from '@interfaces/assignment.interface';
 import { ScoutInterface } from '@interfaces/scout.interface';
@@ -12,6 +12,7 @@ export interface RegistrationInterface {
     notes?: string;
     preferences?: OfferingInterface[];
     assignments?: OfferingInterface[];
+    purchases?: PurchasableInterface[];
 }
 
 export interface RegistrationDto extends RegistrationInterface {
@@ -19,16 +20,26 @@ export interface RegistrationDto extends RegistrationInterface {
     scout?: ScoutInterface;
 }
 
-export interface RegistrationPreferenceDto extends RegistrationDto {
+export interface RegistrationDetailsDto extends RegistrationDto {
+    preferences: OfferingDto<PreferenceInterface>[];
+    assignments: OfferingDto<AssignmentInterface>[];
+    purchases?: PurchasableDto<PurchaseInterface>[];
+}
+
+export interface RegistrationPreferencesDto extends RegistrationDto {
     preferences: OfferingDto<PreferenceInterface>[];
 }
 
-export interface RegistrationAssignmentDto extends RegistrationDto {
+export interface RegistrationAssignmentsDto extends RegistrationDto {
     assignments: OfferingDto<AssignmentInterface>[];
 }
 
-export interface RegistrationPurchaseDto extends RegistrationDto {
+export interface RegistrationPurchasesDto extends RegistrationDto {
     purchases?: PurchasableDto<PurchaseInterface>[];
+}
+
+export interface AssignmentRegistrationDto extends RegistrationDto {
+    assignment?: AssignmentInterface;
 }
 
 export interface CreateRegistrationResponseDto {
@@ -45,4 +56,4 @@ export interface CostCalculationResponseDto {
     cost: string;
 }
 
-export type RegistrationsResponseDto = RegistrationDto[];
+export type RegistrationsResponseDto = RegistrationDetailsDto[];

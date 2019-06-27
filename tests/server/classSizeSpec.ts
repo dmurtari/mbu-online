@@ -13,7 +13,10 @@ import { Assignment } from '@models/assignment.model';
 import { Registration } from '@models/registration.model';
 import testScouts from './testScouts';
 import { CreateOfferingDto, OfferingInterface } from '@interfaces/offering.interface';
-import { CreateAssignmentRequestDto } from '@interfaces/assignment.interface';
+import { CreateAssignmentRequestDto, CreateAssignmentResponseDto } from '@interfaces/assignment.interface';
+import { SuperTestResponse } from '@test/helpers/supertest.interface';
+import { CreateRegistrationResponseDto } from '@interfaces/registration.interface';
+import { CreateOfferingResponseDto, EventsResponseDto, ClassSizeDto } from '@interfaces/event.interface';
 
 const request = supertest(app);
 
@@ -22,7 +25,7 @@ describe('Class sizes', () => {
     let events: Event[];
     let generatedUsers: RoleTokenObjects;
     let generatedScouts: Scout[];
-    let registrationIds: string[];
+    let registrationIds: number[];
 
     before(async () => {
         await TestUtils.dropDb();
@@ -52,7 +55,7 @@ describe('Class sizes', () => {
                     event_id: events[0].id
                 })
                 .expect(status.CREATED)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<CreateRegistrationResponseDto>) => {
                     if (err) { return done(err); }
                     registrationIds.push(res.body.registration.id);
                     return cb();
@@ -86,7 +89,7 @@ describe('Class sizes', () => {
                 .set('Authorization', generatedUsers.admin.token)
                 .send(postData)
                 .expect(status.CREATED)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<CreateOfferingResponseDto>) => {
                     if (err) { return done(err); }
                     const event = res.body.event;
                     expect(event.offerings).to.have.lengthOf(1);
@@ -102,7 +105,7 @@ describe('Class sizes', () => {
                 .set('Authorization', generatedUsers.admin.token)
                 .send(postData)
                 .expect(status.CREATED)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<CreateOfferingResponseDto>) => {
                     if (err) { return done(err); }
                     const event = res.body.event;
                     expect(event.offerings).to.have.lengthOf(1);
@@ -150,7 +153,7 @@ describe('Class sizes', () => {
                 .set('Authorization', generatedUsers.admin.token)
                 .send(postData)
                 .expect(status.CREATED)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<CreateOfferingResponseDto>) => {
                     if (err) { return done(err); }
                     const event = res.body.event;
                     offering = event.offerings[0];
@@ -168,7 +171,7 @@ describe('Class sizes', () => {
         it('should get the allowed class size', (done) => {
             request.get('/api/events?id=' + events[0].id)
                 .expect(status.OK)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<EventsResponseDto>) => {
                     if (err) { return done(err); }
                     const event = res.body[0];
                     expect(event.offerings.length).to.equal(1);
@@ -182,7 +185,7 @@ describe('Class sizes', () => {
             request.get('/api/events/' + events[0].id + '/badges/' + offering.id + '/limits')
                 .set('Authorization', generatedUsers.teacher.token)
                 .expect(status.OK)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<ClassSizeDto>) => {
                     if (err) { return done(err); }
                     const sizeInfo = res.body;
                     expect(sizeInfo).to.deep.equal({
@@ -223,14 +226,15 @@ describe('Class sizes', () => {
         });
 
         describe('and one scout has been assigned', () => {
-            let offeringId: string;
+            let offeringId: number;
 
             beforeEach((done) => {
                 request.post('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/assignments')
                     .set('Authorization', generatedUsers.teacher.token)
                     .send(assignmentData)
                     .expect(status.CREATED)
-                    .end((err, res) => {
+                    .end((err, res: SuperTestResponse<CreateAssignmentResponseDto>) => {
+                        if (err) { return done(err); }
                         offeringId = res.body.registration.assignments[0].offering_id;
                         return done();
                     });
@@ -240,7 +244,7 @@ describe('Class sizes', () => {
                 request.get('/api/events/' + events[0].id + '/badges/' + offering.id + '/limits')
                     .set('Authorization', generatedUsers.teacher.token)
                     .expect(status.OK)
-                    .end((err, res) => {
+                    .end((err, res: SuperTestResponse<ClassSizeDto>) => {
                         if (err) { return done(err); }
                         const sizeInfo = res.body;
                         expect(sizeInfo).to.deep.equal({
@@ -258,7 +262,7 @@ describe('Class sizes', () => {
                 request.put('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/assignments/' +
                     assignmentData.offering)
                     .set('Authorization', generatedUsers.teacher.token)
-                    .send({
+                    .send(<CreateAssignmentRequestDto>{
                         periods: [3]
                     })
                     .expect(status.OK, done);
@@ -283,7 +287,7 @@ describe('Class sizes', () => {
             it('should allow setting completions for that scout', (done) => {
                 request.put('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/assignments/' + offeringId)
                     .set('Authorization', generatedUsers.admin.token)
-                    .send({
+                    .send(<CreateAssignmentRequestDto>{
                         completions: ['1']
                     })
                     .expect(status.OK, done);
@@ -303,7 +307,7 @@ describe('Class sizes', () => {
                     request.put('/api/scouts/' + generatedScouts[1].id + '/registrations/' + registrationIds[1] + '/assignments/' +
                         assignmentData.offering)
                         .set('Authorization', generatedUsers.teacher.token)
-                        .send({
+                        .send(<CreateAssignmentRequestDto>{
                             periods: [1]
                         })
                         .expect(status.BAD_REQUEST, done);
@@ -332,7 +336,7 @@ describe('Class sizes', () => {
                 .set('Authorization', generatedUsers.admin.token)
                 .send(postData)
                 .expect(status.CREATED)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<CreateOfferingResponseDto>) => {
                     if (err) { return done(err); }
                     const event = res.body.event;
                     offering = event.offerings[0];
@@ -351,7 +355,7 @@ describe('Class sizes', () => {
             request.get('/api/events/' + events[0].id + '/badges/' + offering.id + '/limits')
                 .set('Authorization', generatedUsers.teacher.token)
                 .expect(status.OK)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<ClassSizeDto>) => {
                     if (err) { return done(err); }
                     const sizeInfo = res.body;
                     expect(sizeInfo).to.deep.equal({
@@ -377,7 +381,7 @@ describe('Class sizes', () => {
                 request.get('/api/events/' + events[0].id + '/badges/' + offering.id + '/limits')
                     .set('Authorization', generatedUsers.teacher.token)
                     .expect(status.OK)
-                    .end((err, res) => {
+                    .end((err, res: SuperTestResponse<ClassSizeDto>) => {
                         if (err) { return done(err); }
                         const sizeInfo = res.body;
                         expect(sizeInfo).to.deep.equal({
@@ -413,7 +417,7 @@ describe('Class sizes', () => {
                 .set('Authorization', generatedUsers.admin.token)
                 .send(postData)
                 .expect(status.CREATED)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<CreateOfferingResponseDto>) => {
                     if (err) { return done(err); }
                     const event = res.body.event;
                     offering = event.offerings[0];
@@ -432,7 +436,7 @@ describe('Class sizes', () => {
             request.get('/api/events/' + events[0].id + '/badges/' + offering.id + '/limits')
                 .set('Authorization', generatedUsers.teacher.token)
                 .expect(status.OK)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<ClassSizeDto>) => {
                     if (err) { return done(err); }
                     const sizeInfo = res.body;
                     expect(sizeInfo).to.deep.equal({
@@ -484,7 +488,7 @@ describe('Class sizes', () => {
                 request.get('/api/events/' + events[0].id + '/badges/' + offering.id + '/limits')
                     .set('Authorization', generatedUsers.teacher.token)
                     .expect(status.OK)
-                    .end((err, res) => {
+                    .end((err, res: SuperTestResponse<ClassSizeDto>) => {
                         if (err) { return done(err); }
                         const sizeInfo = res.body;
                         expect(sizeInfo).to.deep.equal({

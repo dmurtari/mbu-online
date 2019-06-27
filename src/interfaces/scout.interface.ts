@@ -1,22 +1,33 @@
-import { EventDto } from '@interfaces/event.interface';
+import { EventDto, EventInterface } from '@interfaces/event.interface';
 import { RegistrationDto } from '@interfaces/registration.interface';
+import { UserInterface, ScoutUserDto } from '@interfaces/user.interface';
 
 export interface ScoutInterface {
     id?: number;
     firstname?: string;
     lastname?: string;
+    fullname?: string;
     birthday?: Date;
     troop?: number;
     notes?: string;
     emergency_name?: string;
     emergency_relation?: string;
     emergency_phone?: string;
-    registrations?: any[];
+    user?: UserInterface;
+    registrations?: EventInterface[];
 }
 
-export type CreateScoutRequestDto = ScoutInterface;
+export interface ScoutDto extends ScoutInterface {
+    scout_id?: number;
+    user?: ScoutUserDto;
+    registrations?: EventDto<RegistrationDto>[];
+}
 
-export interface ScoutRegistrationDto extends ScoutInterface {
+export type ScoutsResponseDto = ScoutDto[];
+
+export type CreateScoutRequestDto = ScoutDto;
+
+export interface ScoutRegistrationDto extends ScoutDto {
     registrations: EventDto<RegistrationDto>[];
 }
 
@@ -24,5 +35,5 @@ export type ScoutRegistrationResponseDto = ScoutRegistrationDto[];
 
 export interface ScoutResponseDto {
     message: string;
-    scout: ScoutInterface;
+    scout: ScoutDto;
 }

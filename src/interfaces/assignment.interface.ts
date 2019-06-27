@@ -1,4 +1,4 @@
-import { RegistrationAssignmentDto } from '@interfaces/registration.interface';
+import { RegistrationAssignmentsDto } from '@interfaces/registration.interface';
 import { OfferingDto } from '@interfaces/offering.interface';
 
 export interface AssignmentInterface {
@@ -16,7 +16,7 @@ export interface CreateAssignmentRequestDto {
 
 export interface CreateAssignmentResponseDto {
     message: string;
-    registration: RegistrationAssignmentDto;
+    registration: RegistrationAssignmentsDto;
 }
 
 export interface UpdateAssignmentResponseDto {

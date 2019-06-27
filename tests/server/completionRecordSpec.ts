@@ -11,7 +11,9 @@ import { Scout } from '@models/scout.model';
 import { Offering } from '@models/offering.model';
 import { OfferingInterface } from '@interfaces/offering.interface';
 import testScouts from './testScouts';
-import { CreateAssignmentRequestDto, UpdateAssignmentResponseDto } from '@interfaces/assignment.interface';
+import { CreateAssignmentRequestDto, UpdateAssignmentResponseDto, CreateAssignmentResponseDto } from '@interfaces/assignment.interface';
+import { CreateRegistrationResponseDto, RegistrationRequestDto } from '@interfaces/registration.interface';
+import { SuperTestResponse } from '@test/helpers/supertest.interface';
 
 const request = supertest(app);
 
@@ -22,7 +24,7 @@ describe('completion records', () => {
     let generatedScouts: Scout[];
     let generatedOfferings: Offering[];
     let scoutId: string;
-    let registrationIds: string[];
+    let registrationIds: number[];
 
     const defaultRequirements: string[] = ['1', '2', '3a'];
 
@@ -56,11 +58,11 @@ describe('completion records', () => {
             (cb) => {
                 request.post('/api/scouts/' + scoutId + '/registrations')
                     .set('Authorization', generatedUsers.coordinator.token)
-                    .send({
+                    .send(<RegistrationRequestDto>{
                         event_id: events[0].id
                     })
                     .expect(status.CREATED)
-                    .end((err, res) => {
+                    .end((err, res: SuperTestResponse<CreateRegistrationResponseDto>) => {
                         if (err) { return done(err); }
                         registrationIds.push(res.body.registration.id);
                         return cb();
@@ -69,11 +71,11 @@ describe('completion records', () => {
             (cb) => {
                 request.post('/api/scouts/' + scoutId + '/registrations')
                     .set('Authorization', generatedUsers.coordinator.token)
-                    .send({
+                    .send(<RegistrationRequestDto>{
                         event_id: events[1].id
                     })
                     .expect(status.CREATED)
-                    .end((err, res) => {
+                    .end((err, res: SuperTestResponse<CreateRegistrationResponseDto>) => {
                         if (err) { return done(err); }
                         registrationIds.push(res.body.registration.id);
                         return cb();
@@ -103,7 +105,7 @@ describe('completion records', () => {
                 .set('Authorization', generatedUsers.admin.token)
                 .send(postData)
                 .expect(status.CREATED)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<CreateAssignmentResponseDto>) => {
                     if (err) { return done(err); }
                     const registration = (res.body as any).registration;
                     expect(registration.assignments).to.have.lengthOf(3);
@@ -121,9 +123,9 @@ describe('completion records', () => {
         it('should allow admins to change completion records', (done) => {
             request.put('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/assignments/' + generatedOfferings[0].id)
                 .set('Authorization', generatedUsers.admin.token)
-                .send({ completions: ['1', '2'] })
+                .send(<CreateAssignmentRequestDto>{ completions: ['1', '2'] })
                 .expect(status.OK)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<UpdateAssignmentResponseDto>) => {
                     if (err) { return done(err); }
                     const assignment = (res.body as UpdateAssignmentResponseDto).assignment;
                     expect(assignment.offering_id).to.equal(generatedOfferings[0].id);
@@ -135,14 +137,14 @@ describe('completion records', () => {
         it('should allow teachers to change completion records', (done) => {
             request.put('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/assignments/' + generatedOfferings[0].id)
                 .set('Authorization', generatedUsers.admin.token)
-                .send({ completions: ['1'] })
+                .send(<CreateAssignmentRequestDto>{ completions: ['1'] })
                 .expect(status.OK, done);
         });
 
         it('should not allow coordinators to change completion records', (done) => {
             request.put('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/assignments/' + generatedOfferings[0].id)
                 .set('Authorization', generatedUsers.coordinator.token)
-                .send({ completions: ['1'] })
+                .send(<CreateAssignmentRequestDto>{ completions: ['1'] })
                 .expect(status.UNAUTHORIZED, done);
         });
     });

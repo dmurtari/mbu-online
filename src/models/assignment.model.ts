@@ -1,8 +1,9 @@
 import { Table, Model, Column, DataType, Default, ForeignKey, BeforeValidate } from 'sequelize-typescript';
 
-import { Offering, ClassSizeInformation } from '@models/offering.model';
+import { Offering } from '@models/offering.model';
 import { Registration } from '@models/registration.model';
 import { AssignmentInterface } from '@interfaces/assignment.interface';
+import { ClassSizeDto } from '@interfaces/event.interface';
 
 @Table({
     underscored: true,
@@ -17,7 +18,7 @@ export class Assignment extends Model<Assignment> implements AssignmentInterface
 
         try {
             const offering: Offering = await Offering.findByPk(assignment.offering_id);
-            const sizes: ClassSizeInformation = await offering.getClassSizes();
+            const sizes: ClassSizeDto = await offering.getClassSizes();
 
             assignment.periods.forEach((period: number) => {
                 if ((<any>sizes)[period] >= sizes.size_limit) {

@@ -28,6 +28,11 @@ export interface UserDetailsInterface {
     council?: string;
     chapter?: string;
 }
+
+export interface ScoutUserDto extends UserInterface {
+    user_id?: number;
+}
+
 export interface SignupRequestDto {
     email: string;
     password: string;

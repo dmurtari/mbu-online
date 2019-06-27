@@ -10,12 +10,16 @@ import { Purchasable } from '@models/purchasable.model';
 import { Scout } from '@models/scout.model';
 import { Badge } from '@models/badge.model';
 import { Offering } from '@models/offering.model';
-import { Preference } from '@models/preference.model';
 import { UserRole } from '@interfaces/user.interface';
 import { OfferingInterface } from '@interfaces/offering.interface';
 import testScouts from './testScouts';
-import { CreatePreferenceRequestDto } from '@interfaces/preference.interface';
+import { CreatePreferenceRequestDto, CreatePreferenceResponseDto, PreferenceInterface } from '@interfaces/preference.interface';
 import { CreateAssignmentRequestDto } from '@interfaces/assignment.interface';
+import { CreateRegistrationResponseDto, RegistrationRequestDto, RegistrationsResponseDto } from '@interfaces/registration.interface';
+import { SuperTestResponse } from '@test/helpers/supertest.interface';
+import { CreatePurchaseRequestDto } from '@interfaces/purchase.interface';
+import { ScoutsResponseDto, ScoutDto } from '@interfaces/scout.interface';
+import { AssigneesResponseDto } from '@interfaces/event.interface';
 
 const request = supertest(app);
 
@@ -26,7 +30,7 @@ describe('using preference and assignments', () => {
     let generatedScouts: Scout[];
     let generatedBadges: Badge[];
     let generatedOfferings: Offering[];
-    let preferences: { [key: string]: Preference[]};
+    let preferences: { [key: string]: PreferenceInterface[]};
 
     const badId = TestUtils.badId;
 
@@ -67,15 +71,15 @@ describe('using preference and assignments', () => {
         }];
 
         async.forEachOfSeries(generatedScouts, (scout, index, cb) => {
-            let registrationId: string;
+            let registrationId: number;
 
             async.series([
                 (next) => {
                     request.post('/api/scouts/' + scout.id + '/registrations')
                         .set('Authorization', generatedUsers.coordinator.token)
-                        .send({ event_id: events[0].id })
+                        .send(<RegistrationRequestDto>{ event_id: events[0].id })
                         .expect(status.CREATED)
-                        .end((err, res) => {
+                        .end((err, res: SuperTestResponse<CreateRegistrationResponseDto>) => {
                             if (err) { return done(err); }
                             registrationId = res.body.registration.id;
                             return next();
@@ -84,7 +88,7 @@ describe('using preference and assignments', () => {
                 (next) => {
                     request.post('/api/scouts/' + scout.id + '/registrations/' + registrationId + '/purchases')
                         .set('Authorization', generatedUsers.coordinator.token)
-                        .send({
+                        .send(<CreatePurchaseRequestDto>{
                             purchasable: purchasables[0].id,
                             quantity: 2,
                             size: 'l'
@@ -96,7 +100,7 @@ describe('using preference and assignments', () => {
                         .set('Authorization', generatedUsers.admin.token)
                         .send(postData)
                         .expect(status.CREATED)
-                        .end((err, res) => {
+                        .end((err, res: SuperTestResponse<CreatePreferenceResponseDto>) => {
                             if (err) { return done(err); }
                             preferences[registrationId] = res.body.registration.preferences;
                             return next();
@@ -133,9 +137,9 @@ describe('using preference and assignments', () => {
             request.get('/api/events/' + events[0].id + '/registrations')
                 .set('Authorization', generatedUsers.admin.token)
                 .expect(status.OK)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<RegistrationsResponseDto>) => {
                     if (err) { return done(err); }
-                    res.body.forEach((registration: any) => {
+                    res.body.forEach((registration) => {
                         expect(registration.scout_id).to.exist;
                         expect(registration.scout).to.exist;
                         expect(registration.scout.firstname).to.exist;
@@ -145,19 +149,19 @@ describe('using preference and assignments', () => {
                         expect(registration.assignments).to.have.lengthOf(3);
                         expect(registration.purchases).to.have.lengthOf(1);
 
-                        registration.preferences.forEach((preference: any) => {
+                        registration.preferences.forEach((preference) => {
                             expect(preference.badge.name).to.exist;
                             expect(preference.details.rank).to.exist;
                         });
 
-                        registration.purchases.forEach((purchase: any) => {
+                        registration.purchases.forEach((purchase) => {
                             expect(purchase.item).to.exist;
                             expect(purchase.price).to.exist;
                             expect(purchase.details.quantity).to.exist;
                             expect(purchase.details.size).to.exist;
                         });
 
-                        registration.assignments.forEach((assignment: any) => {
+                        registration.assignments.forEach((assignment) => {
                             expect(assignment.badge.name).to.exist;
                             expect(assignment.details.periods).to.exist;
                             expect(assignment.details.completions).to.exist;
@@ -192,11 +196,11 @@ describe('using preference and assignments', () => {
             request.get('/api/scouts')
                 .set('Authorization', generatedUsers.admin.token)
                 .expect(status.OK)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<ScoutsResponseDto>) => {
                     if (err) { return done(err); }
                     const scouts = res.body;
                     expect(scouts).to.have.lengthOf(10);
-                    scouts.forEach((scout: Scout) => {
+                    scouts.forEach((scout) => {
                         expect(scout.firstname).to.exist;
                         expect(scout.lastname).to.exist;
                         expect(scout.troop).to.exist;
@@ -221,12 +225,12 @@ describe('using preference and assignments', () => {
             request.get('/api/scouts')
                 .set('Authorization', generatedUsers.admin.token)
                 .expect(status.OK)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<ScoutsResponseDto>) => {
                     if (err) { return done(err); }
                     const scouts = res.body;
                     expect(scouts).to.have.lengthOf(10);
-                    scouts.forEach((scout: any) => {
-                        scout.registrations.forEach((registration: any) => {
+                    scouts.forEach((scout) => {
+                        scout.registrations.forEach((registration) => {
                             expect(registration.details.id).to.exist;
                             expect(registration.event_id).to.exist;
                             expect(registration.year).to.exist;
@@ -241,11 +245,11 @@ describe('using preference and assignments', () => {
             request.get('/api/scouts')
                 .set('Authorization', generatedUsers.admin.token)
                 .expect(status.OK)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<ScoutsResponseDto>) => {
                     if (err) { return done(err); }
                     const scouts = res.body;
                     expect(scouts).to.have.lengthOf(10);
-                    scouts.forEach((scout: any) => {
+                    scouts.forEach((scout) => {
                         expect(scout.user.fullname).to.exist;
                         expect(scout.user.email).to.exist;
                         expect(scout.user.user_id).to.exist;
@@ -264,7 +268,7 @@ describe('using preference and assignments', () => {
             request.get('/api/scouts/' + generatedScouts[0].id)
                 .set('Authorization', generatedUsers.admin.token)
                 .expect(status.OK)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<ScoutDto>) => {
                     if (err) { return done(err); }
                     const scout = res.body;
                     expect(scout.scout_id).to.equal(generatedScouts[0].id);
@@ -281,14 +285,14 @@ describe('using preference and assignments', () => {
             request.get('/api/events/' + events[0].id + '/offerings/assignees')
                 .set('Authorization', generatedUsers.admin.token)
                 .expect(status.OK)
-                .end((err, res) => {
+                .end((err, res: SuperTestResponse<AssigneesResponseDto>) => {
                     if (err) { return done(err); }
                     const offerings = res.body;
                     expect(offerings).to.have.lengthOf(3);
-                    offerings.forEach((offering: any) => {
+                    offerings.forEach((offering) => {
                         expect(offering.badge.name).to.exist;
                         expect(offering.assignees).to.have.lengthOf(5);
-                        offering.assignees.forEach((assignee: any) => {
+                        offering.assignees.forEach((assignee) => {
                             expect(assignee.scout.fullname).to.exist;
                             expect(assignee.scout.troop).to.exist;
                             expect(assignee.assignment.periods).to.exist;

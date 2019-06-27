@@ -1,9 +1,14 @@
+import { BadgeInterface } from '@interfaces/badge.interface';
+import { RegistrationInterface } from '@interfaces/registration.interface';
+
 export interface OfferingInterface {
     id?: number;
     duration?: number;
     periods?: number[];
     price?: number|string;
     requirements?: string[];
+    badge?: BadgeInterface;
+    assignees?: RegistrationInterface[];
     event_id?: number;
     badge_id?: number;
     size_limit?: number;
