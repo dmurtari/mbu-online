@@ -1,7 +1,7 @@
 {
     "development": {
         "username": "mbu",
-        "password": null,
+        "password": "mbu",
         "database": "mbu",
         "host": "localhost",
         "dialect": "postgres"
