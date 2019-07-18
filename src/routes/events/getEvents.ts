@@ -15,7 +15,6 @@ import { Registration } from '@models/registration.model';
 import { Scout } from '@models/scout.model';
 import { CalculationType } from '@routes/shared/calculationType.enum';
 import { PurchasableDto } from '@interfaces/purchasable.interface';
-import { Purchase } from '@models/purchase.model';
 
 export const getEvent = async (req: Request, res: Response) => {
     try {
