@@ -530,5 +530,27 @@ describe('event badge association', () => {
                     .expect(status.BAD_REQUEST, done);
             });
         });
+
+        describe('deleting a badge', () => {
+            it('should delete associated offerings', async () => {
+                await request.get('/api/events?id=' + events[0].id)
+                    .expect(status.OK)
+                    .then((res: SuperTestResponse<EventsResponseDto>) => {
+                        const event = res.body[0];
+                        expect(event.offerings.length).to.equal(3);
+                    });
+
+                await request.del(`/api/badges/${badges[0].id}`)
+                    .set('Authorization', adminToken)
+                    .expect(status.OK);
+
+                await request.get('/api/events?id=' + events[0].id)
+                    .expect(status.OK)
+                    .then((res: SuperTestResponse<EventsResponseDto>) => {
+                        const event = res.body[0];
+                        expect(event.offerings.length).to.equal(2);
+                    });
+            });
+        });
     });
 });
