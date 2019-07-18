@@ -1,14 +1,14 @@
 'use strict';
 
 module.exports = {
-  up: (queryInterface, Sequelize) => {
-    queryInterface.addColumn('Offerings', 'size_limit', {
-      type: Sequelize.INTEGER,
-      defaultValue: 20
-    });
-  },
+    up: (queryInterface, Sequelize) => {
+        return queryInterface.addColumn('Offerings', 'size_limit', {
+            type: Sequelize.INTEGER,
+            defaultValue: 20
+        });
+    },
 
-  down: (queryInterface) => {
-    queryInterface.removeColumn('Offerings', 'size_limit');
-  }
+    down: (queryInterface) => {
+        return queryInterface.removeColumn('Offerings', 'size_limit');
+    }
 };
