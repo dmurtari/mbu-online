@@ -19,7 +19,7 @@ export class Purchase extends Model<Purchase> implements PurchaseInterface {
                 return;
             }
 
-            if (currentPurchaserCount + purchase.quantity > purchasable.purchaser_limit) {
+            if (currentPurchaserCount + Number(purchase.quantity) > purchasable.purchaser_limit) {
                 throw new Error(`Purchaser limit has been met`);
             }
         } catch {

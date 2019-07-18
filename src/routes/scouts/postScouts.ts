@@ -208,7 +208,7 @@ export const createPurchase = async (req: Request, res: Response) => {
     } catch (err) {
         return res.status(status.BAD_REQUEST).json(<ErrorResponseDto>{
             message: 'Purchase could not be created',
-            error: 'err'
+            error: err
         });
     }
 };
