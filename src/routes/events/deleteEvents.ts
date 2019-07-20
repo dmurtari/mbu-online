@@ -3,8 +3,8 @@ import status from 'http-status-codes';
 
 import { Event } from '@models/event.model';
 import { ErrorResponseDto } from '@app/interfaces/shared.interface';
-import { Badge } from '@models/badge.model';
 import { Purchasable } from '@models/purchasable.model';
+import { Offering } from '@models/offering.model';
 
 export const deleteEvent = async (req: Request, res: Response) => {
     try {
@@ -22,16 +22,18 @@ export const deleteEvent = async (req: Request, res: Response) => {
 
 export const deleteOffering = async (req: Request, res: Response) => {
     try {
-        const [event, badge] = await Promise.all([
-            Event.findByPk(req.params.eventId),
-            Badge.findByPk(req.params.badgeId)
-        ]);
+        const offering: Offering = await Offering.findOne({
+            where: {
+                badge_id: req.params.badgeId,
+                event_id: req.params.eventId
+            }
+        });
 
-        if (!badge) {
+        if (!offering) {
             throw new Error('Badge to remove as offering does not exist');
         }
 
-        await event.$remove('offerings', req.params.badgeId);
+        await offering.destroy();
 
         return res.status(status.OK).end();
     } catch (err) {
@@ -49,11 +51,11 @@ export const deletePurchasable = async (req: Request, res: Response) => {
             Purchasable.findByPk(req.params.purchasableId)
         ]);
 
-        if (!purchasable) {
+        if (!purchasable || !event) {
             throw new Error('Purchasable to remove not found');
         }
 
-        await event.$remove('purchasables', req.params.purchasableId);
+        await purchasable.destroy();
 
         return res.status(status.OK).end();
     } catch (err) {
@@ -63,20 +65,3 @@ export const deletePurchasable = async (req: Request, res: Response) => {
         });
     }
 };
-
-//   deletePurchasable: function (req, res) {
-//     var eventId = req.params.eventId;
-//     var purchasableId = req.params.purchasableId;
-
-//     Model.Event.findById(eventId)
-//       .then(function (event) {
-//         return event.removePurchasables(purchasableId);
-//       })
-//       .then(function () {
-//         return res.status(status.OK).end();
-//       })
-//       .catch(function () {
-//         return res.status(status.BAD_REQUEST).end();
-//       });
-//   }
-// };
