@@ -196,7 +196,7 @@ export const getAssignees = async (req: Request, res: Response) => {
                         'notes'
                     ],
                 },
-                through: {
+                through: <any>{
                     as: 'assignment',
                     attributes: [
                         'periods',

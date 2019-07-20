@@ -148,7 +148,7 @@ async function getRegistrationDetails(req: Request, res: Response, target: 'pref
                 model: detailQueryMap[target].model,
                 as: target,
                 attributes: detailQueryMap[target].modelAttributes,
-                through: {
+                through: <any>{
                     as: 'details',
                     attributes: detailQueryMap[target].joinAttributes
                 }

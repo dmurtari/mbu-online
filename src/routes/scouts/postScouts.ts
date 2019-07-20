@@ -80,7 +80,7 @@ export const createPreference = async (req: Request, res: Response) => {
             });
 
             await registration.$add('preference', req.body.offering, {
-                through: {
+                through: <any>{
                     rank: req.body.rank
                 }
             });
@@ -91,7 +91,7 @@ export const createPreference = async (req: Request, res: Response) => {
                 model: Offering,
                 as: 'preferences',
                 attributes: ['badge_id', ['id', 'offering_id']],
-                through: {
+                through: <any>{
                     as: 'details',
                     attributes: ['rank']
                 }
@@ -148,7 +148,7 @@ export const createAssignment = async (req: Request, res: Response) => {
                 model: Offering,
                 as: 'assignments',
                 attributes: ['badge_id', ['id', 'offering_id'], 'price'],
-                through: {
+                through: <any>{
                     as: 'details',
                     attributes: ['periods', 'completions']
                 },
@@ -188,13 +188,11 @@ export const createPurchase = async (req: Request, res: Response) => {
             registration_id: req.params.registrationId
         });
 
-        // await registration.$add('purchase', purchase);
-
         const createdRegistration: Registration = await Registration.findByPk(req.params.registrationId, {
             include: [{
                 model: Purchasable,
                 as: 'purchases',
-                through: {
+                through: <any>{
                     as: 'details',
                     attributes: ['size', 'quantity']
                 }

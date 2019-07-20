@@ -19,7 +19,7 @@ export default <FindOptions>{
             model: Offering,
             as: 'preferences',
             attributes: [['id', 'offering_id'], 'duration', 'periods', 'price'],
-            through: {
+            through: <any>{
                 as: 'details',
                 attributes: ['rank']
             },
@@ -32,7 +32,7 @@ export default <FindOptions>{
             model: Offering,
             as: 'assignments',
             attributes: [['id', 'offering_id'], 'price'],
-            through: {
+            through: <any>{
                 as: 'details',
                 attributes: ['periods', 'completions']
             },
@@ -45,7 +45,7 @@ export default <FindOptions>{
             model: Purchasable,
             as: 'purchases',
             attributes: [['id', 'purchasable_id'], 'item', 'price', 'has_size'],
-            through: {
+            through: <any>{
                 as: 'details',
                 attributes: ['size', 'quantity']
             },

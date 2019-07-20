@@ -19,7 +19,13 @@ import {
 import { Registration } from '@models/registration.model';
 import { Purchase } from '@models/purchase.model';
 import testScouts from './testScouts';
-import { CreatePurchaseRequestDto, Size, CreatePurchaseResponseDto, ScoutPurchasesResponseDto, BuyersResponseDto } from '@interfaces/purchase.interface';
+import {
+    CreatePurchaseRequestDto,
+    Size,
+    CreatePurchaseResponseDto,
+    ScoutPurchasesResponseDto,
+    BuyersResponseDto
+} from '@interfaces/purchase.interface';
 import { SuperTestResponse } from '@test/helpers/supertest.interface';
 import { EventsResponseDto } from '@interfaces/event.interface';
 import { RegistrationDto, CreateRegistrationResponseDto } from '@interfaces/registration.interface';
@@ -1190,7 +1196,7 @@ describe('purchasables', () => {
                     });
                 });
 
-                describe.only('when an associated purchasable is deleted', () => {
+                describe('when an associated purchasable is deleted', () => {
                     it('should delete associated purchases', async () => {
                         await request.get('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/purchases')
                             .set('Authorization', generatedUsers.coordinator.token)
