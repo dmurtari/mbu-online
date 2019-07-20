@@ -1189,6 +1189,28 @@ describe('purchasables', () => {
                             .expect(status.BAD_REQUEST, done);
                     });
                 });
+
+                describe.only('when an associated purchasable is deleted', () => {
+                    it('should delete associated purchases', async () => {
+                        await request.get('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/purchases')
+                            .set('Authorization', generatedUsers.coordinator.token)
+                            .expect(status.OK)
+                            .then((res: SuperTestResponse<ScoutPurchasesResponseDto>) => {
+                                expect(res.body).to.have.length(2);
+                            });
+
+                        await request.del('/api/events/' + events[0].id + '/purchasables/' + purchasableIds[0])
+                            .set('Authorization', generatedUsers.admin.token)
+                            .expect(status.OK);
+
+                        await request.get('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/purchases')
+                            .set('Authorization', generatedUsers.coordinator.token)
+                            .expect(status.OK)
+                            .then((res: SuperTestResponse<ScoutPurchasesResponseDto>) => {
+                                expect(res.body).to.have.length(1);
+                            });
+                    });
+                });
             });
         });
     });
