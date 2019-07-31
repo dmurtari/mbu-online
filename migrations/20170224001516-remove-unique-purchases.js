@@ -2,7 +2,7 @@
 
 module.exports = {
     up: function (queryInterface) {
-        Promise.all([
+        return Promise.all([
             queryInterface.sequelize.query('ALTER TABLE "Purchases" DROP CONSTRAINT "Purchases_pkey";'),
             queryInterface.removeIndex('Purchases', 'Purchases_pkey'),
         ]);
