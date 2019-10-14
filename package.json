@@ -20,7 +20,11 @@
     "tslint": "tslint -c tslint.json -p tsconfig.json",
     "debug": "npm run build && npm run watch-debug",
     "serve-debug": "nodemon --inspect dist/app.js",
-    "watch-debug": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold\" \"npm run watch-ts\" \"npm run serve-debug\""
+    "watch-debug": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold\" \"npm run watch-ts\" \"npm run serve-debug\"",
+    "start-client": "react-scripts start",
+    "build-client": "react-scripts build",
+    "test-client": "react-scripts test",
+    "eject-client": "react-scripts eject"
   },
   "repository": {
     "type": "git",
@@ -71,6 +75,10 @@
   },
   "dependencies": {
     "@sendgrid/mail": "6.3.1",
+    "@types/jest": "24.0.18",
+    "@types/node": "12.7.12",
+    "@types/react-dom": "16.9.1",
+    "@types/react": "16.9.5",
     "bcrypt": "3.0.4",
     "body-parser": "1.18.3",
     "compression": "1.7.3",
@@ -85,14 +93,18 @@
     "moment": "2.24.0",
     "morgan": "1.9.1",
     "npm": "^6.10.2",
-    "passport": "0.4.0",
     "passport-jwt": "4.0.0",
+    "passport": "0.4.0",
     "path": "0.12.7",
     "pg": "7.12.0",
+    "react-dom": "^16.10.2",
+    "react-scripts": "3.2.0",
+    "react": "^16.10.2",
     "reflect-metadata": "0.1.13",
-    "sequelize": "5.12.0",
     "sequelize-cli": "5.5.0",
-    "sequelize-typescript": "1.0.0-beta.3"
+    "sequelize-typescript": "1.0.0-beta.3",
+    "sequelize": "5.12.0",
+    "typescript": "3.6.4"
   },
   "_moduleAliases": {
     "@models": "./dist/models",
@@ -101,5 +113,17 @@
     "@interfaces": "./dist/interfaces",
     "@middleware": "./dist/middleware",
     "@app": "./dist"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }
