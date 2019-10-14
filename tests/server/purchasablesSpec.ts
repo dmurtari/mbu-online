@@ -40,11 +40,11 @@ describe('purchasables', () => {
 
     const badId = TestUtils.badId;
 
-    before(async () => {
+    beforeAll(async () => {
         await TestUtils.dropDb();
     });
 
-    before(async () => {
+    beforeAll(async () => {
         generatedUsers = await TestUtils.generateTokens([
             UserRole.ADMIN,
             UserRole.TEACHER,
@@ -59,12 +59,13 @@ describe('purchasables', () => {
         await TestUtils.dropTable([Purchasable]);
     });
 
-    after(async () => {
+    afterAll(async () => {
         await TestUtils.dropDb();
+        await TestUtils.closeDb();
     });
 
     describe('creating a purchasable', () => {
-        it('should be able to be created for an event', (done) => {
+        test('should be able to be created for an event', (done) => {
             const postData: CreatePurchasableDto = {
                 item: 'T-Shirt',
                 description: 'A t-shirt',
@@ -85,7 +86,7 @@ describe('purchasables', () => {
                 });
         });
 
-        it('should not require a description', (done) => {
+        test('should not require a description', (done) => {
             const postData: CreatePurchasableDto = {
                 item: 'T-Shirt',
                 price: '10.00'
@@ -104,7 +105,7 @@ describe('purchasables', () => {
                 });
         });
 
-        it('should be created with a maximum age', (done) => {
+        test('should be created with a maximum age', (done) => {
             const postData: CreatePurchasableDto = {
                 item: 'Youth Lunch',
                 price: '10.00',
@@ -125,7 +126,7 @@ describe('purchasables', () => {
                 });
         });
 
-        it('should not allow a blank maximum age', (done) => {
+        test('should not allow a blank maximum age', (done) => {
             const postData: any = {
                 item: 'Youth Lunch',
                 price: '10.00',
@@ -138,7 +139,7 @@ describe('purchasables', () => {
                 .expect(status.BAD_REQUEST, done);
         });
 
-        it('should not allow a blank minimum age', (done) => {
+        test('should not allow a blank minimum age', (done) => {
             const postData: any = {
                 item: 'Youth Lunch',
                 price: '10.00',
@@ -151,7 +152,7 @@ describe('purchasables', () => {
                 .expect(status.BAD_REQUEST, done);
         });
 
-        it('should be created with whether the item has a size', (done) => {
+        test('should be created with whether the item has a size', (done) => {
             const postData: CreatePurchasableDto = {
                 item: 'T-Shirt',
                 price: '10.00',
@@ -172,7 +173,7 @@ describe('purchasables', () => {
                 });
         });
 
-        it('should not allow size as an empty string', (done) => {
+        test('should not allow size as an empty string', (done) => {
             const postData: any = {
                 item: 'Youth Lunch',
                 price: '10.00',
@@ -185,7 +186,7 @@ describe('purchasables', () => {
                 .expect(status.BAD_REQUEST, done);
         });
 
-        it('should be created with a minimum', (done) => {
+        test('should be created with a minimum', (done) => {
             const postData: CreatePurchasableDto = {
                 item: 'Adult Lunch',
                 price: '12.00',
@@ -206,7 +207,7 @@ describe('purchasables', () => {
                 });
         });
 
-        it('should create with an age range', (done) => {
+        test('should create with an age range', (done) => {
             const postData: CreatePurchasableDto = {
                 item: 'Teen Lunch',
                 price: '12.00',
@@ -229,7 +230,7 @@ describe('purchasables', () => {
                 });
         });
 
-        it('should not create with an invalid range', (done) => {
+        test('should not create with an invalid range', (done) => {
             const postData: CreatePurchasableDto = {
                 item: 'Teen Lunch',
                 price: '12.00',
@@ -243,7 +244,7 @@ describe('purchasables', () => {
                 .expect(status.BAD_REQUEST, done);
         });
 
-        it('should not allow an invalid age', (done) => {
+        test('should not allow an invalid age', (done) => {
             const postData: any = {
                 item: 'Teen Lunch',
                 price: '12.00',
@@ -256,7 +257,7 @@ describe('purchasables', () => {
                 .expect(status.BAD_REQUEST, done);
         });
 
-        it('should not create with invalid data', (done) => {
+        test('should not create with invalid data', (done) => {
             request.post('/api/events/' + events[0].id + '/purchasables')
                 .set('Authorization', generatedUsers.admin.token)
                 .send({
@@ -265,13 +266,13 @@ describe('purchasables', () => {
                 .expect(status.BAD_REQUEST, done);
         });
 
-        it('should require admin authorization', (done) => {
+        test('should require admin authorization', (done) => {
             request.post('/api/events/' + events[0].id + '/purchasables')
                 .set('Authorization', generatedUsers.teacher.token)
                 .expect(status.UNAUTHORIZED, done);
         });
 
-        it('should not create for a bad event', (done) => {
+        test('should not create for a bad event', (done) => {
             request.post('/api/events/' + badId + '/purchasables')
                 .set('Authorization', generatedUsers.admin.token)
                 .expect(status.BAD_REQUEST, done);
@@ -351,7 +352,7 @@ describe('purchasables', () => {
         });
 
         describe('getting purchasables', () => {
-            it('should show purchasables for an event', (done) => {
+            test('should show purchasables for an event', (done) => {
                 request.get('/api/events/' + events[0].id + '/purchasables')
                     .expect(status.OK)
                     .end((err, res: SuperTestResponse<PurchasablesResponseDto>) => {
@@ -367,7 +368,7 @@ describe('purchasables', () => {
                     });
             });
 
-            it('should get different purchasables for a second event', (done) => {
+            test('should get different purchasables for a second event', (done) => {
                 request.get('/api/events/' + events[1].id + '/purchasables')
                     .expect(status.OK)
                     .end((err, res: SuperTestResponse<PurchasablesResponseDto>) => {
@@ -384,7 +385,7 @@ describe('purchasables', () => {
                     });
             });
 
-            it('should include purchasables for all events', (done) => {
+            test('should include purchasables for all events', (done) => {
                 request.get('/api/events/')
                     .expect(status.OK)
                     .end((err, res: SuperTestResponse<EventsResponseDto>) => {
@@ -397,14 +398,14 @@ describe('purchasables', () => {
                     });
             });
 
-            it('should not get purchasables for a bad event', (done) => {
+            test('should not get purchasables for a bad event', (done) => {
                 request.get('/api/events/' + badId + '/purchasables')
                     .expect(status.BAD_REQUEST, done);
             });
         });
 
         describe('updating purchasables', () => {
-            it('should update an existing purchasable', (done) => {
+            test('should update an existing purchasable', (done) => {
                 request.put('/api/events/' + events[0].id + '/purchasables/' + purchasableIds[0])
                     .set('Authorization', generatedUsers.admin.token)
                     .send(<UpdatePurchasableDto>{
@@ -424,7 +425,7 @@ describe('purchasables', () => {
                     });
             });
 
-            it('should update an age requirement', (done) => {
+            test('should update an age requirement', (done) => {
                 request.put('/api/events/' + events[1].id + '/purchasables/' + purchasableIds[3])
                     .set('Authorization', generatedUsers.admin.token)
                     .send(<UpdatePurchasableDto>{
@@ -441,7 +442,7 @@ describe('purchasables', () => {
                     });
             });
 
-            it('should update with new information', (done) => {
+            test('should update with new information', (done) => {
                 request.put('/api/events/' + events[0].id + '/purchasables/' + purchasableIds[0])
                     .set('Authorization', generatedUsers.admin.token)
                     .send(<UpdatePurchasableDto>{
@@ -462,7 +463,7 @@ describe('purchasables', () => {
 
             });
 
-            it('should not update without required fields', (done) => {
+            test('should not update without required fields', (done) => {
                 request.put('/api/events/' + events[0].id + '/purchasables/' + purchasableIds[0])
                     .set('Authorization', generatedUsers.admin.token)
                     .send(<UpdatePurchasableDto>{
@@ -472,7 +473,7 @@ describe('purchasables', () => {
                     .expect(status.BAD_REQUEST, done);
             });
 
-            it('should not update for an invalid event', (done) => {
+            test('should not update for an invalid event', (done) => {
                 request.put('/api/events/' + badId + '/purchasables/' + purchasableIds[0])
                     .set('Authorization', generatedUsers.admin.token)
                     .send(<UpdatePurchasableDto>{
@@ -482,7 +483,7 @@ describe('purchasables', () => {
                     .expect(status.BAD_REQUEST, done);
             });
 
-            it('should not update for an invalid purchasable', (done) => {
+            test('should not update for an invalid purchasable', (done) => {
                 request.put('/api/events/' + events[0].id + '/purchasables/' + badId)
                     .set('Authorization', generatedUsers.admin.token)
                     .send(<UpdatePurchasableDto>{
@@ -492,13 +493,13 @@ describe('purchasables', () => {
                     .expect(status.BAD_REQUEST, done);
             });
 
-            it('should require admin privileges', (done) => {
+            test('should require admin privileges', (done) => {
                 request.put('/api/events/' + events[0].id + '/purchasables/' + purchasableIds[0])
                     .set('Authorization', generatedUsers.coordinator.token)
                     .expect(status.UNAUTHORIZED, done);
             });
 
-            it('should not create invalid fields', (done) => {
+            test('should not create invalid fields', (done) => {
                 request.put('/api/events/' + events[0].id + '/purchasables/' + purchasableIds[0])
                     .set('Authorization', generatedUsers.admin.token)
                     .send(<UpdatePurchasableDto>{
@@ -517,7 +518,7 @@ describe('purchasables', () => {
         });
 
         describe('deleting purchasables', () => {
-            it('should delete purchasables from an event', (done) => {
+            test('should delete purchasables from an event', (done) => {
                 async.series([
                     (cb) => {
                         request.get('/api/events/' + events[0].id + '/purchasables')
@@ -546,19 +547,19 @@ describe('purchasables', () => {
                 ], done);
             });
 
-            it('should require admin privileges', (done) => {
+            test('should require admin privileges', (done) => {
                 request.del('/api/events/' + events[0].id + '/purchasables/' + purchasableIds[0])
                     .set('Authorization', generatedUsers.coordinator.token)
                     .expect(status.UNAUTHORIZED, done);
             });
 
-            it('should not delete from a bad event', (done) => {
+            test('should not delete from a bad event', (done) => {
                 request.del('/api/events/' + badId + '/purchasables/' + purchasableIds[0])
                     .set('Authorization', generatedUsers.admin.token)
                     .expect(status.BAD_REQUEST, done);
             });
 
-            it('should not delete a bad purchasable', (done) => {
+            test('should not delete a bad purchasable', (done) => {
                 request.del('/api/events/' + events[0].id + '/purchasables/' + badId)
                     .set('Authorization', generatedUsers.admin.token)
                     .expect(status.BAD_REQUEST, done);
@@ -628,7 +629,7 @@ describe('purchasables', () => {
             });
 
             describe('creating a purchase', () => {
-                it('should associate the purchasable to an event', (done) => {
+                test('should associate the purchasable to an event', (done) => {
                     const postData: CreatePurchaseRequestDto = {
                         purchasable: purchasables[1].id,
                         quantity: 3
@@ -649,7 +650,7 @@ describe('purchasables', () => {
                         });
                 });
 
-                it('should allow a scout that is in the valid age range', (done) => {
+                test('should allow a scout that is in the valid age range', (done) => {
                     let validPurchaseId: number;
                     async.series([
                         (cb) => {
@@ -683,7 +684,7 @@ describe('purchasables', () => {
                     ], done);
                 });
 
-                xit('should allow scouts to purchase an item multiple times', (done) => {
+                xtest('should allow scouts to purchase an item multiple times', (done) => {
                     const postData: CreatePurchaseRequestDto = {
                         purchasable: purchasables[1].id,
                         quantity: 3
@@ -716,7 +717,7 @@ describe('purchasables', () => {
                     ], done);
                 });
 
-                xit('should not allow a scout that is too old to purchase', (done) => {
+                xtest('should not allow a scout that is too old to purchase', (done) => {
                     let invalidPurchaseId: number;
                     async.series([
                         (cb) => {
@@ -750,7 +751,7 @@ describe('purchasables', () => {
                     ], done);
                 });
 
-                it('should default to 0 for quantity', (done) => {
+                test('should default to 0 for quantity', (done) => {
                     const postData: CreatePurchaseRequestDto = {
                         purchasable: purchasables[0].id
                     };
@@ -770,7 +771,7 @@ describe('purchasables', () => {
                         });
                 });
 
-                it('should accept a size', (done) => {
+                test('should accept a size', (done) => {
                     const postData: CreatePurchaseRequestDto = {
                         purchasable: purchasables[0].id,
                         size: Size.L,
@@ -792,7 +793,7 @@ describe('purchasables', () => {
                         });
                 });
 
-                it('should check for the scouts owner', (done) => {
+                test('should check for the scouts owner', (done) => {
                     const postData: CreatePurchaseRequestDto = {
                         purchasable: purchasables[0].id,
                         size: Size.L,
@@ -805,7 +806,7 @@ describe('purchasables', () => {
                         .expect(status.UNAUTHORIZED, done);
                 });
 
-                it('should not allow teachers to create', (done) => {
+                test('should not allow teachers to create', (done) => {
                     const postData: CreatePurchaseRequestDto = {
                         purchasable: purchasables[0].id,
                         size: Size.L,
@@ -818,7 +819,7 @@ describe('purchasables', () => {
                         .expect(status.UNAUTHORIZED, done);
                 });
 
-                it('should allow admins to create', (done) => {
+                test('should allow admins to create', (done) => {
                     const postData: CreatePurchaseRequestDto = {
                         purchasable: purchasables[0].id,
                         size: Size.L,
@@ -831,7 +832,7 @@ describe('purchasables', () => {
                         .expect(status.CREATED, done);
                 });
 
-                it('should not create for a nonexistant purchasable', (done) => {
+                test('should not create for a nonexistant purchasable', (done) => {
                     const postData: CreatePurchaseRequestDto = {
                         purchasable: TestUtils.badId as any,
                         quantity: 1
@@ -843,7 +844,7 @@ describe('purchasables', () => {
                         .expect(status.BAD_REQUEST, done);
                 });
 
-                it('should not create for a nonexistant registration', (done) => {
+                test('should not create for a nonexistant registration', (done) => {
                     const postData: CreatePurchaseRequestDto = {
                         purchasable: purchasables[0].id,
                         quantity: 1
@@ -855,7 +856,7 @@ describe('purchasables', () => {
                         .expect(status.BAD_REQUEST, done);
                 });
 
-                it('should not create for a nonexistant scout', (done) => {
+                test('should not create for a nonexistant scout', (done) => {
                     const postData: CreatePurchaseRequestDto = {
                         purchasable: purchasables[0].id,
                         quantity: 1
@@ -921,7 +922,7 @@ describe('purchasables', () => {
                 });
 
                 describe('getting purchases', () => {
-                    it('should get all purchases for a registration', (done) => {
+                    test('should get all purchases for a registration', (done) => {
                         request.get('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/purchases')
                             .set('Authorization', generatedUsers.coordinator.token)
                             .expect(status.OK)
@@ -939,19 +940,19 @@ describe('purchasables', () => {
                             });
                     });
 
-                    it('should not get with an incorrect scout', (done) => {
+                    test('should not get with an incorrect scout', (done) => {
                         request.get('/api/scouts/' + badId + '/registrations/' + registrationIds[0] + '/purchases')
                             .set('Authorization', generatedUsers.coordinator.token)
                             .expect(status.BAD_REQUEST, done);
                     });
 
-                    it('should not get with an incorrect registration', (done) => {
+                    test('should not get with an incorrect registration', (done) => {
                         request.get('/api/scouts/' + generatedScouts[0].id + '/registrations/' + badId + '/purchases')
                             .set('Authorization', generatedUsers.coordinator.token)
                             .expect(status.BAD_REQUEST, done);
                     });
 
-                    it('should get the buyers of an item', async () => {
+                    test('should get the buyers of an item', async () => {
                         await request.get(`/api/events/${events[0].id}/purchasables/${purchasables[0].id}/buyers`)
                             .set('Authorization', generatedUsers.admin.token)
                             .expect(status.OK)
@@ -982,7 +983,7 @@ describe('purchasables', () => {
 
                     });
 
-                    it('should not get buyers for an invalid item', async () => {
+                    test('should not get buyers for an invalid item', async () => {
                         await request.get(`/api/events/${events[0].id}/purchasables/${badId}/buyers`)
                             .set('Authorization', generatedUsers.admin.token)
                             .expect(status.OK)
@@ -991,7 +992,7 @@ describe('purchasables', () => {
                             });
                     });
 
-                    it('should not allow coordinators to get buyers', async () => {
+                    test('should not allow coordinators to get buyers', async () => {
                         await request.get(`/api/events/${events[0].id}/purchasables/${purchasables[0].id}/buyers`)
                             .set('Authorization', generatedUsers.coordinator.token)
                             .expect(status.UNAUTHORIZED);
@@ -999,7 +1000,7 @@ describe('purchasables', () => {
                 });
 
                 describe('updating purchases', () => {
-                    it('should update a purchase', (done) => {
+                    test('should update a purchase', (done) => {
                         async.series([
                             (cb) => {
                                 request.get('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/purchases')
@@ -1033,7 +1034,7 @@ describe('purchasables', () => {
                         ], done);
                     });
 
-                    it('should check for the scouts owner', (done) => {
+                    test('should check for the scouts owner', (done) => {
                         request.put('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] +
                             '/purchases/' + purchasables[0].id)
                             .set('Authorization', generatedUsers.coordinator2.token)
@@ -1043,7 +1044,7 @@ describe('purchasables', () => {
                             .expect(status.UNAUTHORIZED, done);
                     });
 
-                    it('should not allow teachers to update', (done) => {
+                    test('should not allow teachers to update', (done) => {
                         request.put('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] +
                             '/purchases/' + purchasables[0].id)
                             .set('Authorization', generatedUsers.teacher.token)
@@ -1053,7 +1054,7 @@ describe('purchasables', () => {
                             .expect(status.UNAUTHORIZED, done);
                     });
 
-                    it('should allow admins to update', (done) => {
+                    test('should allow admins to update', (done) => {
                         request.put('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] +
                             '/purchases/' + purchasables[0].id)
                             .set('Authorization', generatedUsers.admin.token)
@@ -1063,7 +1064,7 @@ describe('purchasables', () => {
                             .expect(status.OK, done);
                     });
 
-                    it('should not update an invalid purchase', (done) => {
+                    test('should not update an invalid purchase', (done) => {
                         request.put('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] +
                             '/purchases/' + TestUtils.badId)
                             .set('Authorization', generatedUsers.coordinator.token)
@@ -1073,7 +1074,7 @@ describe('purchasables', () => {
                             .expect(status.BAD_REQUEST, done);
                     });
 
-                    it('should not update an invalid registration', (done) => {
+                    test('should not update an invalid registration', (done) => {
                         request.put('/api/scouts/' + generatedScouts[0].id + '/registrations/' + TestUtils.badId +
                             '/purchases/' + purchasables[0].id)
                             .set('Authorization', generatedUsers.coordinator.token)
@@ -1083,7 +1084,7 @@ describe('purchasables', () => {
                             .expect(status.BAD_REQUEST, done);
                     });
 
-                    it('should not update an invalid scout', (done) => {
+                    test('should not update an invalid scout', (done) => {
                         request.put('/api/scouts/' + TestUtils.badId + '/registrations/' + registrationIds[0] +
                             '/purchases/' + purchasables[0].id)
                             .set('Authorization', generatedUsers.coordinator.token)
@@ -1093,7 +1094,7 @@ describe('purchasables', () => {
                             .expect(status.BAD_REQUEST, done);
                     });
 
-                    it('should not update a purchase for the wrong registration', (done) => {
+                    test('should not update a purchase for the wrong registration', (done) => {
                         request.put('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] +
                             '/purchases/' + purchasables[3].id)
                             .set('Authorization', generatedUsers.coordinator.token)
@@ -1103,7 +1104,7 @@ describe('purchasables', () => {
                             .expect(status.BAD_REQUEST, done);
                     });
 
-                    it('should not allow a required value to be unset', (done) => {
+                    test('should not allow a required value to be unset', (done) => {
                         request.put('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] +
                             '/purchases/' + purchasables[0].id)
                             .set('Authorization', generatedUsers.coordinator.token)
@@ -1115,7 +1116,7 @@ describe('purchasables', () => {
                 });
 
                 describe('deleting purchases', () => {
-                    it('should delete a purchase', (done) => {
+                    test('should delete a purchase', (done) => {
                         async.series([
                             (cb) => {
                                 request.get('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/purchases')
@@ -1146,49 +1147,49 @@ describe('purchasables', () => {
                         ], done);
                     });
 
-                    it('should check for the scouts owner', (done) => {
+                    test('should check for the scouts owner', (done) => {
                         request.del('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] +
                             '/purchases/' + purchasables[0].id)
                             .set('Authorization', generatedUsers.coordinator2.token)
                             .expect(status.UNAUTHORIZED, done);
                     });
 
-                    it('should not allow teachers to delete', (done) => {
+                    test('should not allow teachers to delete', (done) => {
                         request.del('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] +
                             '/purchases/' + purchasables[0].id)
                             .set('Authorization', generatedUsers.teacher.token)
                             .expect(status.UNAUTHORIZED, done);
                     });
 
-                    it('should allow admins to delete', (done) => {
+                    test('should allow admins to delete', (done) => {
                         request.del('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] +
                             '/purchases/' + purchasables[0].id)
                             .set('Authorization', generatedUsers.admin.token)
                             .expect(status.OK, done);
                     });
 
-                    it('should not delete an invalid purchase', (done) => {
+                    test('should not delete an invalid purchase', (done) => {
                         request.del('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] +
                             '/purchases/' + TestUtils.badId)
                             .set('Authorization', generatedUsers.coordinator.token)
                             .expect(status.BAD_REQUEST, done);
                     });
 
-                    it('should not delete an invalid registration', (done) => {
+                    test('should not delete an invalid registration', (done) => {
                         request.del('/api/scouts/' + generatedScouts[0].id + '/registrations/' + TestUtils.badId +
                             '/purchases/' + purchasables[0].id)
                             .set('Authorization', generatedUsers.coordinator.token)
                             .expect(status.BAD_REQUEST, done);
                     });
 
-                    it('should not delete an invalid scout', (done) => {
+                    test('should not delete an invalid scout', (done) => {
                         request.del('/api/scouts/' + TestUtils.badId + '/registrations/' + registrationIds[0] +
                             '/purchases/' + purchasables[0].id)
                             .set('Authorization', generatedUsers.coordinator.token)
                             .expect(status.BAD_REQUEST, done);
                     });
 
-                    it('should not delete a purchase for the wrong registration', (done) => {
+                    test('should not delete a purchase for the wrong registration', (done) => {
                         request.del('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] +
                             '/purchases/' + purchasables[3].id)
                             .set('Authorization', generatedUsers.coordinator.token)
@@ -1197,7 +1198,7 @@ describe('purchasables', () => {
                 });
 
                 describe('when an associated purchasable is deleted', () => {
-                    it('should delete associated purchases', async () => {
+                    test('should delete associated purchases', async () => {
                         await request.get('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/purchases')
                             .set('Authorization', generatedUsers.coordinator.token)
                             .expect(status.OK)

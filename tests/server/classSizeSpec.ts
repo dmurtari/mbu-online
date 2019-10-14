@@ -27,11 +27,11 @@ describe('Class sizes', () => {
     let generatedScouts: Scout[];
     let registrationIds: number[];
 
-    before(async () => {
+    beforeAll(async () => {
         await TestUtils.dropDb();
     });
 
-    before(async () => {
+    beforeAll(async () => {
         generatedUsers = await TestUtils.generateTokens();
     });
 
@@ -65,8 +65,9 @@ describe('Class sizes', () => {
         });
     });
 
-    after(async () => {
+    afterAll(async () => {
         await TestUtils.dropDb();
+        await TestUtils.closeDb();
     });
 
     describe('when offerings do not exist', () => {
@@ -84,7 +85,7 @@ describe('Class sizes', () => {
             };
         });
 
-        it('should default to 20 as the size limit', (done) => {
+        test('should default to 20 as the size limit', (done) => {
             request.post('/api/events/' + events[0].id + '/badges')
                 .set('Authorization', generatedUsers.admin.token)
                 .send(postData)
@@ -98,7 +99,7 @@ describe('Class sizes', () => {
                 });
         });
 
-        it('should accept an input for class size', (done) => {
+        test('should accept an input for class size', (done) => {
             postData.offering.size_limit = 30;
 
             request.post('/api/events/' + events[0].id + '/badges')
@@ -114,7 +115,7 @@ describe('Class sizes', () => {
                 });
         });
 
-        it('should not allow a negative class size', (done) => {
+        test('should not allow a negative class size', (done) => {
             postData.offering.size_limit = -1;
 
             request.post('/api/events/' + events[0].id + '/badges')
@@ -123,7 +124,7 @@ describe('Class sizes', () => {
                 .expect(status.BAD_REQUEST, done);
         });
 
-        it('should expect a number', (done) => {
+        test('should expect a number', (done) => {
             postData.offering.size_limit = 'hello' as any;
 
             request.post('/api/events/' + events[0].id + '/badges')
@@ -168,7 +169,7 @@ describe('Class sizes', () => {
             };
         });
 
-        it('should get the allowed class size', (done) => {
+        test('should get the allowed class size', (done) => {
             request.get('/api/events?id=' + events[0].id)
                 .expect(status.OK)
                 .end((err, res: SuperTestResponse<EventsResponseDto>) => {
@@ -181,7 +182,7 @@ describe('Class sizes', () => {
                 });
         });
 
-        it('should know that there are no enrolled scouts', (done) => {
+        test('should know that there are no enrolled scouts', (done) => {
             request.get('/api/events/' + events[0].id + '/badges/' + offering.id + '/limits')
                 .set('Authorization', generatedUsers.teacher.token)
                 .expect(status.OK)
@@ -199,14 +200,14 @@ describe('Class sizes', () => {
                 });
         });
 
-        it('should allow joining if under the limit for a period', (done) => {
+        test('should allow joining if under the limit for a period', (done) => {
             request.post('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/assignments')
                 .set('Authorization', generatedUsers.teacher.token)
                 .send(assignmentData)
                 .expect(status.CREATED, done);
         });
 
-        it('should allow joining multiple periods under the limit', (done) => {
+        test('should allow joining multiple periods under the limit', (done) => {
             async.series([
                 (cb) => {
                     request.post('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/assignments')
@@ -240,7 +241,7 @@ describe('Class sizes', () => {
                     });
             });
 
-            it('should know that there is one scout registered', (done) => {
+            test('should know that there is one scout registered', (done) => {
                 request.get('/api/events/' + events[0].id + '/badges/' + offering.id + '/limits')
                     .set('Authorization', generatedUsers.teacher.token)
                     .expect(status.OK)
@@ -258,7 +259,7 @@ describe('Class sizes', () => {
                     });
             });
 
-            it('should not allow the scout to join a different period', (done) => {
+            test('should not allow the scout to join a different period', (done) => {
                 request.put('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/assignments/' +
                     assignmentData.offering)
                     .set('Authorization', generatedUsers.teacher.token)
@@ -268,7 +269,7 @@ describe('Class sizes', () => {
                     .expect(status.OK, done);
             });
 
-            it('should allow a scout to join a different period', (done) => {
+            test('should allow a scout to join a different period', (done) => {
                 assignmentData.periods = [2];
 
                 request.post('/api/scouts/' + generatedScouts[1].id + '/registrations/' + registrationIds[1] + '/assignments')
@@ -277,14 +278,14 @@ describe('Class sizes', () => {
                     .expect(status.CREATED, done);
             });
 
-            it('should not allow another scout to join the same period', (done) => {
+            test('should not allow another scout to join the same period', (done) => {
                 request.post('/api/scouts/' + generatedScouts[1].id + '/registrations/' + registrationIds[1] + '/assignments')
                     .set('Authorization', generatedUsers.teacher.token)
                     .send(assignmentData)
                     .expect(status.BAD_REQUEST, done);
             });
 
-            it('should allow setting completions for that scout', (done) => {
+            test('should allow setting completions for that scout', (done) => {
                 request.put('/api/scouts/' + generatedScouts[0].id + '/registrations/' + registrationIds[0] + '/assignments/' + offeringId)
                     .set('Authorization', generatedUsers.admin.token)
                     .send(<CreateAssignmentRequestDto>{
@@ -303,7 +304,7 @@ describe('Class sizes', () => {
                         .expect(status.CREATED, done);
                 });
 
-                it('should not allow editing the scout to be in a full class', (done) => {
+                test('should not allow editing the scout to be in a full class', (done) => {
                     request.put('/api/scouts/' + generatedScouts[1].id + '/registrations/' + registrationIds[1] + '/assignments/' +
                         assignmentData.offering)
                         .set('Authorization', generatedUsers.teacher.token)
@@ -351,7 +352,7 @@ describe('Class sizes', () => {
             };
         });
 
-        it('should know that there are no scouts assigned', (done) => {
+        test('should know that there are no scouts assigned', (done) => {
             request.get('/api/events/' + events[0].id + '/badges/' + offering.id + '/limits')
                 .set('Authorization', generatedUsers.teacher.token)
                 .expect(status.OK)
@@ -377,7 +378,7 @@ describe('Class sizes', () => {
                     .expect(status.CREATED, done);
             });
 
-            it('should know there is only one scout registered', (done) => {
+            test('should know there is only one scout registered', (done) => {
                 request.get('/api/events/' + events[0].id + '/badges/' + offering.id + '/limits')
                     .set('Authorization', generatedUsers.teacher.token)
                     .expect(status.OK)
@@ -432,7 +433,7 @@ describe('Class sizes', () => {
             };
         });
 
-        it('should know that there are no scouts assigned', (done) => {
+        test('should know that there are no scouts assigned', (done) => {
             request.get('/api/events/' + events[0].id + '/badges/' + offering.id + '/limits')
                 .set('Authorization', generatedUsers.teacher.token)
                 .expect(status.OK)
@@ -484,7 +485,7 @@ describe('Class sizes', () => {
                 ], done);
             });
 
-            it('should return the correct class sizes', (done) => {
+            test('should return the correct class sizes', (done) => {
                 request.get('/api/events/' + events[0].id + '/badges/' + offering.id + '/limits')
                     .set('Authorization', generatedUsers.teacher.token)
                     .expect(status.OK)
@@ -502,7 +503,7 @@ describe('Class sizes', () => {
                     });
             });
 
-            it('should not allow joining a full class period', (done) => {
+            test('should not allow joining a full class period', (done) => {
                 assignmentData.periods = [1];
 
                 request.post('/api/scouts/' + generatedScouts[5].id + '/registrations/' + registrationIds[5] + '/assignments')
@@ -511,7 +512,7 @@ describe('Class sizes', () => {
                     .expect(status.BAD_REQUEST, done);
             });
 
-            it('should allow joining a class period with room', (done) => {
+            test('should allow joining a class period with room', (done) => {
                 assignmentData.periods = [2];
 
                 request.post('/api/scouts/' + generatedScouts[5].id + '/registrations/' + registrationIds[5] + '/assignments')

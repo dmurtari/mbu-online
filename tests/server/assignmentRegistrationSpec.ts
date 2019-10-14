@@ -30,11 +30,11 @@ describe('Assignments and registrations', () => {
     let troop1Registrations: number[];
     let troop2Registrations: number[];
 
-    before(async () => {
+    beforeAll(async () => {
         await TestUtils.dropDb();
     });
 
-    before(async () => {
+    beforeAll(async () => {
         generatedUsers = await TestUtils.generateTokens([
             UserRole.ADMIN,
             UserRole.COORDINATOR,
@@ -64,8 +64,9 @@ describe('Assignments and registrations', () => {
         generatedTroop2 = await TestUtils.createScoutsForUser(generatedUsers.coordinator1, testScouts(5));
     });
 
-    after(async () => {
+    afterAll(async () => {
         await TestUtils.dropDb();
+        await TestUtils.closeDb();
     });
 
     describe('when a group of scouts has been registered', () => {
@@ -87,7 +88,7 @@ describe('Assignments and registrations', () => {
             });
         });
 
-        it('should contain the correct registrations', (done) => {
+        test('should contain the correct registrations', (done) => {
             request.get('/api/events/' + events[0].id + '/registrations')
                 .set('Authorization', generatedUsers.admin.token)
                 .expect(status.OK)
@@ -117,7 +118,7 @@ describe('Assignments and registrations', () => {
                 });
             });
 
-            it('should contain the correct registrations', (done) => {
+            test('should contain the correct registrations', (done) => {
                 request.get('/api/events/' + events[0].id + '/registrations')
                     .set('Authorization', generatedUsers.admin.token)
                     .expect(status.OK)
@@ -135,7 +136,7 @@ describe('Assignments and registrations', () => {
                         .expect(status.OK, done);
                 });
 
-                it('should contain the correct registrations', (done) => {
+                test('should contain the correct registrations', (done) => {
                     request.get('/api/events/' + events[0].id + '/registrations')
                         .set('Authorization', generatedUsers.admin.token)
                         .expect(status.OK)
@@ -164,7 +165,7 @@ describe('Assignments and registrations', () => {
                 });
             });
 
-            it('should contain the correct registrations', (done) => {
+            test('should contain the correct registrations', (done) => {
                 request.get('/api/events/' + events[0].id + '/registrations')
                     .set('Authorization', generatedUsers.admin.token)
                     .expect(status.OK)
@@ -194,7 +195,7 @@ describe('Assignments and registrations', () => {
                     });
                 });
 
-                it('should contain the correct registrations', (done) => {
+                test('should contain the correct registrations', (done) => {
                     request.get('/api/events/' + events[0].id + '/registrations')
                         .set('Authorization', generatedUsers.admin.token)
                         .expect(status.OK)

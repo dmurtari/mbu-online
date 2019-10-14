@@ -17,11 +17,11 @@ describe('scouts', () => {
     let exampleScout: CreateScoutRequestDto;
     const badId = TestUtils.badId;
 
-    before(async () => {
+    beforeAll(async () => {
         await TestUtils.dropDb();
     });
 
-    before(async () => {
+    beforeAll(async () => {
         generatedUsers = await TestUtils.generateTokens([
             UserRole.ADMIN,
             UserRole.TEACHER,
@@ -47,12 +47,13 @@ describe('scouts', () => {
         TestUtils.removeScoutsForUser(generatedUsers.coordinator);
     });
 
-    after(async () => {
+    afterAll(async () => {
         await TestUtils.dropDb();
+        await TestUtils.closeDb();
     });
 
     describe('in order to be associated with users', () => {
-        it('should be able to be created', (done) => {
+        test('should be able to be created', (done) => {
             request.post('/api/users/' + generatedUsers.coordinator.profile.id + '/scouts')
                 .set('Authorization', generatedUsers.coordinator.token)
                 .send(exampleScout)
@@ -71,34 +72,34 @@ describe('scouts', () => {
                 });
         });
 
-        it('should not be created by a different coordinator', (done) => {
+        test('should not be created by a different coordinator', (done) => {
             request.post('/api/users/' + generatedUsers.coordinator.profile.id + '/scouts')
                 .set('Authorization', generatedUsers.coordinator2.token)
                 .send(exampleScout)
                 .expect(status.UNAUTHORIZED, done);
         });
 
-        it('should be able to be created by teachers', (done) => {
+        test('should be able to be created by teachers', (done) => {
             request.post('/api/users/' + generatedUsers.coordinator.profile.id + '/scouts')
                 .set('Authorization', generatedUsers.teacher.token)
                 .send(exampleScout)
                 .expect(status.CREATED, done);
         });
 
-        it('should be able to be created by admins', (done) => {
+        test('should be able to be created by admins', (done) => {
             request.post('/api/users/' + generatedUsers.coordinator.profile.id + '/scouts')
                 .set('Authorization', generatedUsers.admin.token)
                 .send(exampleScout)
                 .expect(status.CREATED, done);
         });
 
-        it('should require authorization', (done) => {
+        test('should require authorization', (done) => {
             request.post('/api/users/' + generatedUsers.coordinator.profile.id + '/scouts')
                 .send(exampleScout)
                 .expect(status.UNAUTHORIZED, done);
         });
 
-        it('should require valid scouts', (done) => {
+        test('should require valid scouts', (done) => {
             const postData = exampleScout;
             postData.birthday = new Date(4000, 1, 1);
 
@@ -108,14 +109,17 @@ describe('scouts', () => {
                 .expect(status.BAD_REQUEST, done);
         });
 
-        it('should not allow scouts to be associated with non-coordinators', (done) => {
-            request.post('/api/users/' + generatedUsers.teacher.profile.id + '/scouts')
-                .set('Authorization', generatedUsers.teacher.token)
-                .send(exampleScout)
-                .expect(status.BAD_REQUEST, done);
-        });
+        test(
+            'should not allow scouts to be associated with non-coordinators',
+            (done) => {
+                request.post('/api/users/' + generatedUsers.teacher.profile.id + '/scouts')
+                    .set('Authorization', generatedUsers.teacher.token)
+                    .send(exampleScout)
+                    .expect(status.BAD_REQUEST, done);
+            }
+        );
 
-        it('should not create a scout for an invalid id', (done) => {
+        test('should not create a scout for an invalid id', (done) => {
             request.post('/api/users/' + badId + '/scouts')
                 .set('Authorization', generatedUsers.coordinator.token)
                 .send(exampleScout)
@@ -136,7 +140,7 @@ describe('scouts', () => {
         });
 
         describe('seeing registered scouts', () => {
-            it('should be able to get scouts for a user', (done) => {
+            test('should be able to get scouts for a user', (done) => {
                 request.get('/api/users/' + generatedUsers.coordinator.profile.id + '/scouts')
                     .set('Authorization', generatedUsers.coordinator.token)
                     .expect(status.OK)
@@ -148,7 +152,7 @@ describe('scouts', () => {
                     });
             });
 
-            it('should let admins get scouts for a user', (done) => {
+            test('should let admins get scouts for a user', (done) => {
                 request.get('/api/users/' + generatedUsers.coordinator.profile.id + '/scouts')
                     .set('Authorization', generatedUsers.admin.token)
                     .expect(status.OK)
@@ -160,7 +164,7 @@ describe('scouts', () => {
                     });
             });
 
-            it('should let teachers get scouts for a user', (done) => {
+            test('should let teachers get scouts for a user', (done) => {
                 request.get('/api/users/' + generatedUsers.coordinator.profile.id + '/scouts')
                     .set('Authorization', generatedUsers.teacher.token)
                     .expect(status.OK)
@@ -172,13 +176,13 @@ describe('scouts', () => {
                     });
             });
 
-            it('should not get scouts if the user doesnt exist', (done) => {
+            test('should not get scouts if the user doesnt exist', (done) => {
                 request.get('/api/users/' + badId + '/scouts')
                     .set('Authorization', generatedUsers.admin.token)
                     .expect(status.BAD_REQUEST, done);
             });
 
-            it('should not get scouts with an invalid query', (done) => {
+            test('should not get scouts with an invalid query', (done) => {
                 request.get('/api/users?age=250')
                     .set('Authorization', generatedUsers.admin.token)
                     .expect(status.BAD_REQUEST, done);
@@ -192,7 +196,7 @@ describe('scouts', () => {
                 scoutUpdate = Object.assign({}, scouts[0]);
             });
 
-            it('should be able to update a scouts information', (done) => {
+            test('should be able to update a scouts information', (done) => {
                 scoutUpdate.firstname = 'Updated';
                 scoutUpdate.lastname = 'Scout';
                 scoutUpdate.emergency_name = 'Incompetent';
@@ -211,7 +215,7 @@ describe('scouts', () => {
                     });
             });
 
-            it('should allow fields to be deleted', (done) => {
+            test('should allow fields to be deleted', (done) => {
                 scoutUpdate.notes = null;
                 request.put('/api/users/' + generatedUsers.coordinator.profile.id + '/scouts/' + scouts[0].id)
                     .set('Authorization', generatedUsers.coordinator.token)
@@ -225,28 +229,28 @@ describe('scouts', () => {
                     });
             });
 
-            it('should allow updates from teachers', (done) => {
+            test('should allow updates from teachers', (done) => {
                 request.put('/api/users/' + generatedUsers.coordinator.profile.id + '/scouts/' + scouts[0].id)
                     .set('Authorization', generatedUsers.teacher.token)
                     .send(scoutUpdate)
                     .expect(status.OK, done);
             });
 
-            it('should allow updates from admins', (done) => {
+            test('should allow updates from admins', (done) => {
                 request.put('/api/users/' + generatedUsers.coordinator.profile.id + '/scouts/' + scouts[0].id)
                     .set('Authorization', generatedUsers.admin.token)
                     .send(scoutUpdate)
                     .expect(status.OK, done);
             });
 
-            it('should not allow update from a different coordinator', (done) => {
+            test('should not allow update from a different coordinator', (done) => {
                 request.put('/api/users/' + generatedUsers.coordinator.profile.id + '/scouts/' + scouts[0].id)
                     .set('Authorization', generatedUsers.coordinator2.token)
                     .send(scoutUpdate)
                     .expect(status.UNAUTHORIZED, done);
             });
 
-            it('should not update with invalid fields', (done) => {
+            test('should not update with invalid fields', (done) => {
                 scoutUpdate.birthday = new Date(4000, 1, 1);
                 request.put('/api/users/' + generatedUsers.coordinator.profile.id + '/scouts/' + scouts[0].id)
                     .set('Authorization', generatedUsers.coordinator.token)
@@ -254,14 +258,14 @@ describe('scouts', () => {
                     .expect(status.BAD_REQUEST, done);
             });
 
-            it('should not update a nonexistent user', (done) => {
+            test('should not update a nonexistent user', (done) => {
                 request.put('/api/users/' + badId + '/scouts/' + scouts[0].id)
                     .set('Authorization', generatedUsers.coordinator.token)
                     .send(scoutUpdate)
                     .expect(status.UNAUTHORIZED, done);
             });
 
-            it('should not update nonexistent scouts', (done) => {
+            test('should not update nonexistent scouts', (done) => {
                 request.put('/api/users/' + generatedUsers.coordinator.profile.id + '/scouts/' + badId)
                     .set('Authorization', generatedUsers.coordinator.token)
                     .send(scoutUpdate)
@@ -270,7 +274,7 @@ describe('scouts', () => {
         });
 
         describe('deleting scouts', () => {
-            it('should delete scouts for a user', (done) => {
+            test('should delete scouts for a user', (done) => {
                 async.series([
                     (cb) => {
                         request.get('/api/users/' + generatedUsers.coordinator.profile.id + '/scouts')
@@ -300,36 +304,36 @@ describe('scouts', () => {
                 ], done);
             });
 
-            it('should require authorization', (done) => {
+            test('should require authorization', (done) => {
                 request.del('/api/users/' + generatedUsers.coordinator.profile.id + '/scouts/' + scouts[0].id)
                     .expect(status.UNAUTHORIZED, done);
             });
 
-            it('should check for the correct owner', (done) => {
+            test('should check for the correct owner', (done) => {
                 request.del('/api/users/' + generatedUsers.coordinator.profile.id + '/scouts/' + scouts[0].id)
                     .set('Authorization', generatedUsers.coordinator2.token)
                     .expect(status.UNAUTHORIZED, done);
             });
 
-            it('should allow admins to delete', (done) => {
+            test('should allow admins to delete', (done) => {
                 request.del('/api/users/' + generatedUsers.coordinator.profile.id + '/scouts/' + scouts[0].id)
                     .set('Authorization', generatedUsers.admin.token)
                     .expect(status.OK, done);
             });
 
-            it('should allow teachers to delete', (done) => {
+            test('should allow teachers to delete', (done) => {
                 request.del('/api/users/' + generatedUsers.coordinator.profile.id + '/scouts/' + scouts[0].id)
                     .set('Authorization', generatedUsers.teacher.token)
                     .expect(status.OK, done);
             });
 
-            it('should not delete from nonexistent users', (done) => {
+            test('should not delete from nonexistent users', (done) => {
                 request.del('/api/users/' + badId + '/scouts/' + scouts[0].id)
                     .set('Authorization', generatedUsers.coordinator.token)
                     .expect(status.UNAUTHORIZED, done);
             });
 
-            it('should not delete nonexistent scouts', (done) => {
+            test('should not delete nonexistent scouts', (done) => {
                 request.del('/api/users/' + generatedUsers.coordinator.profile.id + '/scouts/' + badId)
                     .set('Authorization', generatedUsers.coordinator.token)
                     .expect(status.BAD_REQUEST, done);

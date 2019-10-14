@@ -36,11 +36,11 @@ describe('preferences', () => {
 
     const badId = TestUtils.badId;
 
-    before(async () => {
+    beforeAll(async () => {
         await TestUtils.dropDb();
     });
 
-    before(async () => {
+    beforeAll(async () => {
         generatedUsers = await TestUtils.generateTokens([UserRole.ADMIN, UserRole.TEACHER, UserRole.COORDINATOR, 'coordinator2' as any]);
         badges = await TestUtils.createBadges();
         events = await TestUtils.createEvents();
@@ -92,12 +92,13 @@ describe('preferences', () => {
         ], done);
     });
 
-    after(async () => {
+    afterAll(async () => {
         await TestUtils.dropDb();
+        await TestUtils.closeDb();
     });
 
     describe('when preferences do not exist', () => {
-        it('should be able to be generated', (done) => {
+        test('should be able to be generated', (done) => {
             const postData: CreatePreferenceRequestDto = {
                 offering: generatedOfferings[0].id,
                 rank: 1
@@ -120,7 +121,7 @@ describe('preferences', () => {
                 });
         });
 
-        it('should check for scout owner', (done) => {
+        test('should check for scout owner', (done) => {
             const postData: CreatePreferenceRequestDto = {
                 offering: generatedOfferings[0].id,
                 rank: 1
@@ -133,7 +134,7 @@ describe('preferences', () => {
                 .expect(status.UNAUTHORIZED, done);
         });
 
-        it('should allow teachers to create', (done) => {
+        test('should allow teachers to create', (done) => {
             const postData: CreatePreferenceRequestDto = {
                 offering: generatedOfferings[0].id,
                 rank: 1
@@ -146,7 +147,7 @@ describe('preferences', () => {
                 .expect(status.CREATED, done);
         });
 
-        it('should allow admins to create', (done) => {
+        test('should allow admins to create', (done) => {
             const postData: CreatePreferenceRequestDto = {
                 offering: generatedOfferings[0].id,
                 rank: 1
@@ -159,7 +160,7 @@ describe('preferences', () => {
                 .expect(status.CREATED, done);
         });
 
-        it('should not create for a nonexistant offering', (done) => {
+        test('should not create for a nonexistant offering', (done) => {
             const postData: CreatePreferenceRequestDto = {
                 offering: badId as any,
                 rank: 1
@@ -172,7 +173,7 @@ describe('preferences', () => {
                 .expect(status.BAD_REQUEST, done);
         });
 
-        it('should not create for nonexistant registrations', (done) => {
+        test('should not create for nonexistant registrations', (done) => {
             const postData: CreatePreferenceRequestDto = {
                 offering: generatedOfferings[0].id,
                 rank: 1
@@ -184,7 +185,7 @@ describe('preferences', () => {
                 .expect(status.BAD_REQUEST, done);
         });
 
-        it('should not have a maximum rank of 6', (done) => {
+        test('should not have a maximum rank of 6', (done) => {
             const postData: CreatePreferenceRequestDto = {
                 offering: generatedOfferings[0].id,
                 rank: 7
@@ -197,7 +198,7 @@ describe('preferences', () => {
                 .expect(status.BAD_REQUEST, done);
         });
 
-        it('should not have a minimum rank of 1', (done) => {
+        test('should not have a minimum rank of 1', (done) => {
             const postData: CreatePreferenceRequestDto = {
                 offering: generatedOfferings[0].id,
                 rank: 0
@@ -248,7 +249,7 @@ describe('preferences', () => {
         });
 
         describe('getting preferences', () => {
-            it('should get all preferences for a registration', (done) => {
+            test('should get all preferences for a registration', (done) => {
                 request.get('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/preferences')
                     .set('Authorization', generatedUsers.coordinator.token)
                     .expect(status.OK)
@@ -266,13 +267,13 @@ describe('preferences', () => {
                     });
             });
 
-            it('should not get with an incorrect scout', (done) => {
+            test('should not get with an incorrect scout', (done) => {
                 request.get('/api/scouts/' + badId + '/registrations/' + registrationIds[0] + '/preferences')
                     .set('Authorization', generatedUsers.coordinator.token)
                     .expect(status.BAD_REQUEST, done);
             });
 
-            it('should not get with an incorrect registration', (done) => {
+            test('should not get with an incorrect registration', (done) => {
                 request.get('/api/scouts/' + generatedScouts[0].id + '/registrations/' + badId + '/preferences')
                     .set('Authorization', generatedUsers.coordinator.token)
                     .expect(status.BAD_REQUEST, done);
@@ -280,7 +281,7 @@ describe('preferences', () => {
         });
 
         describe('updating preferences', () => {
-            it('should update a preference rank', (done) => {
+            test('should update a preference rank', (done) => {
                 async.series([
                     (cb) => {
                         request.get('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/preferences')
@@ -316,7 +317,7 @@ describe('preferences', () => {
                 ], done);
             });
 
-            it('should check for the owner', (done) => {
+            test('should check for the owner', (done) => {
                 request.put('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/preferences/' + generatedOfferings[0].id)
                     .set('Authorization', generatedUsers.coordinator2.token)
                     .send(<UpdatePreferenceRequestDto>{
@@ -325,7 +326,7 @@ describe('preferences', () => {
                     .expect(status.UNAUTHORIZED, done);
             });
 
-            it('should allow teachers to update', (done) => {
+            test('should allow teachers to update', (done) => {
                 request.put('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/preferences/' + generatedOfferings[0].id)
                     .set('Authorization', generatedUsers.teacher.token)
                     .send(<UpdatePreferenceRequestDto>{
@@ -334,7 +335,7 @@ describe('preferences', () => {
                     .expect(status.OK, done);
             });
 
-            it('should allow admins to update', (done) => {
+            test('should allow admins to update', (done) => {
                 request.put('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/preferences/' + generatedOfferings[0].id)
                     .set('Authorization', generatedUsers.admin.token)
                     .send(<UpdatePreferenceRequestDto>{
@@ -343,19 +344,19 @@ describe('preferences', () => {
                     .expect(status.OK, done);
             });
 
-            it('should not update an invalid preference', (done) => {
+            test('should not update an invalid preference', (done) => {
                 request.put('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/preferences/' + badId)
                     .set('Authorization', generatedUsers.coordinator.token)
                     .expect(status.BAD_REQUEST, done);
             });
 
-            it('should not update an invalid registration', (done) => {
+            test('should not update an invalid registration', (done) => {
                 request.put('/api/scouts/' + scoutId + '/registrations/' + badId + '/preferences/' + generatedOfferings[0].id)
                     .set('Authorization', generatedUsers.coordinator.token)
                     .expect(status.BAD_REQUEST, done);
             });
 
-            it('should not update for an invalid scout', (done) => {
+            test('should not update for an invalid scout', (done) => {
                 request.put('/api/scouts/' + badId + '/registrations/' + registrationIds[0] + '/preferences/' + generatedOfferings[0].id)
                     .set('Authorization', generatedUsers.coordinator.token)
                     .expect(status.BAD_REQUEST, done);
@@ -363,7 +364,7 @@ describe('preferences', () => {
         });
 
         describe('deleting preferences', () => {
-            it('should delete an existing preference', (done) => {
+            test('should delete an existing preference', (done) => {
                 async.series([
                     (cb) => {
                         request.get('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/preferences')
@@ -393,37 +394,37 @@ describe('preferences', () => {
                 ], done);
             });
 
-            it('should check for the correct owner', (done) => {
+            test('should check for the correct owner', (done) => {
                 request.del('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/preferences/' + generatedOfferings[0].id)
                     .set('Authorization', generatedUsers.coordinator2.token)
                     .expect(status.UNAUTHORIZED, done);
             });
 
-            it('should allow teachers to delete', (done) => {
+            test('should allow teachers to delete', (done) => {
                 request.del('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/preferences/' + generatedOfferings[0].id)
                     .set('Authorization', generatedUsers.teacher.token)
                     .expect(status.OK, done);
             });
 
-            it('should allow admins to delete', (done) => {
+            test('should allow admins to delete', (done) => {
                 request.del('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/preferences/' + generatedOfferings[0].id)
                     .set('Authorization', generatedUsers.admin.token)
                     .expect(status.OK, done);
             });
 
-            it('should not delete an invalid preference', (done) => {
+            test('should not delete an invalid preference', (done) => {
                 request.del('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/preferences/' + badId)
                     .set('Authorization', generatedUsers.coordinator.token)
                     .expect(status.BAD_REQUEST, done);
             });
 
-            it('should not delete an invalid registration', (done) => {
+            test('should not delete an invalid registration', (done) => {
                 request.del('/api/scouts/' + scoutId + '/registrations/' + badId + '/preferences/' + generatedOfferings[0].id)
                     .set('Authorization', generatedUsers.coordinator.token)
                     .expect(status.BAD_REQUEST, done);
             });
 
-            it('should not delete for an invalid scout', (done) => {
+            test('should not delete for an invalid scout', (done) => {
                 request.del('/api/scouts/' + badId + '/registrations/' + registrationIds[0] + '/preferences/' + generatedOfferings[0].id)
                     .set('Authorization', generatedUsers.coordinator.token)
                     .expect(status.BAD_REQUEST, done);
@@ -433,7 +434,7 @@ describe('preferences', () => {
 
     describe('batch modifying preferences', () => {
 
-        it('should add a batch of preferences', (done) => {
+        test('should add a batch of preferences', (done) => {
             const postData: CreatePreferenceRequestDto[] = [{
                 offering: generatedOfferings[0].id,
                 rank: 1
@@ -461,7 +462,7 @@ describe('preferences', () => {
                 });
         });
 
-        it('should override existing preferences', (done) => {
+        test('should override existing preferences', (done) => {
             async.series([
                 (cb) => {
                     const postData: CreatePreferenceRequestDto[] = [{
@@ -514,7 +515,7 @@ describe('preferences', () => {
             ], done);
         });
 
-        it('should not create with an invalid offering', (done) => {
+        test('should not create with an invalid offering', (done) => {
             const postData: CreatePreferenceRequestDto[] = [{
                 offering: 30,
                 rank: 1
@@ -526,7 +527,7 @@ describe('preferences', () => {
                 .expect(status.BAD_REQUEST, done);
         });
 
-        it('should not create with an invalid rank', (done) => {
+        test('should not create with an invalid rank', (done) => {
             const postData: CreatePreferenceRequestDto[] = [{
                 offering: generatedOfferings[0].id,
                 rank: 30

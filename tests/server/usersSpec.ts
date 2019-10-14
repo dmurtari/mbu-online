@@ -21,12 +21,13 @@ describe('users', () => {
         await TestUtils.dropDb();
     });
 
-    after(async () => {
+    afterAll(async () => {
         await TestUtils.dropDb();
+        await TestUtils.closeDb();
     });
 
     describe('user account creation', () => {
-        it('creates an account if all required info is supplied', (done) => {
+        test('creates an account if all required info is supplied', (done) => {
             const postData: SignupRequestDto = {
                 email: 'test@test.com',
                 password: 'password',
@@ -39,7 +40,7 @@ describe('users', () => {
                 .expect(status.CREATED, done);
         });
 
-        it('should return a token and the profile', (done) => {
+        test('should return a token and the profile', (done) => {
             const postData: SignupRequestDto = {
                 email: 'test@test.com',
                 password: 'password',
@@ -61,7 +62,7 @@ describe('users', () => {
                 });
         });
 
-        it('requires email, password, firstname, lastname', (done) => {
+        test('requires email, password, firstname, lastname', (done) => {
             let postData: any = {};
 
             async.series([
@@ -96,7 +97,7 @@ describe('users', () => {
             ], done);
         });
 
-        it('checks for a valid email address', (done) => {
+        test('checks for a valid email address', (done) => {
             let postData: SignupRequestDto;
 
             async.series([
@@ -150,7 +151,7 @@ describe('users', () => {
                     .expect(status.CREATED, done);
             });
 
-            it('should know if a user exists by email', (done) => {
+            test('should know if a user exists by email', (done) => {
                 request.get('/api/users/exists/Test@test.com')
                     .expect(status.OK)
                     .end((err, res: SuperTestResponse<UserExistsResponseDto>) => {
@@ -160,13 +161,13 @@ describe('users', () => {
                     });
             });
 
-            it('should not create a duplicate user', (done) => {
+            test('should not create a duplicate user', (done) => {
                 request.post('/api/signup')
                     .send(postData)
                     .expect(status.BAD_REQUEST, done);
             });
 
-            it('should treat email as case insensitive', (done) => {
+            test('should treat email as case insensitive', (done) => {
                 const uppercaseData: SignupRequestDto = {
                     email: 'Test@Test.com',
                     password: 'password',
@@ -195,7 +196,7 @@ describe('users', () => {
                 .expect(status.CREATED, done);
         });
 
-        it('should find a user and send back a token', (done) => {
+        test('should find a user and send back a token', (done) => {
             request.post('/api/authenticate')
                 .send(<LoginRequestDto>{
                     email: 'test@test.com',
@@ -204,7 +205,7 @@ describe('users', () => {
                 .expect(status.OK, done);
         });
 
-        it('should not enforce case sensitivity for emails', (done) => {
+        test('should not enforce case sensitivity for emails', (done) => {
             request.post('/api/authenticate')
                 .send(<LoginRequestDto>{
                     email: 'Test@Test.com',
@@ -213,12 +214,12 @@ describe('users', () => {
                 .expect(status.OK, done);
         });
 
-        it('should fail gracefully if no email is supplied', (done) => {
+        test('should fail gracefully if no email is supplied', (done) => {
             request.post('/api/authenticate')
                 .expect(status.UNAUTHORIZED, done);
         });
 
-        it('should not find a nonexistent email', (done) => {
+        test('should not find a nonexistent email', (done) => {
             request.post('/api/authenticate')
                 .send(<LoginRequestDto>{
                     email: 'dne',
@@ -227,7 +228,7 @@ describe('users', () => {
                 .expect(status.UNAUTHORIZED, done);
         });
 
-        it('should fail to authenticate without a password', (done) => {
+        test('should fail to authenticate without a password', (done) => {
             request.post('/api/authenticate')
                 .send(<LoginRequestDto>{
                     email: 'test@test.com'
@@ -235,7 +236,7 @@ describe('users', () => {
                 .expect(status.UNAUTHORIZED, done);
         });
 
-        it('should fail to authenticate with an incorrect password', (done) => {
+        test('should fail to authenticate with an incorrect password', (done) => {
             request.post('/api/authenticate')
                 .send(<LoginRequestDto>{
                     email: 'test@test.com',
@@ -266,7 +267,7 @@ describe('users', () => {
                 });
         });
 
-        it('should reply with the profile for the jwt owner', (done) => {
+        test('should reply with the profile for the jwt owner', (done) => {
             request.get('/api/profile')
                 .set('Authorization', token)
                 .expect(status.OK)

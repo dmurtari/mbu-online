@@ -30,11 +30,11 @@ describe('assignments', () => {
     const badId = TestUtils.badId;
     const defaultRequirements: string[] = ['1', '2', '3a'];
 
-    before(async () => {
+    beforeAll(async () => {
         await TestUtils.dropDb();
     });
 
-    before(async () => {
+    beforeAll(async () => {
         generatedUsers = await TestUtils.generateTokens();
         badges = await TestUtils.createBadges();
         events = await TestUtils.createEvents();
@@ -87,12 +87,13 @@ describe('assignments', () => {
         ], done);
     });
 
-    after(async () => {
+    afterAll(async () => {
         await TestUtils.dropDb();
+        await TestUtils.closeDb();
     });
 
     describe('when assignments do not exist', () => {
-        it('should be able to assign a scout to an offering', (done) => {
+        test('should be able to assign a scout to an offering', (done) => {
             const postData: CreateAssignmentRequestDto = {
                 periods: [1],
                 offering: generatedOfferings[1].id
@@ -113,7 +114,7 @@ describe('assignments', () => {
                 });
         });
 
-        it('should create a blank object of completions', (done) => {
+        test('should create a blank object of completions', (done) => {
             const postData: CreateAssignmentRequestDto = {
                 periods: [1],
                 offering: generatedOfferings[1].id
@@ -135,7 +136,7 @@ describe('assignments', () => {
                 });
         });
 
-        it('should be able to batch assign to offerings', (done) => {
+        test('should be able to batch assign to offerings', (done) => {
             const postData: CreateAssignmentRequestDto[] = [{
                 periods: [1],
                 offering: generatedOfferings[0].id
@@ -165,7 +166,7 @@ describe('assignments', () => {
                 });
         });
 
-        it('should allow an empty period', (done) => {
+        test('should allow an empty period', (done) => {
             const postData: CreateAssignmentRequestDto[] = [{
                 periods: [2],
                 offering: generatedOfferings[1].id
@@ -192,7 +193,7 @@ describe('assignments', () => {
                 });
         });
 
-        it('should not allow coordinators to access', (done) => {
+        test('should not allow coordinators to access', (done) => {
             const postData: CreateAssignmentRequestDto = {
                 periods: [1],
                 offering: generatedOfferings[1].id
@@ -204,7 +205,7 @@ describe('assignments', () => {
                 .expect(status.UNAUTHORIZED, done);
         });
 
-        it('should not create for a nonexistant offering', (done) => {
+        test('should not create for a nonexistant offering', (done) => {
             const postData: any = {
                 offering: badId,
                 periods: [1]
@@ -217,7 +218,7 @@ describe('assignments', () => {
                 .expect(status.BAD_REQUEST, done);
         });
 
-        it('should not create for nonexistant registrations', (done) => {
+        test('should not create for nonexistant registrations', (done) => {
             const postData: CreateAssignmentRequestDto = {
                 offering: generatedOfferings[0].id,
                 periods: [1]
@@ -268,7 +269,7 @@ describe('assignments', () => {
         });
 
         describe('getting assignments', () => {
-            it('should get all assignments for a registration', (done) => {
+            test('should get all assignments for a registration', (done) => {
                 request.get('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/assignments')
                     .set('Authorization', generatedUsers.teacher.token)
                     .expect(status.OK)
@@ -286,13 +287,13 @@ describe('assignments', () => {
                     });
             });
 
-            it('should not get with an incorrect scout', (done) => {
+            test('should not get with an incorrect scout', (done) => {
                 request.get('/api/scouts/' + badId + '/registrations/' + registrationIds[0] + '/assignments')
                     .set('Authorization', generatedUsers.teacher.token)
                     .expect(status.BAD_REQUEST, done);
             });
 
-            it('should not get with an incorrect registration', (done) => {
+            test('should not get with an incorrect registration', (done) => {
                 request.get('/api/scouts/' + generatedScouts[0].id + '/registrations/' + badId + '/assignments')
                     .set('Authorization', generatedUsers.teacher.token)
                     .expect(status.BAD_REQUEST, done);
@@ -300,7 +301,7 @@ describe('assignments', () => {
         });
 
         describe('updating assignments', () => {
-            it('should update a assignment periods', (done) => {
+            test('should update a assignment periods', (done) => {
                 async.series([
                     (cb) => {
                         request.get('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/assignments')
@@ -340,7 +341,7 @@ describe('assignments', () => {
                 ], done);
             });
 
-            it('should overwrite assignments with a batch', (done) => {
+            test('should overwrite assignments with a batch', (done) => {
                 const postData: CreateAssignmentRequestDto[] = [{
                     periods: [1],
                     offering: generatedOfferings[0].id
@@ -370,7 +371,7 @@ describe('assignments', () => {
                     });
             });
 
-            it('should allow overwriting with empty values for a period', (done) => {
+            test('should allow overwriting with empty values for a period', (done) => {
                 const postData: CreateAssignmentRequestDto[] = [{
                     periods: [2],
                     offering: generatedOfferings[1].id
@@ -397,19 +398,19 @@ describe('assignments', () => {
                     });
             });
 
-            it('should not update an invalid assignment', (done) => {
+            test('should not update an invalid assignment', (done) => {
                 request.put('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/assignments/' + badId)
                     .set('Authorization', generatedUsers.teacher.token)
                     .expect(status.BAD_REQUEST, done);
             });
 
-            it('should not update an invalid registration', (done) => {
+            test('should not update an invalid registration', (done) => {
                 request.put('/api/scouts/' + scoutId + '/registrations/' + badId + '/assignments/' + generatedOfferings[0].id)
                     .set('Authorization', generatedUsers.teacher.token)
                     .expect(status.BAD_REQUEST, done);
             });
 
-            it('should not update for an invalid scout', (done) => {
+            test('should not update for an invalid scout', (done) => {
                 request.put('/api/scouts/' + badId + '/registrations/' + registrationIds[0] + '/assignments/' + generatedOfferings[0].id)
                     .set('Authorization', generatedUsers.teacher.token)
                     .expect(status.BAD_REQUEST, done);
@@ -417,7 +418,7 @@ describe('assignments', () => {
         });
 
         describe('deleting assignments', () => {
-            it('should delete an existing assignment', (done) => {
+            test('should delete an existing assignment', (done) => {
                 async.series([
                     (cb) => {
                         request.get('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/assignments')
@@ -447,19 +448,19 @@ describe('assignments', () => {
                 ], done);
             });
 
-            it('should not delete an invalid assignment', (done) => {
+            test('should not delete an invalid assignment', (done) => {
                 request.del('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/assignments/' + badId)
                     .set('Authorization', generatedUsers.teacher.token)
                     .expect(status.BAD_REQUEST, done);
             });
 
-            it('should not delete an invalid registration', (done) => {
+            test('should not delete an invalid registration', (done) => {
                 request.del('/api/scouts/' + scoutId + '/registrations/' + badId + '/assignments/' + generatedOfferings[0].id)
                     .set('Authorization', generatedUsers.teacher.token)
                     .expect(status.BAD_REQUEST, done);
             });
 
-            it('should not delete for an invalid scout', (done) => {
+            test('should not delete for an invalid scout', (done) => {
                 request.del('/api/scouts/' + badId + '/registrations/' + registrationIds[0] + '/assignments/' + generatedOfferings[0].id)
                     .set('Authorization', generatedUsers.teacher.token)
                     .expect(status.BAD_REQUEST, done);

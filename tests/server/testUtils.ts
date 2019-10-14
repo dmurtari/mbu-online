@@ -38,7 +38,11 @@ export default class TestUtils {
     public static badId: string = '6575';
 
     public static async dropDb(): Promise<Sequelize> {
-        return sequelize.sync({ force: true });
+        return await sequelize.sync({ force: true });
+    }
+
+    public static async closeDb(): Promise<void> {
+        return await sequelize.close();
     }
 
     public static async dropTable(models: typeof Model[]): Promise<any> {

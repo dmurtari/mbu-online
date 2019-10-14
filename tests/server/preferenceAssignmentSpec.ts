@@ -34,11 +34,11 @@ describe('using preference and assignments', () => {
 
     const badId = TestUtils.badId;
 
-    before(async () => {
+    beforeAll(async () => {
         await TestUtils.dropDb();
     });
 
-    before(async () => {
+    beforeAll(async () => {
         const defaultPostData: OfferingInterface = {
         price: 10,
             periods: [1, 2, 3],
@@ -61,7 +61,7 @@ describe('using preference and assignments', () => {
         purchasables = await TestUtils.createPurchasablesForEvent(events[0]);
     });
 
-    before((done) => {
+    beforeAll((done) => {
         const postData: CreatePreferenceRequestDto[] = [{
             offering: generatedOfferings[0].id,
             rank: 1
@@ -127,13 +127,14 @@ describe('using preference and assignments', () => {
         }, done);
     });
 
-    after(async () => {
+    afterAll(async () => {
         await TestUtils.dropDb();
+        await TestUtils.closeDb();
     });
 
     describe('getting scouts that are registered for an event', () => {
 
-        it('should get all registrations for an event', (done) => {
+        test('should get all registrations for an event', (done) => {
             request.get('/api/events/' + events[0].id + '/registrations')
                 .set('Authorization', generatedUsers.admin.token)
                 .expect(status.OK)
@@ -172,19 +173,19 @@ describe('using preference and assignments', () => {
                 });
         });
 
-        it('should allow teachers to see registrations', (done) => {
+        test('should allow teachers to see registrations', (done) => {
             request.get('/api/events/' + events[0].id + '/registrations')
                 .set('Authorization', generatedUsers.teacher.token)
                 .expect(status.OK, done);
         });
 
-        it('should not allow coordinators to see registrations', (done) => {
+        test('should not allow coordinators to see registrations', (done) => {
             request.get('/api/events/' + events[0].id + '/registrations')
                 .set('Authorization', generatedUsers.coordinator.token)
                 .expect(status.UNAUTHORIZED, done);
         });
 
-        it('should fail gracefully for a bad id', (done) => {
+        test('should fail gracefully for a bad id', (done) => {
             request.get('/api/events/' + badId + '/registrations')
                 .set('Authorization', generatedUsers.teacher.token)
                 .expect(status.OK, done);
@@ -192,7 +193,7 @@ describe('using preference and assignments', () => {
     });
 
     describe('getting all scouts and all registrations', () => {
-        it('should get all scouts of the site', (done) => {
+        test('should get all scouts of the site', (done) => {
             request.get('/api/scouts')
                 .set('Authorization', generatedUsers.admin.token)
                 .expect(status.OK)
@@ -215,13 +216,13 @@ describe('using preference and assignments', () => {
                 });
         });
 
-        it('should allow teachers to get a list of scouts', (done) => {
+        test('should allow teachers to get a list of scouts', (done) => {
             request.get('/api/scouts')
                 .set('Authorization', generatedUsers.teacher.token)
                 .expect(status.OK, done);
         });
 
-        it('should get some details of the registration', (done) => {
+        test('should get some details of the registration', (done) => {
             request.get('/api/scouts')
                 .set('Authorization', generatedUsers.admin.token)
                 .expect(status.OK)
@@ -241,7 +242,7 @@ describe('using preference and assignments', () => {
                 });
         });
 
-        it('should get some details of the user', (done) => {
+        test('should get some details of the user', (done) => {
             request.get('/api/scouts')
                 .set('Authorization', generatedUsers.admin.token)
                 .expect(status.OK)
@@ -258,13 +259,13 @@ describe('using preference and assignments', () => {
                 });
         });
 
-        it('should not allow coordinators to access', (done) => {
+        test('should not allow coordinators to access', (done) => {
             request.get('/api/scouts')
                 .set('Authorization', generatedUsers.coordinator.token)
                 .expect(status.UNAUTHORIZED, done);
         });
 
-        it('should also get details for a single scout', (done) => {
+        test('should also get details for a single scout', (done) => {
             request.get('/api/scouts/' + generatedScouts[0].id)
                 .set('Authorization', generatedUsers.admin.token)
                 .expect(status.OK)
@@ -281,7 +282,7 @@ describe('using preference and assignments', () => {
     });
 
     describe('getting scouts that are assigned to a class', () => {
-        it('should get all assignees for an event', (done) => {
+        test('should get all assignees for an event', (done) => {
             request.get('/api/events/' + events[0].id + '/offerings/assignees')
                 .set('Authorization', generatedUsers.admin.token)
                 .expect(status.OK)
@@ -305,13 +306,13 @@ describe('using preference and assignments', () => {
         });
 
 
-        it('should allow teachers to access assignees', (done) => {
+        test('should allow teachers to access assignees', (done) => {
             request.get('/api/events/' + events[0].id + '/offerings/assignees')
                 .set('Authorization', generatedUsers.teacher.token)
                 .expect(status.OK, done);
         });
 
-        it('should not allow coordinators to access assignees', (done) => {
+        test('should not allow coordinators to access assignees', (done) => {
             request.get('/api/events/' + events[0].id + '/offerings/assignees')
                 .set('Authorization', generatedUsers.coordinator.token)
                 .expect(status.UNAUTHORIZED, done);

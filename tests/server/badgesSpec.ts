@@ -16,11 +16,11 @@ const request = supertest(app);
 describe('merit badges', () => {
     let token: string;
 
-    before(async () => {
+    beforeAll(async () => {
         await TestUtils.dropDb();
     });
 
-    before(async () => {
+    beforeAll(async () => {
         token = (await TestUtils.generateToken(UserRole.ADMIN)).token;
     });
 
@@ -28,8 +28,9 @@ describe('merit badges', () => {
         await TestUtils.dropTable([Badge]);
     });
 
-    after(async () => {
+    afterAll(async () => {
         await TestUtils.dropDb();
+        await TestUtils.closeDb();
     });
 
     describe('creating merit badges', () => {
@@ -39,7 +40,7 @@ describe('merit badges', () => {
             notes: 'Eagle'
         };
 
-        it('should create badges with names', (done) => {
+        test('should create badges with names', (done) => {
             const postData: CreateUpdateBadgeDto = {
                 name: 'Test'
             };
@@ -50,7 +51,7 @@ describe('merit badges', () => {
                 .expect(status.CREATED, done);
         });
 
-        it('should require authentication', (done) => {
+        test('should require authentication', (done) => {
             const postData = testBadge;
 
             request.post('/api/badges')
@@ -58,7 +59,7 @@ describe('merit badges', () => {
                 .expect(status.UNAUTHORIZED, done);
         });
 
-        it('should require name', (done) => {
+        test('should require name', (done) => {
             const postData: CreateUpdateBadgeDto = {
                 description: 'No name'
             };
@@ -69,7 +70,7 @@ describe('merit badges', () => {
                 .expect(status.BAD_REQUEST, done);
         });
 
-        it('should not allow blank names', (done) => {
+        test('should not allow blank names', (done) => {
             const postData: CreateUpdateBadgeDto = {
                 name: ''
             };
@@ -80,7 +81,7 @@ describe('merit badges', () => {
                 .expect(status.BAD_REQUEST, done);
         });
 
-        it('should allow long details', (done) => {
+        test('should allow long details', (done) => {
             const postData: CreateUpdateBadgeDto = {
                 name: 'Swimming',
                 description: 'Swimming is a leisure activity'
@@ -92,7 +93,7 @@ describe('merit badges', () => {
                 .expect(status.CREATED, done);
         });
 
-        it('should not allow duplicate names', (done) => {
+        test('should not allow duplicate names', (done) => {
             async.series([
                 (cb) => {
                     request.post('/api/badges')
@@ -109,7 +110,7 @@ describe('merit badges', () => {
             ], done);
         });
 
-        it('should ignore extra fields', (done) => {
+        test('should ignore extra fields', (done) => {
             const postData: any = {
                 name: 'Test',
                 birthday: 'Nonsense'
@@ -152,7 +153,7 @@ describe('merit badges', () => {
                 });
         });
 
-        it('should be able to get a badge by id', (done) => {
+        test('should be able to get a badge by id', (done) => {
             request.get('/api/badges?id=' + id)
                 .expect(status.OK)
                 .end((err, res: SuperTestResponse<BadgesResponseDto>) => {
@@ -165,7 +166,7 @@ describe('merit badges', () => {
                 });
         });
 
-        it('should be able to get a badge by name', (done) => {
+        test('should be able to get a badge by name', (done) => {
             request.get('/api/badges?name=' + test1.name)
                 .expect(status.OK)
                 .end((err, res: SuperTestResponse<BadgesResponseDto>) => {
@@ -178,7 +179,7 @@ describe('merit badges', () => {
                 });
         });
 
-        it('should respond with all badges if no query is supplied', (done) => {
+        test('should respond with all badges if no query is supplied', (done) => {
             async.series([
                 (cb) => {
                     request.post('/api/badges')
@@ -203,12 +204,12 @@ describe('merit badges', () => {
             ], done);
         });
 
-        it('should fail gracefully if incorrect arguments are supplied', (done) => {
+        test('should fail gracefully if incorrect arguments are supplied', (done) => {
             request.get('/api/badges?wrong=hello')
                 .expect(status.OK, done);
         });
 
-        it('should not fail if a badge does not exist', (done) => {
+        test('should not fail if a badge does not exist', (done) => {
             request.get('/api/badges?name=dne')
                 .expect(status.OK, done);
         });
@@ -217,7 +218,7 @@ describe('merit badges', () => {
     describe('removing a merit badge', () => {
         let id: number;
 
-        it('should remove a badge with a given id', (done) => {
+        test('should remove a badge with a given id', (done) => {
             const badge: CreateUpdateBadgeDto = {
                 name: 'Test'
             };
@@ -252,19 +253,19 @@ describe('merit badges', () => {
             ], done);
         });
 
-        it('should fail gracefully if a badge is not found with a valid id form', (done) => {
+        test('should fail gracefully if a badge is not found with a valid id form', (done) => {
             request.del('/api/badges/123123')
                 .set('Authorization', token)
                 .expect(status.BAD_REQUEST, done);
         });
 
-        it('should fail gracefully if a valid id is not supplied', (done) => {
+        test('should fail gracefully if a valid id is not supplied', (done) => {
             request.del('/api/badges/invalidid')
                 .set('Authorization', token)
                 .expect(status.BAD_REQUEST, done);
         });
 
-        it('should fail gracefully if delete is sent to the wrong endpoint', (done) => {
+        test('should fail gracefully if delete is sent to the wrong endpoint', (done) => {
             request.del('/api/badges')
                 .set('Authorization', token)
                 .expect(status.NOT_FOUND, done);
@@ -279,7 +280,7 @@ describe('merit badges', () => {
             notes: 'Note'
         };
 
-        it('should update a badge with all fields', (done) => {
+        test('should update a badge with all fields', (done) => {
             const badgeUpdate: CreateUpdateBadgeDto = {
                 name: 'Test updated',
                 description: 'New',
@@ -315,7 +316,7 @@ describe('merit badges', () => {
             ], done);
         });
 
-        it('should update a badge with partial fields', (done) => {
+        test('should update a badge with partial fields', (done) => {
             const badgeUpdate: CreateUpdateBadgeDto = {
                 name: 'Test updated'
             };
@@ -349,7 +350,7 @@ describe('merit badges', () => {
             ], done);
         });
 
-        it('should fail gracefully if required fields are not supplied', (done) => {
+        test('should fail gracefully if required fields are not supplied', (done) => {
             const badgeUpdate: CreateUpdateBadgeDto = {
                 name: null,
                 description: 'New',
@@ -377,7 +378,7 @@ describe('merit badges', () => {
             ], done);
         });
 
-        it('should not allow badges to be modified to be duplicates', (done) => {
+        test('should not allow badges to be modified to be duplicates', (done) => {
             let id2: number;
             const badge2 = Object.assign({}, badge);
             badge2.name = 'Different';
@@ -414,7 +415,7 @@ describe('merit badges', () => {
             ], done);
         });
 
-        it('should not edit the badge if no fields are supplied', (done) => {
+        test('should not edit the badge if no fields are supplied', (done) => {
             async.series([
                 (cb) => {
                     request.post('/api/badges')
@@ -443,7 +444,7 @@ describe('merit badges', () => {
             ], done);
         });
 
-        it('should fail gracefully if the badge is not found', (done) => {
+        test('should fail gracefully if the badge is not found', (done) => {
             async.series([
                 (cb) => {
                     request.post('/api/badges')
@@ -467,7 +468,7 @@ describe('merit badges', () => {
             ], done);
         });
 
-        it('should not edit the badge if an empty request is sent', (done) => {
+        test('should not edit the badge if an empty request is sent', (done) => {
             async.series([
                 (cb) => {
                     request.post('/api/badges')
@@ -495,13 +496,13 @@ describe('merit badges', () => {
             ], done);
         });
 
-        it('should fail gracefully if no id is sent', (done) => {
+        test('should fail gracefully if no id is sent', (done) => {
             request.put('/api/badges/')
                 .set('Authorization', token)
                 .expect(status.NOT_FOUND, done);
         });
 
-        it('should allow long details', (done) => {
+        test('should allow long details', (done) => {
             async.series([
                 (cb) => {
                     request.post('/api/badges')
