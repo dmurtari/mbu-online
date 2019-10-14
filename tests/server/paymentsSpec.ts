@@ -295,8 +295,13 @@ describe('payments', () => {
         ], done);
     });
 
+    afterAll(async () => {
+        await TestUtils.dropDb();
+        await TestUtils.closeDb();
+    });
+
     describe('calculating potential prices', () => {
-        it('should calculate for an individual scout', (done) => {
+        test('should calculate for an individual scout', (done) => {
             request.get('/api/scouts/' + generatedTroop1[0].id + '/registrations/' + registrationIds[0] + '/projectedCost')
                 .set('Authorization', generatedUsers.coordinator.token)
                 .expect(status.OK)
@@ -307,7 +312,7 @@ describe('payments', () => {
                 });
         });
 
-        it('should calculate a different cost for another scout', (done) => {
+        test('should calculate a different cost for another scout', (done) => {
             request.get('/api/scouts/' + generatedTroop1[1].id + '/registrations/' + registrationIds[1] + '/projectedCost')
                 .set('Authorization', generatedUsers.coordinator.token)
                 .expect(status.OK)
@@ -318,7 +323,7 @@ describe('payments', () => {
                 });
         });
 
-        it('should calculate a different cost for another scout for another event', (done) => {
+        test('should calculate a different cost for another scout for another event', (done) => {
             request.get('/api/scouts/' + generatedTroop1[1].id + '/registrations/' + registrationIds[2] + '/projectedCost')
                 .set('Authorization', generatedUsers.coordinator.token)
                 .expect(status.OK)
@@ -329,7 +334,7 @@ describe('payments', () => {
                 });
         });
 
-        it('should get the potential cost of attendance for a troop', (done) => {
+        test('should get the potential cost of attendance for a troop', (done) => {
             request.get('/api/users/' + generatedUsers.coordinator.profile.id + '/events/' + generatedEvents[0].id + '/projectedCost')
                 .set('Authorization', generatedUsers.coordinator.token)
                 .expect(status.OK)
@@ -340,7 +345,7 @@ describe('payments', () => {
                 });
         });
 
-        it('should get the potential cost of attendance for a troop for another event', (done) => {
+        test('should get the potential cost of attendance for a troop for another event', (done) => {
             request.get('/api/users/' + generatedUsers.coordinator.profile.id + '/events/' + generatedEvents[1].id + '/projectedCost')
                 .set('Authorization', generatedUsers.coordinator.token)
                 .expect(status.OK)
@@ -351,7 +356,7 @@ describe('payments', () => {
                 });
         });
 
-        it('should get the potential cost of attendence for a different troop', (done) => {
+        test('should get the potential cost of attendence for a different troop', (done) => {
             request.get('/api/users/' + generatedUsers.coordinator2.profile.id + '/events/' + generatedEvents[0].id + '/projectedCost')
                 .set('Authorization', generatedUsers.coordinator2.token)
                 .expect(status.OK)
@@ -362,7 +367,7 @@ describe('payments', () => {
                 });
         });
 
-        it('should get the total potential income from an event', (done) => {
+        test('should get the total potential income from an event', (done) => {
             request.get('/api/events/' + generatedEvents[0].id + '/potentialIncome')
                 .set('Authorization', generatedUsers.admin.token)
                 .expect(status.OK)
@@ -373,7 +378,7 @@ describe('payments', () => {
                 });
         });
 
-        it('should get the total potential income from another event', (done) => {
+        test('should get the total potential income from another event', (done) => {
             request.get('/api/events/' + generatedEvents[1].id + '/potentialIncome')
                 .set('Authorization', generatedUsers.admin.token)
                 .expect(status.OK)
@@ -384,31 +389,31 @@ describe('payments', () => {
                 });
         });
 
-        it('should fail for an invalid user', (done) => {
+        test('should fail for an invalid user', (done) => {
             request.get('/api/users/1337/events/' + generatedEvents[0].id + '/projectedCost')
                 .set('Authorization', generatedUsers.admin.token)
                 .expect(status.BAD_REQUEST, done);
         });
 
-        it('should fail for an invalid event', (done) => {
+        test('should fail for an invalid event', (done) => {
             request.get('/api/users/' + generatedUsers.coordinator2.profile.id + '/events/13370/projectedCost')
                 .set('Authorization', generatedUsers.admin.token)
                 .expect(status.BAD_REQUEST, done);
         });
 
-        it('should fail for an invalid scout', (done) => {
+        test('should fail for an invalid scout', (done) => {
             request.get('/api/scouts/1337/registrations/' + registrationIds[0] + '/projectedCost')
                 .set('Authorization', generatedUsers.coordinator.token)
                 .expect(status.BAD_REQUEST, done);
         });
 
-        it('should fail for an invalid registration', (done) => {
+        test('should fail for an invalid registration', (done) => {
             request.get('/api/scouts/' + generatedTroop1[1].id + '/registrations/1337/projectedCost')
                 .set('Authorization', generatedUsers.coordinator.token)
                 .expect(status.BAD_REQUEST, done);
         });
 
-        it('should fail to get total potential income from an invalid event', (done) => {
+        test('should fail to get total potential income from an invalid event', (done) => {
             request.get('/api/events/1337/potentialIncome')
                 .set('Authorization', generatedUsers.admin.token)
                 .expect(status.BAD_REQUEST, done);
@@ -457,7 +462,7 @@ describe('payments', () => {
             ], done);
         });
 
-        it('should calculate the actual cost for an individual scout', (done) => {
+        test('should calculate the actual cost for an individual scout', (done) => {
             request.get('/api/scouts/' + generatedTroop1[0].id + '/registrations/' + registrationIds[0] + '/cost')
                 .set('Authorization', generatedUsers.coordinator.token)
                 .expect(status.OK)
@@ -468,7 +473,7 @@ describe('payments', () => {
                 });
         });
 
-        it('should calculate the actual cost for another scout', (done) => {
+        test('should calculate the actual cost for another scout', (done) => {
             request.get('/api/scouts/' + generatedTroop1[1].id + '/registrations/' + registrationIds[1] + '/cost')
                 .set('Authorization', generatedUsers.coordinator.token)
                 .expect(status.OK)
@@ -479,7 +484,7 @@ describe('payments', () => {
                 });
         });
 
-        it('should calculate the actual cost for another scout and different registration', (done) => {
+        test('should calculate the actual cost for another scout and different registration', (done) => {
             request.get('/api/scouts/' + generatedTroop1[1].id + '/registrations/' + registrationIds[2] + '/cost')
                 .set('Authorization', generatedUsers.coordinator.token)
                 .expect(status.OK)
@@ -490,7 +495,7 @@ describe('payments', () => {
                 });
         });
 
-        it('should get the cost of attendance for a troop', (done) => {
+        test('should get the cost of attendance for a troop', (done) => {
             request.get('/api/users/' + generatedUsers.coordinator.profile.id + '/events/' + generatedEvents[0].id + '/cost')
                 .set('Authorization', generatedUsers.coordinator.token)
                 .expect(status.OK)
@@ -501,7 +506,7 @@ describe('payments', () => {
                 });
         });
 
-        it('should get the cost of attendance for a troop for another event', (done) => {
+        test('should get the cost of attendance for a troop for another event', (done) => {
             request.get('/api/users/' + generatedUsers.coordinator.profile.id + '/events/' + generatedEvents[1].id + '/cost')
                 .set('Authorization', generatedUsers.coordinator.token)
                 .expect(status.OK)
@@ -512,7 +517,7 @@ describe('payments', () => {
                 });
         });
 
-        it('should get the cost of attendence for a different troop', (done) => {
+        test('should get the cost of attendence for a different troop', (done) => {
             request.get('/api/users/' + generatedUsers.coordinator2.profile.id + '/events/' + generatedEvents[0].id + '/cost')
                 .set('Authorization', generatedUsers.coordinator2.token)
                 .expect(status.OK)
@@ -523,7 +528,7 @@ describe('payments', () => {
                 });
         });
 
-        it('should get the real income from an event', (done) => {
+        test('should get the real income from an event', (done) => {
             request.get('/api/events/' + generatedEvents[0].id + '/income')
                 .set('Authorization', generatedUsers.admin.token)
                 .expect(status.OK)
@@ -534,7 +539,7 @@ describe('payments', () => {
                 });
         });
 
-        it('should get the real income from another event', (done) => {
+        test('should get the real income from another event', (done) => {
             request.get('/api/events/' + generatedEvents[1].id + '/income')
                 .set('Authorization', generatedUsers.admin.token)
                 .expect(status.OK)
@@ -545,31 +550,31 @@ describe('payments', () => {
                 });
         });
 
-        it('should fail for an invalid user', (done) => {
+        test('should fail for an invalid user', (done) => {
             request.get('/api/users/1337/events/' + generatedEvents[0].id + '/cost')
                 .set('Authorization', generatedUsers.admin.token)
                 .expect(status.BAD_REQUEST, done);
         });
 
-        it('should fail for an invalid event', (done) => {
+        test('should fail for an invalid event', (done) => {
             request.get('/api/users/' + generatedUsers.coordinator2.profile.id + '/events/13370/cost')
                 .set('Authorization', generatedUsers.admin.token)
                 .expect(status.BAD_REQUEST, done);
         });
 
-        it('should fail for an invalid scout', (done) => {
+        test('should fail for an invalid scout', (done) => {
             request.get('/api/scouts/1337/registrations/' + registrationIds[0] + '/cost')
                 .set('Authorization', generatedUsers.coordinator.token)
                 .expect(status.BAD_REQUEST, done);
         });
 
-        it('should fail for an invalid registration', (done) => {
+        test('should fail for an invalid registration', (done) => {
             request.get('/api/scouts/' + generatedTroop1[1].id + '/registrations/1337/cost')
                 .set('Authorization', generatedUsers.coordinator.token)
                 .expect(status.BAD_REQUEST, done);
         });
 
-        it('should fail to get total income from an invalid event', (done) => {
+        test('should fail to get total income from an invalid event', (done) => {
             request.get('/api/events/1337/income')
                 .set('Authorization', generatedUsers.admin.token)
                 .expect(status.BAD_REQUEST, done);

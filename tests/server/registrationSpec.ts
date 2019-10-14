@@ -25,11 +25,11 @@ describe('registration', () => {
 
     const badId = TestUtils.badId;
 
-    before(async () => {
+    beforeAll(async () => {
         await TestUtils.dropDb();
     });
 
-    before(async () => {
+    beforeAll(async () => {
         generatedUsers = await TestUtils.generateTokens([
             UserRole.ADMIN,
             UserRole.TEACHER,
@@ -45,12 +45,13 @@ describe('registration', () => {
         generatedScouts = await TestUtils.createScoutsForUser(generatedUsers.coordinator, testScouts(5));
     });
 
-    after(async () => {
+    afterAll(async () => {
         await TestUtils.dropDb();
+        await TestUtils.closeDb();
     });
 
     describe('registering a scout for an event', () => {
-        it('should create the registration', (done) => {
+        test('should create the registration', (done) => {
             request.post('/api/scouts/' + generatedScouts[3].id + '/registrations')
                 .set('Authorization', generatedUsers.coordinator.token)
                 .send(<RegistrationRequestDto>{
@@ -66,7 +67,7 @@ describe('registration', () => {
                 });
         });
 
-        it('should create a registration with a note', (done) => {
+        test('should create a registration with a note', (done) => {
             const note = 'This is a note';
 
             request.post('/api/scouts/' + generatedScouts[3].id + '/registrations')
@@ -86,7 +87,7 @@ describe('registration', () => {
                 });
         });
 
-        it('should check for the correct owner', (done) => {
+        test('should check for the correct owner', (done) => {
             request.post('/api/scouts/' + generatedScouts[3].id + '/registrations')
                 .set('Authorization', generatedUsers.coordinator2.token)
                 .send(<RegistrationRequestDto>{
@@ -95,7 +96,7 @@ describe('registration', () => {
                 .expect(status.UNAUTHORIZED, done);
         });
 
-        it('should allow admins to register', (done) => {
+        test('should allow admins to register', (done) => {
             request.post('/api/scouts/' + generatedScouts[3].id + '/registrations')
                 .set('Authorization', generatedUsers.admin.token)
                 .send(<RegistrationRequestDto>{
@@ -104,7 +105,7 @@ describe('registration', () => {
                 .expect(status.CREATED, done);
         });
 
-        it('should allow teachers to register', (done) => {
+        test('should allow teachers to register', (done) => {
             request.post('/api/scouts/' + generatedScouts[3].id + '/registrations')
                 .set('Authorization', generatedUsers.teacher.token)
                 .send(<RegistrationRequestDto>{
@@ -113,7 +114,7 @@ describe('registration', () => {
                 .expect(status.CREATED, done);
         });
 
-        it('should not create a registration for a nonexistant scout', (done) => {
+        test('should not create a registration for a nonexistant scout', (done) => {
             request.post('/api/scouts/' + badId + '/registrations')
                 .set('Authorization', generatedUsers.coordinator.token)
                 .send(<RegistrationRequestDto>{
@@ -122,7 +123,7 @@ describe('registration', () => {
                 .expect(status.BAD_REQUEST, done);
         });
 
-        it('should not create a registration for a nonexistant event', (done) => {
+        test('should not create a registration for a nonexistant event', (done) => {
             request.post('/api/scouts/' + generatedScouts[3].id + '/registrations')
                 .set('Authorization', generatedUsers.coordinator.token)
                 .send(<RegistrationRequestDto>{
@@ -131,7 +132,7 @@ describe('registration', () => {
                 .expect(status.BAD_REQUEST, done);
         });
 
-        it('should not create duplicate registrations', (done) => {
+        test('should not create duplicate registrations', (done) => {
             async.series([
                 (cb) => {
                     request.post('/api/scouts/' + generatedScouts[3].id + '/registrations')
@@ -203,7 +204,7 @@ describe('registration', () => {
         });
 
         describe('getting a scouts registrations', () => {
-            it('should get all associated registrations', (done) => {
+            test('should get all associated registrations', (done) => {
                 request.get('/api/scouts/' + scoutId + '/registrations')
                     .set('Authorization', generatedUsers.coordinator.token)
                     .expect(status.OK)
@@ -227,7 +228,7 @@ describe('registration', () => {
 
         describe('deleting a registration', () => {
 
-            it('should delete a single registration', (done) => {
+            test('should delete a single registration', (done) => {
                 async.series([
                     (cb) => {
                         request.del('/api/scouts/' + scoutId + '/registrations/' + events[0].id)
@@ -249,31 +250,31 @@ describe('registration', () => {
                 ], done);
             });
 
-            it('should check for the correct owner', (done) => {
+            test('should check for the correct owner', (done) => {
                 request.del('/api/scouts/' + scoutId + '/registrations/' + events[0].id)
                     .set('Authorization', generatedUsers.coordinator2.token)
                     .expect(status.UNAUTHORIZED, done);
             });
 
-            it('should allow teachers to delete', (done) => {
+            test('should allow teachers to delete', (done) => {
                 request.del('/api/scouts/' + scoutId + '/registrations/' + events[0].id)
                     .set('Authorization', generatedUsers.teacher.token)
                     .expect(status.OK, done);
             });
 
-            it('should allow admins to delete', (done) => {
+            test('should allow admins to delete', (done) => {
                 request.del('/api/scouts/' + scoutId + '/registrations/' + events[0].id)
                     .set('Authorization', generatedUsers.admin.token)
                     .expect(status.OK, done);
             });
 
-            it('should not delete for an invalid scout', (done) => {
+            test('should not delete for an invalid scout', (done) => {
                 request.del('/api/scouts/' + badId + '/registrations/' + events[0].id)
                     .set('Authorization', generatedUsers.coordinator.token)
                     .expect(status.BAD_REQUEST, done);
             });
 
-            it('should handle invalid events', (done) => {
+            test('should handle invalid events', (done) => {
                 request.del('/api/scouts/' + scoutId + '/registrations/' + badId)
                     .set('Authorization', generatedUsers.coordinator.token)
                     .expect(status.BAD_REQUEST, done);
@@ -327,7 +328,7 @@ describe('registration', () => {
             });
         });
 
-        it('should get scout registrations for a user', (done) => {
+        test('should get scout registrations for a user', (done) => {
             request.get('/api/users/' + generatedUsers.coordinator.profile.id + '/scouts/registrations')
                 .set('Authorization', generatedUsers.coordinator.token)
                 .expect(status.OK)
@@ -344,7 +345,7 @@ describe('registration', () => {
                 });
         });
 
-        it('should get registrations for an event for a user', (done) => {
+        test('should get registrations for an event for a user', (done) => {
             request.get('/api/users/' + generatedUsers.coordinator.profile.id + '/events/' + events[0].id + '/registrations')
                 .set('Authorization', generatedUsers.coordinator.token)
                 .expect(status.OK)
@@ -364,7 +365,7 @@ describe('registration', () => {
                 });
         });
 
-        it('should get registrations for another event for a user', (done) => {
+        test('should get registrations for another event for a user', (done) => {
             request.get('/api/users/' + generatedUsers.coordinator.profile.id + '/events/' + events[1].id + '/registrations')
                 .set('Authorization', generatedUsers.coordinator.token)
                 .expect(status.OK)
@@ -384,7 +385,7 @@ describe('registration', () => {
                 });
         });
 
-        it('should get registrations for an event for another user', (done) => {
+        test('should get registrations for an event for another user', (done) => {
             request.get('/api/users/' + generatedUsers.coordinator2.profile.id + '/events/' + events[0].id + '/registrations')
                 .set('Authorization', generatedUsers.coordinator2.token)
                 .expect(status.OK)
@@ -404,25 +405,25 @@ describe('registration', () => {
                 });
         });
 
-        it('should allow admins to see scout registrations for a user', (done) => {
+        test('should allow admins to see scout registrations for a user', (done) => {
             request.get('/api/users/' + generatedUsers.coordinator.profile.id + '/scouts/registrations')
                 .set('Authorization', generatedUsers.admin.token)
                 .expect(status.OK, done);
         });
 
-        it('should allow teachers to see scout registrations for a user', (done) => {
+        test('should allow teachers to see scout registrations for a user', (done) => {
             request.get('/api/users/' + generatedUsers.coordinator.profile.id + '/scouts/registrations')
                 .set('Authorization', generatedUsers.teacher.token)
                 .expect(status.OK, done);
         });
 
-        it('should not allow other coordinators to see scout registrations for a user', (done) => {
+        test('should not allow other coordinators to see scout registrations for a user', (done) => {
             request.get('/api/users/' + generatedUsers.coordinator.profile.id + '/scouts/registrations')
                 .set('Authorization', generatedUsers.coordinator2.token)
                 .expect(status.UNAUTHORIZED, done);
         });
 
-        it('should get registrations and offerings as parts of the event stats', (done) => {
+        test('should get registrations and offerings as parts of the event stats', (done) => {
             request.get('/api/events/' + events[0].id + '/stats')
                 .set('Authorization', generatedUsers.admin.token)
                 .expect(status.OK)

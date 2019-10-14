@@ -14,12 +14,13 @@ describe('authentication', () => {
         await TestUtils.dropDb();
     });
 
-    after(async () => {
+    afterAll(async () => {
         await TestUtils.dropDb();
+        await TestUtils.closeDb();
     });
 
     describe('user roles', () => {
-        it('should create a user with a default role', (done) => {
+        test('should create a user with a default role', (done) => {
             const postData: SignupRequestDto = {
                 email: 'test@test.com',
                 password: 'password',
@@ -39,7 +40,7 @@ describe('authentication', () => {
                 });
         });
 
-        it('should create a user with a role', (done) => {
+        test('should create a user with a role', (done) => {
             const postData: SignupRequestDto = {
                 email: 'test@test.com',
                 password: 'password',
@@ -60,7 +61,7 @@ describe('authentication', () => {
                 });
         });
 
-        it('should not create a user with an invalid role', (done) => {
+        test('should not create a user with an invalid role', (done) => {
             const postData: SignupRequestDto = {
                 email: 'test@test.com',
                 password: 'password',

@@ -84,8 +84,9 @@ describe('completion records', () => {
         ], done);
     });
 
-    after(async () => {
+    afterAll(async () => {
         await TestUtils.dropDb();
+        await TestUtils.closeDb();
     });
 
     describe('adding completion records', () => {
@@ -120,7 +121,7 @@ describe('completion records', () => {
                 });
         });
 
-        it('should allow admins to change completion records', (done) => {
+        test('should allow admins to change completion records', (done) => {
             request.put('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/assignments/' + generatedOfferings[0].id)
                 .set('Authorization', generatedUsers.admin.token)
                 .send(<CreateAssignmentRequestDto>{ completions: ['1', '2'] })
@@ -134,14 +135,14 @@ describe('completion records', () => {
                 });
         });
 
-        it('should allow teachers to change completion records', (done) => {
+        test('should allow teachers to change completion records', (done) => {
             request.put('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/assignments/' + generatedOfferings[0].id)
                 .set('Authorization', generatedUsers.admin.token)
                 .send(<CreateAssignmentRequestDto>{ completions: ['1'] })
                 .expect(status.OK, done);
         });
 
-        it('should not allow coordinators to change completion records', (done) => {
+        test('should not allow coordinators to change completion records', (done) => {
             request.put('/api/scouts/' + scoutId + '/registrations/' + registrationIds[0] + '/assignments/' + generatedOfferings[0].id)
                 .set('Authorization', generatedUsers.coordinator.token)
                 .send(<CreateAssignmentRequestDto>{ completions: ['1'] })

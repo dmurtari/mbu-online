@@ -22,11 +22,11 @@ describe('event badge association', () => {
 
     const badId = TestUtils.badId;
 
-    before(async () => {
+    beforeAll(async () => {
         await TestUtils.dropDb();
     });
 
-    before(async () => {
+    beforeAll(async () => {
         adminToken = (await TestUtils.generateToken(UserRole.ADMIN)).token;
     });
 
@@ -39,12 +39,13 @@ describe('event badge association', () => {
         events = await TestUtils.createEvents();
     });
 
-    after(async () => {
+    afterAll(async () => {
         await TestUtils.dropDb();
+        await TestUtils.closeDb();
     });
 
     describe('when offerings do not exist', () => {
-        it('should create a badge offering', (done) => {
+        test('should create a badge offering', (done) => {
             const postData: CreateOfferingDto = {
                 badge_id: badges[1].id,
                 offering: {
@@ -70,7 +71,7 @@ describe('event badge association', () => {
                 });
         });
 
-        it('should default to a price of 0', (done) => {
+        test('should default to a price of 0', (done) => {
             const postData: CreateOfferingDto = {
                 badge_id: badges[0].id,
                 offering: {
@@ -93,7 +94,7 @@ describe('event badge association', () => {
                 });
         });
 
-        it('should default to empty requirements', (done) => {
+        test('should default to empty requirements', (done) => {
             const postData: CreateOfferingDto = {
                 badge_id: badges[1].id,
                 offering: {
@@ -118,7 +119,7 @@ describe('event badge association', () => {
                 });
         });
 
-        it('should not save null periods', (done) => {
+        test('should not save null periods', (done) => {
             const postData: CreateOfferingDto = {
                 badge_id: badges[1].id,
                 offering: {
@@ -143,7 +144,7 @@ describe('event badge association', () => {
                 });
         });
 
-        it('should create multiple offerings', (done) => {
+        test('should create multiple offerings', (done) => {
             async.series([
                 (cb) => {
                     const postData: CreateOfferingDto = {
@@ -198,7 +199,7 @@ describe('event badge association', () => {
             ], done);
         });
 
-        it('should not create an offering if the badge does not exist', (done) => {
+        test('should not create an offering if the badge does not exist', (done) => {
             const postData: CreateOfferingDto = {
                 badge_id: Number(badId),
                 offering: {
@@ -213,7 +214,7 @@ describe('event badge association', () => {
                 .expect(status.BAD_REQUEST, done);
         });
 
-        it('should not create an offering if the event does not exist', (done) => {
+        test('should not create an offering if the event does not exist', (done) => {
             const postData: CreateOfferingDto = {
                 badge_id: badges[0].id,
                 offering: {
@@ -228,7 +229,7 @@ describe('event badge association', () => {
                 .expect(status.BAD_REQUEST, done);
         });
 
-        it('should validate the presence of required fields', (done) => {
+        test('should validate the presence of required fields', (done) => {
             const postData: any = {
                 badge_id: badges[0].id
             };
@@ -239,7 +240,7 @@ describe('event badge association', () => {
                 .expect(status.BAD_REQUEST, done);
         });
 
-        it('should validate for correct durations', (done) => {
+        test('should validate for correct durations', (done) => {
             const postData: CreateOfferingDto = {
                 badge_id: badges[0].id,
                 offering: {
@@ -254,7 +255,7 @@ describe('event badge association', () => {
                 .expect(status.BAD_REQUEST, done);
         });
 
-        it('should respond gracefully to bad ids', (done) => {
+        test('should respond gracefully to bad ids', (done) => {
             const postData: CreateOfferingDto = {
                 badge_id: badges[0].id,
                 offering: {
@@ -284,7 +285,7 @@ describe('event badge association', () => {
         });
 
         describe('getting offerings', () => {
-            it('should get all offerings for an event', (done) => {
+            test('should get all offerings for an event', (done) => {
                 request.get('/api/events?id=' + events[0].id)
                     .expect(status.OK)
                     .end((err, res: SuperTestResponse<EventsResponseDto>) => {
@@ -296,7 +297,7 @@ describe('event badge association', () => {
                     });
             });
 
-            it('should get offerings as part of the event stats', (done) => {
+            test('should get offerings as part of the event stats', (done) => {
                 request.get('/api/events/' + events[0].id + '/stats')
                 .set('Authorization', adminToken)
                 .expect(status.OK)
@@ -312,7 +313,7 @@ describe('event badge association', () => {
         });
 
         describe('updating offerings', () => {
-            it('should be able to update without specifying a badge', (done) => {
+            test('should be able to update without specifying a badge', (done) => {
                 const offeringUpdate: OfferingInterface = {
                     duration: 1,
                     periods: [1, 2],
@@ -335,7 +336,7 @@ describe('event badge association', () => {
                     });
             });
 
-            it('should not require price', (done) => {
+            test('should not require price', (done) => {
                 const offeringUpdate: OfferingInterface = {
                     duration: 1,
                     periods: [1, 2]
@@ -355,7 +356,7 @@ describe('event badge association', () => {
                     });
             });
 
-            it('should should not save null periods', (done) => {
+            test('should should not save null periods', (done) => {
                 const offeringUpdate: OfferingInterface = {
                     duration: 1,
                     periods: [1, 2, null]
@@ -375,32 +376,35 @@ describe('event badge association', () => {
                     });
             });
 
-            it('should not delete existing offerings if an event is updating without supplying offerings', (done) => {
-                const eventUpdate: EventInterface = {
-                    year: 2014,
-                    semester: Semester.SPRING,
-                    date: new Date(2014, 3, 14),
-                    registration_open: new Date(2014, 1, 12),
-                    registration_close: new Date(2014, 3, 1),
-                    price: 5
-                };
+            test(
+                'should not delete existing offerings if an event is updating without supplying offerings',
+                (done) => {
+                    const eventUpdate: EventInterface = {
+                        year: 2014,
+                        semester: Semester.SPRING,
+                        date: new Date(2014, 3, 14),
+                        registration_open: new Date(2014, 1, 12),
+                        registration_close: new Date(2014, 3, 1),
+                        price: 5
+                    };
 
-                request.put('/api/events/' + events[0].id)
-                    .set('Authorization', adminToken)
-                    .send(eventUpdate)
-                    .expect(status.OK)
-                    .end((err, res: SuperTestResponse<CreateOfferingResponseDto>) => {
-                        if (err) { return done(err); }
-                        const event = res.body.event;
-                        expect(event.id).to.equal(events[0].id);
-                        expect(event.year).to.equal(eventUpdate.year);
-                        expect(event.price).to.equal(eventUpdate.price);
-                        expect(event.offerings).to.have.lengthOf(3);
-                        return done();
-                    });
-            });
+                    request.put('/api/events/' + events[0].id)
+                        .set('Authorization', adminToken)
+                        .send(eventUpdate)
+                        .expect(status.OK)
+                        .end((err, res: SuperTestResponse<CreateOfferingResponseDto>) => {
+                            if (err) { return done(err); }
+                            const event = res.body.event;
+                            expect(event.id).to.equal(events[0].id);
+                            expect(event.year).to.equal(eventUpdate.year);
+                            expect(event.price).to.equal(eventUpdate.price);
+                            expect(event.offerings).to.have.lengthOf(3);
+                            return done();
+                        });
+                }
+            );
 
-            it('should not allow an update with invalid information', (done) => {
+            test('should not allow an update with invalid information', (done) => {
                 const offeringUpdate: OfferingInterface = {
                     duration: 2,
                     periods: [1]
@@ -412,7 +416,7 @@ describe('event badge association', () => {
                     .expect(status.BAD_REQUEST, done);
             });
 
-            it('should not update with extra fields', (done) => {
+            test('should not update with extra fields', (done) => {
                 const offeringUpdate: any = {
                     duration: 1,
                     periods: [1, 2],
@@ -435,7 +439,7 @@ describe('event badge association', () => {
                     });
             });
 
-            it('should update without deleting fields', (done) => {
+            test('should update without deleting fields', (done) => {
                 const offeringUpdate: OfferingInterface = {
                     duration: 1
                 };
@@ -455,7 +459,7 @@ describe('event badge association', () => {
                     });
             });
 
-            it('should not update a nonexistent event', (done) => {
+            test('should not update a nonexistent event', (done) => {
                 const offeringUpdate: OfferingInterface = {
                     duration: 1,
                     periods: [1, 2],
@@ -468,7 +472,7 @@ describe('event badge association', () => {
                     .expect(status.BAD_REQUEST, done);
             });
 
-            it('should not update a nonexistent offering', (done) => {
+            test('should not update a nonexistent offering', (done) => {
                 const offeringUpdate: OfferingInterface = {
                     duration: 1,
                     periods: [1, 2],
@@ -483,7 +487,7 @@ describe('event badge association', () => {
         });
 
         describe('deleting offerings', () => {
-            it('should be able to delete an offering', (done) => {
+            test('should be able to delete an offering', (done) => {
                 async.series([
                     (cb) => {
                         request.get('/api/events?id=' + events[0].id)
@@ -513,18 +517,18 @@ describe('event badge association', () => {
                 ], done);
             });
 
-            it('should require authorization', (done) => {
+            test('should require authorization', (done) => {
                 request.del('/api/events/' + events[0].id + '/badges/' + offerings[0].badge_id)
                     .expect(status.UNAUTHORIZED, done);
             });
 
-            it('should not delete from a nonexistant event', (done) => {
+            test('should not delete from a nonexistant event', (done) => {
                 request.del('/api/events/' + badId + '/badges/' + offerings[0].badge_id)
                     .set('Authorization', adminToken)
                     .expect(status.BAD_REQUEST, done);
             });
 
-            it('should not delete a nonexistant offering', (done) => {
+            test('should not delete a nonexistant offering', (done) => {
                 request.del('/api/events/' + events[0].id + '/badges/' + badId)
                     .set('Authorization', adminToken)
                     .expect(status.BAD_REQUEST, done);
@@ -532,7 +536,7 @@ describe('event badge association', () => {
         });
 
         describe('deleting a badge', () => {
-            it('should delete associated offerings', async () => {
+            test('should delete associated offerings', async () => {
                 await request.get('/api/events?id=' + events[0].id)
                     .expect(status.OK)
                     .then((res: SuperTestResponse<EventsResponseDto>) => {

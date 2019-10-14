@@ -32,12 +32,13 @@ describe('user profiles', () => {
         generatedUsers = await TestUtils.generateTokens();
     });
 
-    after(async () => {
+    afterAll(async () => {
         await TestUtils.dropDb();
+        await TestUtils.closeDb();
     });
 
     describe('account details', () => {
-        it('creates an account with coordinator information', (done) => {
+        test('creates an account with coordinator information', (done) => {
             const postData: SignupRequestDto = {
                 email: 'test@test.com',
                 password: 'password',
@@ -66,7 +67,7 @@ describe('user profiles', () => {
                 });
         });
 
-        it('creates an account with teacher information', (done) => {
+        test('creates an account with teacher information', (done) => {
             const postData: SignupRequestDto = {
                 email: 'test@test.com',
                 password: 'password',
@@ -93,7 +94,7 @@ describe('user profiles', () => {
                 });
         });
 
-        it('does not create coordinator with teacher info', (done) => {
+        test('does not create coordinator with teacher info', (done) => {
             const postData: SignupRequestDto = {
                 email: 'test@test.com',
                 password: 'password',
@@ -110,7 +111,7 @@ describe('user profiles', () => {
                 .expect(status.BAD_REQUEST, done);
         });
 
-        it('does not create teacher with coordinator info', (done) => {
+        test('does not create teacher with coordinator info', (done) => {
             const postData: SignupRequestDto = {
                 email: 'test@test.com',
                 password: 'password',
@@ -189,7 +190,7 @@ describe('user profiles', () => {
             ], done);
         });
 
-        it('should not return the encrypted password', (done) => {
+        test('should not return the encrypted password', (done) => {
             request.get('/api/users/' + user1.id)
                 .set('Authorization', user1Token)
                 .expect(status.OK)
@@ -200,7 +201,7 @@ describe('user profiles', () => {
                 });
         });
 
-        it('should get details for a user with their own token', (done) => {
+        test('should get details for a user with their own token', (done) => {
             request.get('/api/users/' + user1.id)
                 .set('Authorization', user1Token)
                 .expect(status.OK)
@@ -212,7 +213,7 @@ describe('user profiles', () => {
                 });
         });
 
-        it('should get details for a user with an admin token', (done) => {
+        test('should get details for a user with an admin token', (done) => {
             request.get('/api/users/' + user1.id)
                 .set('Authorization', generatedUsers.admin.token)
                 .expect(status.OK)
@@ -224,7 +225,7 @@ describe('user profiles', () => {
                 });
         });
 
-        it('should get a list of users', (done) => {
+        test('should get a list of users', (done) => {
             request.get('/api/users/')
                 .set('Authorization', generatedUsers.admin.token)
                 .expect(status.OK)
@@ -235,7 +236,7 @@ describe('user profiles', () => {
                 });
         });
 
-        it('should get details for a user with a teacher token', (done) => {
+        test('should get details for a user with a teacher token', (done) => {
             request.get('/api/users/' + user1.id)
                 .set('Authorization', generatedUsers.teacher.token)
                 .expect(status.OK)
@@ -247,19 +248,19 @@ describe('user profiles', () => {
                 });
         });
 
-        it('should not allow other users to see other profiles', (done) => {
+        test('should not allow other users to see other profiles', (done) => {
             request.get('/api/users/' + user1.id)
                 .set('Authorization', user2Token)
                 .expect(status.UNAUTHORIZED, done);
         });
 
-        it('should not allow other users to see other profiles with query', (done) => {
+        test('should not allow other users to see other profiles with query', (done) => {
             request.get('/api/users?id=' + user1.id)
                 .set('Authorization', user2Token)
                 .expect(status.UNAUTHORIZED, done);
         });
 
-        it('should not get details for an invalid user', (done) => {
+        test('should not get details for an invalid user', (done) => {
             request.get('/api/users/wat')
                 .set('Authorization', generatedUsers.admin.token)
                 .expect(status.BAD_REQUEST, done);
@@ -323,7 +324,7 @@ describe('user profiles', () => {
             ], done);
         });
 
-        it('should edit a profile', (done) => {
+        test('should edit a profile', (done) => {
             const edited: EditUserDto = {
                 firstname: 'changed',
                 details: {
@@ -345,7 +346,7 @@ describe('user profiles', () => {
                 });
         });
 
-        it('should still login after editing a profile', (done) => {
+        test('should still login after editing a profile', (done) => {
             async.series([
                 (cb) => {
                     request.post('/api/authenticate')
@@ -376,7 +377,7 @@ describe('user profiles', () => {
             ], done);
         });
 
-        it('should not send a token if the password did not change', (done) => {
+        test('should not send a token if the password did not change', (done) => {
             request.put('/api/users/' + user1.id)
                 .set('Authorization', user1Token)
                 .send(<EditUserDto>{ firstname: 'New' })
@@ -388,7 +389,7 @@ describe('user profiles', () => {
                 });
         });
 
-        it('should not allow invalid details', (done) => {
+        test('should not allow invalid details', (done) => {
             request.put('/api/users/' + user2.id)
                 .set('Authorization', user2Token)
                 .send(<EditUserDto>{
@@ -397,31 +398,31 @@ describe('user profiles', () => {
                 .expect(status.BAD_REQUEST, done);
         });
 
-        it('should not allow other coordinators to edit a coordinator profile', (done) => {
+        test('should not allow other coordinators to edit a coordinator profile', (done) => {
             request.put('/api/users/' + user1.id)
                 .set('Authorization', generatedUsers.coordinator.token)
                 .expect(status.UNAUTHORIZED, done);
         });
 
-        it('should not allow coordinators to edit a teacher profile', (done) => {
+        test('should not allow coordinators to edit a teacher profile', (done) => {
             request.put('/api/users/' + user2.id)
                 .set('Authorization', user1Token)
                 .expect(status.UNAUTHORIZED, done);
         });
 
-        it('should allow admins to edit a profile', (done) => {
+        test('should allow admins to edit a profile', (done) => {
             request.put('/api/users/' + user1.id)
                 .set('Authorization', generatedUsers.admin.token)
                 .expect(status.OK, done);
         });
 
-        it('should allow teachers to edit a profile', (done) => {
+        test('should allow teachers to edit a profile', (done) => {
             request.put('/api/users/' + user1.id)
                 .set('Authorization', generatedUsers.teacher.token)
                 .expect(status.OK, done);
         });
 
-        it('should change a password', (done) => {
+        test('should change a password', (done) => {
             let newToken: string;
             const edit: EditUserDto = {
                 password: 'edited'
@@ -469,7 +470,7 @@ describe('user profiles', () => {
             ], done);
         });
 
-        it('should allow changes to the same password', (done) => {
+        test('should allow changes to the same password', (done) => {
             let newToken: string;
 
             async.series([
@@ -516,7 +517,7 @@ describe('user profiles', () => {
             ], done);
         });
 
-        it('should allow admins to edit a role', (done) => {
+        test('should allow admins to edit a role', (done) => {
             async.series([
                 (cb) => {
                     request.put('/api/users/' + user2.id)
@@ -538,42 +539,42 @@ describe('user profiles', () => {
             ], done);
         });
 
-        it('should not allow teachers to edit a role', (done) => {
+        test('should not allow teachers to edit a role', (done) => {
             request.put('/api/users/' + user2.id)
                 .set('Authorization', generatedUsers.teacher.token)
                 .send(<EditUserDto>{ role: 'admin' })
                 .expect(status.UNAUTHORIZED, done);
         });
 
-        it('should not allow coordinators to edit a role', (done) => {
+        test('should not allow coordinators to edit a role', (done) => {
             request.put('/api/users/' + user2.id)
                 .set('Authorization', generatedUsers.coordinator.token)
                 .send(<EditUserDto>{ role: 'admin' })
                 .expect(status.UNAUTHORIZED, done);
         });
 
-        it('should not allow self role edits', (done) => {
+        test('should not allow self role edits', (done) => {
             request.put('/api/users/' + user2.id)
                 .set('Authorization', user2Token)
                 .send(<EditUserDto>{ role: 'admin' })
                 .expect(status.UNAUTHORIZED, done);
         });
 
-        it('should not allow teachers to edit other passwords', (done) => {
+        test('should not allow teachers to edit other passwords', (done) => {
             request.put('/api/users/' + user2.id)
                 .set('Authorization', generatedUsers.teacher.token)
                 .send(<EditUserDto>{ password: 'oops' })
                 .expect(status.UNAUTHORIZED, done);
         });
 
-        it('should allow admins to edit a password', (done) => {
+        test('should allow admins to edit a password', (done) => {
             request.put('/api/users/' + user2.id)
                 .set('Authorization', generatedUsers.admin.token)
                 .send(<EditUserDto>{ password: 'oops' })
                 .expect(status.OK, done);
         });
 
-        it('should allow admins to edit a password', (done) => {
+        test('should allow admins to edit a password', (done) => {
             request.put('/api/users/' + user2.id)
                 .set('Authorization', generatedUsers.admin.token)
                 .send(<EditUserDto>{ password: 'new' })
@@ -643,7 +644,7 @@ describe('user profiles', () => {
             ], done);
         });
 
-        it('should delete own account', (done) => {
+        test('should delete own account', (done) => {
             async.series([
                 (cb) => {
                     request.get('/api/users/' + coordinator.id)
@@ -668,30 +669,30 @@ describe('user profiles', () => {
             ], done);
         });
 
-        it('should not delete another users account', (done) => {
+        test('should not delete another users account', (done) => {
             request.del('/api/users/' + coordinator.id)
                 .set('Authorization', teacherToken)
                 .expect(status.UNAUTHORIZED, done);
         });
 
-        it('should require a token', (done) => {
+        test('should require a token', (done) => {
             request.del('/api/users/' + coordinator.id)
                 .expect(status.UNAUTHORIZED, done);
         });
 
-        it('should allow admins to delete accounts', (done) => {
+        test('should allow admins to delete accounts', (done) => {
             request.del('/api/users/' + coordinator.id)
                 .set('Authorization', generatedUsers.admin.token)
                 .expect(status.OK, done);
         });
 
-        it('should fail gracefully if a user isnt found', (done) => {
+        test('should fail gracefully if a user isnt found', (done) => {
             request.del('/api/users/walal')
                 .set('Authorization', generatedUsers.admin.token)
                 .expect(status.BAD_REQUEST, done);
         });
 
-        it('should require an id', (done) => {
+        test('should require an id', (done) => {
             request.del('/api/users')
                 .set('Authorization', generatedUsers.admin.token)
                 .expect(status.NOT_FOUND, done);
@@ -699,7 +700,7 @@ describe('user profiles', () => {
     });
 
     describe('account approval', () => {
-        it('should default new accounts to not approved', (done) => {
+        test('should default new accounts to not approved', (done) => {
             const postData: SignupRequestDto = {
                 email: 'test@test.com',
                 password: 'helloworld',
@@ -717,7 +718,7 @@ describe('user profiles', () => {
                 });
         });
 
-        it('should not allow approval to be set by creator', (done) => {
+        test('should not allow approval to be set by creator', (done) => {
             const postData: any = {
                 email: 'test@test.com',
                 password: 'helloworld',
@@ -736,7 +737,7 @@ describe('user profiles', () => {
                 });
         });
 
-        it('should allow admins to change an accounts approval status', (done) => {
+        test('should allow admins to change an accounts approval status', (done) => {
             let accountId: number;
 
             async.series([
@@ -773,7 +774,7 @@ describe('user profiles', () => {
             ], done);
         });
 
-        it('should not allow coordinators to change account approval status', (done) => {
+        test('should not allow coordinators to change account approval status', (done) => {
             let accountId: number;
 
             async.series([
@@ -804,7 +805,7 @@ describe('user profiles', () => {
             ], done);
         });
 
-        it('should not allow teachers to change account approval status', (done) => {
+        test('should not allow teachers to change account approval status', (done) => {
             let accountId: number;
 
             async.series([
@@ -835,7 +836,7 @@ describe('user profiles', () => {
             ], done);
         });
 
-        it('should require approval for protected routes', (done) => {
+        test('should require approval for protected routes', (done) => {
             let token: string;
             let accountId: number;
             const exampleScout: ScoutInterface = {
@@ -884,7 +885,7 @@ describe('user profiles', () => {
             ], done);
         });
 
-        it('should allow changes once an account is approved', (done) => {
+        test('should allow changes once an account is approved', (done) => {
             let token: string;
             let accountId: number;
             const exampleScout: ScoutInterface = {

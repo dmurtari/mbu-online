@@ -18,9 +18,6 @@ export const sequelize: Sequelize = new Sequelize(dbUrl, {
 });
 
 sequelize.authenticate()
-    .then(() => {
-        console.log('Successfully connected to database at', dbUrl);
-    })
     .catch((err) => {
         console.error('Failed to connect to database', err);
     });

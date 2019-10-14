@@ -17,11 +17,11 @@ describe('events', () => {
     let adminToken: string;
     const badId = TestUtils.badId;
 
-    before(async () => {
+    beforeAll(async () => {
         await TestUtils.dropDb();
     });
 
-    before(async () => {
+    beforeAll(async () => {
         const generatedTokens = await TestUtils.generateTokens([UserRole.COORDINATOR, UserRole.ADMIN]);
         coordinatorToken = generatedTokens[UserRole.COORDINATOR].token;
         adminToken = generatedTokens[UserRole.ADMIN].token;
@@ -31,8 +31,9 @@ describe('events', () => {
         await TestUtils.dropTable([Event]);
     });
 
-    after(async () => {
+    afterAll(async () => {
         await TestUtils.dropDb();
+        await TestUtils.closeDb();
     });
 
     describe('creating an event', () => {
@@ -45,28 +46,28 @@ describe('events', () => {
             price: 10
         };
 
-        it('should create events with year and semester', (done) => {
+        test('should create events with year and semester', (done) => {
             request.post('/api/events')
                 .set('Authorization', adminToken)
                 .send(testEvent)
                 .expect(status.CREATED, done);
         });
 
-        it('should require authorization as admin', (done) => {
+        test('should require authorization as admin', (done) => {
             request.post('/api/events')
                 .set('Authorization', coordinatorToken)
                 .send(testEvent)
                 .expect(status.UNAUTHORIZED, done);
         });
 
-        it('should fail gracefully for a blank request', (done) => {
+        test('should fail gracefully for a blank request', (done) => {
             request.post('/api/events')
                 .set('Authorization', adminToken)
                 .send({})
                 .expect(status.BAD_REQUEST, done);
         });
 
-        it('should ignore extra fields', (done) => {
+        test('should ignore extra fields', (done) => {
             const postData = testEvent as any;
             postData.extra = 'extra data';
 
@@ -132,7 +133,7 @@ describe('events', () => {
         });
 
         describe('the current event', () => {
-            it('should set the current event', (done) => {
+            test('should set the current event', (done) => {
                 request.post('/api/events/current')
                     .set('Authorization', adminToken)
                     .send(<SetCurrentEventDto>{ id: id1 })
@@ -144,20 +145,20 @@ describe('events', () => {
                     });
             });
 
-            it('should not set for an invalid id', (done) => {
+            test('should not set for an invalid id', (done) => {
                 request.post('/api/events/current')
                     .set('Authorization', adminToken)
                     .send(<SetCurrentEventDto>{ id: 10000 })
                     .expect(status.BAD_REQUEST, done);
             });
 
-            it('should not allow teachers to set', (done) => {
+            test('should not allow teachers to set', (done) => {
                 request.post('/api/events/current')
                     .send(<SetCurrentEventDto>{ id: id1 })
                     .expect(status.UNAUTHORIZED, done);
             });
 
-            it('should get the current event', (done) => {
+            test('should get the current event', (done) => {
                 async.series([
                     (cb) => {
                         request.post('/api/events/current')
@@ -182,7 +183,7 @@ describe('events', () => {
                 ], done);
             });
 
-            it('should keep track of the latest value', (done) => {
+            test('should keep track of the latest value', (done) => {
                 async.series([
                     (cb) => {
                         request.post('/api/events/current')
@@ -229,7 +230,7 @@ describe('events', () => {
         });
 
         describe('getting an event', () => {
-            it('should be able to get an event by id', (done) => {
+            test('should be able to get an event by id', (done) => {
                 async.series([
                     (cb) => {
                         request.get('/api/events?id=' + id1)
@@ -254,7 +255,7 @@ describe('events', () => {
                 ], done);
             });
 
-            it('should get an event by year and semester', (done) => {
+            test('should get an event by year and semester', (done) => {
                 async.series([
                     (cb) => {
                         request.get('/api/events?year=' + testEvent1.year + '&semester=' + testEvent1.semester)
@@ -281,7 +282,7 @@ describe('events', () => {
                 ], done);
             });
 
-            it('should find events by year', (done) => {
+            test('should find events by year', (done) => {
                 request.get('/api/events?year=' + testEvent2.year)
                     .expect(status.OK)
                     .end((err, res: SuperTestResponse<EventsResponseDto>) => {
@@ -292,7 +293,7 @@ describe('events', () => {
                     });
             });
 
-            it('should find events by semester', (done) => {
+            test('should find events by semester', (done) => {
                 request.get('/api/events?semester=' + testEvent1.semester)
                     .expect(status.OK)
                     .end((err, res: SuperTestResponse<EventsResponseDto>) => {
@@ -303,7 +304,7 @@ describe('events', () => {
                     });
             });
 
-            it('should get all events if none is specified', (done) => {
+            test('should get all events if none is specified', (done) => {
                 request.get('/api/events')
                     .expect(status.OK)
                     .end((err, res: SuperTestResponse<EventsResponseDto>) => {
@@ -314,7 +315,7 @@ describe('events', () => {
                     });
             });
 
-            it('should return empty if an event is not found by id', (done) => {
+            test('should return empty if an event is not found by id', (done) => {
                 request.get('/api/events?id=123123')
                     .expect(status.OK)
                     .end((err, res: SuperTestResponse<EventsResponseDto>) => {
@@ -325,7 +326,7 @@ describe('events', () => {
                     });
             });
 
-            it('should return empty if an event is not found by semester', (done) => {
+            test('should return empty if an event is not found by semester', (done) => {
                 request.get('/api/events?semester=Summer')
                     .expect(status.OK)
                     .end((err, res: SuperTestResponse<EventsResponseDto>) => {
@@ -336,7 +337,7 @@ describe('events', () => {
                     });
             });
 
-            it('should return empty if an event is not found by year', (done) => {
+            test('should return empty if an event is not found by year', (done) => {
                 request.get('/api/events?year=1914')
                     .expect(status.OK)
                     .end((err, res: SuperTestResponse<EventsResponseDto>) => {
@@ -347,7 +348,7 @@ describe('events', () => {
                     });
             });
 
-            it('should return empty if an event is not found by year and semester', (done) => {
+            test('should return empty if an event is not found by year and semester', (done) => {
                 request.get('/api/events?year=1916&semester=Spring')
                     .expect(status.OK)
                     .end((err, res: SuperTestResponse<EventsResponseDto>) => {
@@ -360,12 +361,12 @@ describe('events', () => {
         });
 
         describe('deleting an event', () => {
-            it('should require authorization', (done) => {
+            test('should require authorization', (done) => {
                 request.del('/api/events/' + id1)
                     .expect(status.UNAUTHORIZED, done);
             });
 
-            it('should delete an event by id', (done) => {
+            test('should delete an event by id', (done) => {
                 async.series([
                     (cb) => {
                         request.get('/api/events?id=' + id2)
@@ -389,13 +390,13 @@ describe('events', () => {
                 ], done);
             });
 
-            it('should not delete a nonexistent id', (done) => {
+            test('should not delete a nonexistent id', (done) => {
                 request.del('/api/events/' + badId)
                     .set('Authorization', adminToken)
                     .expect(status.BAD_REQUEST, done);
             });
 
-            it('should not delete all events', (done) => {
+            test('should not delete all events', (done) => {
                 request.del('/api/events')
                     .set('Authorization', adminToken)
                     .expect(status.NOT_FOUND, done);
@@ -417,7 +418,7 @@ describe('events', () => {
             });
 
 
-            it('should update an event', (done) => {
+            test('should update an event', (done) => {
                 request.put('/api/events/' + id1)
                     .set('Authorization', adminToken)
                     .send(eventUpdate)
@@ -432,14 +433,14 @@ describe('events', () => {
                     });
             });
 
-            it('should require admin privileges', (done) => {
+            test('should require admin privileges', (done) => {
                 request.put('/api/events/' + id1)
                     .set('Authorization', coordinatorToken)
                     .send(eventUpdate)
                     .expect(status.UNAUTHORIZED, done);
             });
 
-            it('should allow partial updates', (done) => {
+            test('should allow partial updates', (done) => {
                 delete eventUpdate.year;
 
                 request.put('/api/events/' + id1)
@@ -456,7 +457,7 @@ describe('events', () => {
                     });
             });
 
-            it('should delete only if explicitly set to null', (done) => {
+            test('should delete only if explicitly set to null', (done) => {
                 request.put('/api/events/' + id1)
                     .set('Authorization', adminToken)
                     .send({})

@@ -7,49 +7,21 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "API Tests",
-            "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
-            "preLaunchTask": "build-ts",
+            "name": "Jest Test (Current File)",
+            "program": "${workspaceFolder}/node_modules/jest/bin/jest",
             "args": [
-                "--no-timeouts",
-                "--colors",
-                "--require",
-                "ts-node/register",
-                "--require",
-                "tsconfig-paths/register",
-                "tests/**/*.ts"
+                "--runInBand",
+                "--codeCoverage=false",
+                "--config=${workspaceFolder}/jest.config.js",
+                "${file}",
             ],
             "console": "integratedTerminal",
-            "sourceMaps": true,
             "internalConsoleOptions": "neverOpen",
+            "sourceMaps": true,
             "env": {
                 "NODE_ENV": "test",
                 "SENDGRID_API_KEY": "sendme",
                 "APP_SECRET": "testsecret"
-            }
-        },
-         {
-            "type": "node",
-            "request": "launch",
-            "name": "API Tests (WSL)",
-            "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
-            "useWSL": true,
-            "args": [
-                "--no-timeouts",
-                "--colors",
-                "--require",
-                "ts-node/register",
-                "--require",
-                "tsconfig-paths/register",
-                "tests/**/*.ts"
-            ],
-            "sourceMaps": true,
-            "internalConsoleOptions": "neverOpen",
-            "env": {
-                "NODE_ENV": "test",
-                "SENDGRID_API_KEY": "sendme",
-                "APP_SECRET": "testsecret",
-                "WSLENV": "NODE_ENV:SENDGRID_API_KEY:APP_SECRET"
             }
         },
         {
@@ -60,29 +32,5 @@
             "restart": true,
             "protocol": "inspector"
         },
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "Mocha Current File",
-            "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
-            "preLaunchTask": "build-ts",
-            "args": [
-                "--no-timeouts",
-                "--colors",
-                "${file}",
-                "--require",
-                "ts-node/register",
-                "--require",
-                "tsconfig-paths/register"
-            ],
-            "console": "integratedTerminal",
-            "sourceMaps": true,
-            "internalConsoleOptions": "neverOpen",
-            "env": {
-                "NODE_ENV": "test",
-                "SENDGRID_API_KEY": "sendme",
-                "APP_SECRET": "testsecret"
-            }
-        }
     ]
 }

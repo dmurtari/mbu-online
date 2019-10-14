@@ -14,7 +14,7 @@
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
         "types": [
-            "mocha"
+            "jest"
         ],
         "baseUrl": "../",
         "moduleResolution": "node",
