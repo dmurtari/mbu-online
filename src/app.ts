@@ -32,9 +32,15 @@ app.use(helmet());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
+app.use((req, _res, next) => {
+    req.url = req.originalUrl;
+    next();
+});
+
 if (env === 'development') {
     app.use(morgan(morganFormat));
-    app.use((req, res, next) => {
+
+    app.use((_req, _res, next) => {
         setTimeout(() => {
             next();
         }, 500);

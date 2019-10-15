@@ -1,6 +1,13 @@
 {
-  "name": "client",
-  "eslintConfig": {
-    "extends": "react-app"
-  }
+    "name": "client",
+    "scripts": {
+        "start": "PORT=3001 npx react-scripts start",
+        "build": "npx react-scripts build",
+        "test": "npx react-scripts test",
+        "eject": "npx react-scripts eject"
+    },
+    "devDependencies": {
+        "react-scripts": "3.2.0"
+    },
+    "proxy": "http://localhost:3000"
 }
