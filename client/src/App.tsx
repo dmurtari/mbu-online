@@ -1,10 +1,11 @@
 import React from 'react';
-import { BrowserRouter as Router } from 'react-router-dom'
+import { Switch, Route } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import { Store } from 'redux';
 
 import './App.css';
 import Navbar from './components/layout/Navbar/Navbar';
+import Login from './components/authentication/Login/Login';
 
 interface MyProps {
     store: Store;
@@ -13,8 +14,13 @@ interface MyProps {
 const App: React.FC<MyProps> = ({ store }) => (
     <Provider store={store}>
         <Navbar></Navbar>
-        <Router>
-        </Router>
+        <div className="container">
+            <Switch>
+                <Route path="/login">
+                    <Login />
+                </Route>
+            </Switch>
+        </div>
     </Provider>
 )
 
