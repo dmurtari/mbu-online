@@ -16,32 +16,29 @@
         "types": [
             "jest"
         ],
-        "baseUrl": "../",
+        "baseUrl": "..",
         "moduleResolution": "node",
         "paths": {
             "@models/*": [
-                "src/models/*"
+                "src/server/models/*"
             ],
             "@config/*": [
-                "src/config/*"
+                "src/server/config/*"
             ],
             "@routes/*": [
-                "src/routes/*"
+                "src/server/routes/*"
             ],
             "@interfaces/*": [
-                "src/interfaces/*"
+                "src/server/interfaces/*"
             ],
             "@middleware/*": [
-                "src/middleware/*"
+                "src/server/middleware/*"
             ],
             "@app/*": [
-                "src/*"
+                "src/server/*"
             ],
             "@test/*": [
                 "tests/*"
-            ],
-            "*": [
-                "node_modules/*"
             ]
         }
     }

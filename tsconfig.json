@@ -9,33 +9,16 @@
         "sourceMap": true,
         "outDir": "dist",
         "baseUrl": "./",
-        "experimentalDecorators": true,
-        "emitDecoratorMetadata": true,
         "paths": {
-            "@models/*": [
-                "src/models/*"
-            ],
-            "@config/*": [
-                "src/config/*"
-            ],
-            "@routes/*": [
-                "src/routes/*"
-            ],
-            "@middleware/*": [
-                "src/middleware/*"
-            ],
             "@interfaces/*": [
-                "src/interfaces/*"
-            ],
-            "@app/*": [
-                "src/*"
+                "src/server/interfaces/*"
             ],
             "@test/*": [
                 "tests/*"
             ]
         }
     },
-    "include": [
-        "src/**/*"
+    "exclude": [
+        "node_modules/"
     ]
 }

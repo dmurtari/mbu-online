@@ -5,8 +5,8 @@ import jwt from 'jsonwebtoken';
 import { User } from '@models/user.model';
 import config from '@config/secrets';
 
-import { EditUserResponseDto } from '@app/interfaces/user.interface';
-import { ErrorResponseDto } from '@app/interfaces/shared.interface';
+import { EditUserResponseDto } from '@interfaces/user.interface';
+import { ErrorResponseDto } from '@interfaces/shared.interface';
 import { Scout } from '@models/scout.model';
 import { ScoutResponseDto } from '@interfaces/scout.interface';
 

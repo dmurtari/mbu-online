@@ -2,8 +2,8 @@ import { Request, Response } from 'express';
 import status from 'http-status-codes';
 
 import { Event } from '@models/event.model';
-import { EventResponseDto } from '@app/interfaces/event.interface';
-import { ErrorResponseDto } from '@app/interfaces/shared.interface';
+import { EventResponseDto } from '@interfaces/event.interface';
+import { ErrorResponseDto } from '@interfaces/shared.interface';
 import { Badge } from '@models/badge.model';
 import { Offering } from '@models/offering.model';
 import { OfferingResponseDto } from '@interfaces/offering.interface';

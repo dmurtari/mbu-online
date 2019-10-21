@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import status from 'http-status-codes';
 
 import { Badge } from '@models/badge.model';
-import { ErrorResponseDto } from '@app/interfaces/shared.interface';
+import { ErrorResponseDto } from '@interfaces/shared.interface';
 
 export const deleteBadge = async (req: Request, res: Response) => {
     try {

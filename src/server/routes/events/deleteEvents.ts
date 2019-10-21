@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import status from 'http-status-codes';
 
 import { Event } from '@models/event.model';
-import { ErrorResponseDto } from '@app/interfaces/shared.interface';
+import { ErrorResponseDto } from '@interfaces/shared.interface';
 import { Purchasable } from '@models/purchasable.model';
 import { Offering } from '@models/offering.model';
 

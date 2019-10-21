@@ -3,7 +3,7 @@ import status from 'http-status-codes';
 import { WhereOptions } from 'sequelize';
 
 import { Badge } from '@models/badge.model';
-import { ErrorResponseDto } from '@app/interfaces/shared.interface';
+import { ErrorResponseDto } from '@interfaces/shared.interface';
 
 export const getBadges = async (req: Request, res: Response) => {
     try {

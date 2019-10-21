@@ -10,7 +10,7 @@ import compression from 'compression';
 import helmet from 'helmet';
 import history from 'connect-history-api-fallback';
 
-import { sequelize } from './sequelize';
+import { sequelize } from './db';
 import { indexRoutes } from '@routes/index';
 import { userRoutes } from '@routes/users';
 import { eventRoutes } from '@routes/events';

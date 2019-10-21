@@ -5,7 +5,7 @@ import { cloneDeep } from 'lodash';
 
 import { CurrentEvent } from '@models/currentEvent.model';
 import { Event } from '@models/event.model';
-import { ErrorResponseDto } from '@app/interfaces/shared.interface';
+import { ErrorResponseDto } from '@interfaces/shared.interface';
 import { Badge } from '@models/badge.model';
 import { Purchasable } from '@models/purchasable.model';
 import { IncomeCalculationResponseDto, EventStatisticsDto, EventsResponseDto, EventDto } from '@interfaces/event.interface';

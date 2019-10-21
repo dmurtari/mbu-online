@@ -3,7 +3,7 @@ import status from 'http-status-codes';
 
 import { Event } from '@models/event.model';
 import { EventResponseDto, CurrentEventResponseDto, EventOfferingInterface, CreateOfferingResponseDto } from '@interfaces/event.interface';
-import { ErrorResponseDto } from '@app/interfaces/shared.interface';
+import { ErrorResponseDto } from '@interfaces/shared.interface';
 import { CurrentEvent } from '@models/currentEvent.model';
 import { Offering } from '@models/offering.model';
 import { Badge } from '@models/badge.model';
