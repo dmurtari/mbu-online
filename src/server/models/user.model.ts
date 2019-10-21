@@ -14,7 +14,7 @@ import {
 } from 'sequelize-typescript';
 
 import { Scout } from '@models/scout.model';
-import { UserInterface, UserRole } from '@app/interfaces/user.interface';
+import { UserInterface, UserRole } from '@interfaces/user.interface';
 
 @Table({
     underscored: true,

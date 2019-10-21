@@ -1,7 +1,7 @@
 import { Router } from 'express';
 
 import { isAuthorized } from '@middleware/isAuthorized';
-import { UserRole } from '@app/interfaces/user.interface';
+import { UserRole } from '@interfaces/user.interface';
 import { createBadge } from '@routes/badges/postBadges';
 import { getBadges } from '@routes/badges/getBadges';
 import { deleteBadge } from '@routes/badges/deleteBadges';

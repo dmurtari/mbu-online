@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import status from 'http-status-codes';
 
 import { User } from '@models/user.model';
-import { ErrorResponseDto } from '@app/interfaces/shared.interface';
+import { ErrorResponseDto } from '@interfaces/shared.interface';
 import { Scout } from '@models/scout.model';
 
 export const deleteUser = async (req: Request, res: Response) => {

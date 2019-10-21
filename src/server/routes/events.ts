@@ -1,7 +1,7 @@
 import { Router } from 'express';
 
 import { isAuthorized } from '@middleware/isAuthorized';
-import { UserRole } from '@app/interfaces/user.interface';
+import { UserRole } from '@interfaces/user.interface';
 import { createEvent, setCurrentEvent, createOffering, createPurchasable } from '@routes/events/postEvents';
 import {
     getCurrentEvent,

@@ -1,0 +1,35 @@
+{
+    "extends": "../../tsconfig.json",
+    "include": [
+        "./**/*"
+    ],
+    "compilerOptions": {
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "module": "commonjs",
+        "allowJs": false,
+        "esModuleInterop": true,
+        "moduleResolution": "node",
+        "target": "es6",
+        "noImplicitAny": true,
+        "outDir": "../../dist/out-tsc/server",
+        "baseUrl": ".",
+        "paths": {
+            "@models/*": [
+                "models/*"
+            ],
+            "@config/*": [
+                "config/*"
+            ],
+            "@routes/*": [
+                "routes/*"
+            ],
+            "@middleware/*": [
+                "middleware/*"
+            ],
+            "@interfaces/*": [
+                "interfaces/*"
+            ]
+        }
+    }
+}

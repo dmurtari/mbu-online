@@ -3,7 +3,7 @@ import passport from 'passport';
 import status from 'http-status-codes';
 
 import { User } from '@models/user.model';
-import { MessageResponseDto } from '@app/interfaces/shared.interface';
+import { MessageResponseDto } from '@interfaces/shared.interface';
 import { UserRole } from '@interfaces/user.interface';
 
 export const canUpdateRole = (req: Request, res: Response, next: NextFunction) => {

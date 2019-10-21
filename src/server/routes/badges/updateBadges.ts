@@ -2,8 +2,8 @@ import { Request, Response } from 'express';
 import status from 'http-status-codes';
 
 import { Badge } from '@models/badge.model';
-import { BadgeResponseDto } from '@app/interfaces/badge.interface';
-import { ErrorResponseDto } from '@app/interfaces/shared.interface';
+import { BadgeResponseDto } from '@interfaces/badge.interface';
+import { ErrorResponseDto } from '@interfaces/shared.interface';
 
 export const updateBadge = async (req: Request, res: Response) => {
     try {

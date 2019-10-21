@@ -5,7 +5,7 @@ import _ from 'lodash';
 
 import app from '@app/app';
 import { User } from '@models/user.model';
-import { sequelize } from '@app/sequelize';
+import { sequelize } from '@app/db';
 import testEvents from './testEvents';
 import testBadges from './testBadges';
 import testPurchasables from './testPurchasables';
