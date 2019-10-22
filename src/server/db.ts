@@ -10,7 +10,7 @@ const dbUrl = process.env.DATABASE_URL ? process.env.DATABASE_URL : localDbUrl;
 export const sequelize: Sequelize = new Sequelize(dbUrl, {
     dialect: 'postgres',
     protocol: 'postgres',
-    logging: env !== 'test',
+    logging: !!process.env.LOGGING,
     models: [`${__dirname}/models/**/*.model*`],
     modelMatch: (filename: string, member: string) => {
         return filename.substring(0, filename.indexOf('.model')).toLowerCase() === member.toLowerCase();

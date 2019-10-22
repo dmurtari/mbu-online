@@ -1,6 +1,7 @@
+import { hot } from 'react-hot-loader/root';
 import React from 'react';
-import { Switch, Route } from 'react-router-dom'
-import { Provider } from 'react-redux'
+import { Switch, Route } from 'react-router-dom';
+import { Provider } from 'react-redux';
 import { Store } from 'redux';
 
 import './App.css';
@@ -13,15 +14,15 @@ interface MyProps {
 
 const App: React.FC<MyProps> = ({ store }) => (
     <Provider store={store}>
-        <Navbar></Navbar>
-        <div className="container">
+        <Navbar />
+        <div className='container'>
             <Switch>
-                <Route path="/login">
+                <Route path='/login'>
                     <Login />
                 </Route>
             </Switch>
         </div>
     </Provider>
-)
+);
 
-export default App;
+export default hot(App);

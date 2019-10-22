@@ -9,6 +9,9 @@ import path from 'path';
 import compression from 'compression';
 import helmet from 'helmet';
 import history from 'connect-history-api-fallback';
+import webpack from 'webpack';
+import webpackDevMiddleware from 'webpack-dev-middleware';
+import webpackHotMiddleware from 'webpack-hot-middleware';
 
 import { sequelize } from './db';
 import { indexRoutes } from '@routes/index';
@@ -38,8 +41,16 @@ app.use((req, _res, next) => {
 });
 
 if (env === 'development') {
-    app.use(morgan(morganFormat));
+    const config = require('../../../src/client/webpack.config.js')();
+    const compiler = webpack(config);
 
+    app.use(webpackDevMiddleware(compiler, {
+        publicPath: config.output.publicPath,
+    }));
+    app.use(webpackHotMiddleware(compiler));
+
+
+    app.use(morgan(morganFormat));
     app.use((_req, _res, next) => {
         setTimeout(() => {
             next();
