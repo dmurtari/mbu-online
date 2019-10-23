@@ -27,7 +27,7 @@ const port = process.env.PORT || 3000;
 const morganFormat = ':method :url :status :res[content-length] - :response-time ms';
 
 app.use(history({
-    // verbose: true
+    verbose: true
 }));
 
 app.use(compression());
@@ -43,15 +43,6 @@ app.use((req, _res, next) => {
 });
 
 if (env === 'development') {
-    const config = require('../../../src/client/webpack.config.js')();
-    const compiler = webpack(config);
-
-    app.use(webpackDevMiddleware(compiler, {
-        publicPath: config.output.publicPath,
-    }));
-    app.use(webpackHotMiddleware(compiler));
-
-
     app.use(morgan(morganFormat));
     app.use((_req, _res, next) => {
         setTimeout(() => {
@@ -86,13 +77,21 @@ app.use('/api/events', eventRoutes);
 app.use('/api/badges', badgeRoutes);
 app.use('/api/scouts', scoutRoutes);
 
-app.get('*', (_req, res) => {
-    console.log('Defailt');
-    res.sendFile(path.join(__dirname, '../client/index.html'));
-});
+if (env === 'development') {
+    const config = require('../../../src/client/webpack.config.js')();
+    const compiler = webpack(config);
+
+    app.use(webpackDevMiddleware(compiler, {
+        publicPath: config.output.publicPath,
+    }));
+    app.use(webpackHotMiddleware(compiler));
+
+    app.get('*', (req, res) => {
+        res.sendFile(path.join(compiler.outputPath, 'index.html'));
+    });
+}
 
 app.use((_req, res, _next) => {
-    console.log('505')
     res.status(404).send();
 });
 
