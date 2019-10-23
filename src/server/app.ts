@@ -36,8 +36,6 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use((req, _res, next) => {
-    console.log('Yo');
-
     req.url = req.originalUrl;
     next();
 });
