@@ -32,6 +32,11 @@ app.use(helmet());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
+app.use((req, _res, next) => {
+    req.url = req.originalUrl;
+    next();
+});
+
 if (env === 'development') {
     app.use(morgan(morganFormat));
     app.use((req, res, next) => {
@@ -67,7 +72,13 @@ app.use('/api/events', eventRoutes);
 app.use('/api/badges', badgeRoutes);
 app.use('/api/scouts', scoutRoutes);
 
+app.get('*', (_req, res) => {
+    console.log('Defailt');
+    res.sendFile(path.join(__dirname, '../client/index.html'));
+});
+
 app.use((_req, res, _next) => {
+    console.log('505')
     res.status(404).send();
 });
 

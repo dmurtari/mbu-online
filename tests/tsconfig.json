@@ -29,7 +29,7 @@
                 "src/server/routes/*"
             ],
             "@interfaces/*": [
-                "src/server/interfaces/*"
+                "src/libs/interfaces/*"
             ],
             "@middleware/*": [
                 "src/server/middleware/*"

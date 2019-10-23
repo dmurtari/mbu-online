@@ -1,4 +1,4 @@
-import { Scout } from '@models/scout.model';
+import { ScoutInterface } from './scout.interface';
 
 export enum UserRole {
     ADMIN = 'admin',
@@ -18,7 +18,7 @@ export interface UserInterface {
     role: UserRole;
     approved?: boolean;
     details?: UserDetailsInterface;
-    scouts?: Scout[];
+    scouts?: ScoutInterface[];
     fullname?: string;
 }
 
