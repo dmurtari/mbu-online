@@ -19,16 +19,10 @@ export interface ILogoutAction extends Action {
 
 export function login(payload: any): ThunkAction<void, IApplicationState, null, Action<String>> {
     return async dispatch => {
-        try {
-            await axios.post(`/api/signup`, payload);
-            dispatch({
-                type: AuthenticationActionTypes.LOGIN
-            });
-        } catch (err) {
-            dispatch({
-                type: AuthenticationActionTypes.LOGIN
-            });
-        }
+        await axios.post(`/api/signup`, payload);
+        dispatch({
+            type: AuthenticationActionTypes.LOGIN
+        });
     }
 }
 
