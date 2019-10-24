@@ -1,5 +1,8 @@
 import { combineReducers } from 'redux';
 
-const rootReducer = () => combineReducers({});
+import authenticationReducer from './authentication/reducers';
+import { IApplicationState } from '.';
 
-export default rootReducer;
+export default combineReducers<IApplicationState>({
+    authentication: authenticationReducer
+});

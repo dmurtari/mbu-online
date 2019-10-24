@@ -1,15 +1,21 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
 
 import './Login.css';
+import { login } from '@store/authentication/actions';
 
 interface IState {
     email?: string;
     password?: string;
 }
 
-class Login extends React.Component<{}, IState> {
-    constructor(props: {}) {
+interface IProps {
+    login: any;
+}
+
+class Login extends React.Component<IProps, IState> {
+    constructor(props: IProps) {
         super(props);
 
         this.state = {
@@ -26,6 +32,10 @@ class Login extends React.Component<{}, IState> {
         this.setState({
             [name]: value
         });
+    }
+
+    handleSubmit = () => {
+        this.props.login();
     }
 
     render() {
@@ -72,7 +82,13 @@ class Login extends React.Component<{}, IState> {
                     </div>
                     <div className='field is-grouped button-bar'>
                         <div className='control'>
-                            <button className='button is-primary'>Login</button>
+                            <button 
+                                type='button'
+                                className='button is-primary'
+                                onClick={this.handleSubmit}
+                            >
+                                Login
+                            </button>
                         </div>
                         <div className='control'>
                             <Link
@@ -97,4 +113,6 @@ class Login extends React.Component<{}, IState> {
     }
 }
 
-export default Login;
+const mapDispatchToProps = { login };
+
+export default connect(null, mapDispatchToProps)(Login);

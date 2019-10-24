@@ -18,7 +18,11 @@ module.exports = function(env, _argv) {
             publicPath: '/',
         },
         resolve: {
-            extensions: ['.js', '.jsx', '.json', '.ts', '.tsx']
+            extensions: ['.js', '.jsx', '.json', '.ts', '.tsx'],
+            alias: {
+                '@components': path.resolve(__dirname, 'app/components/'),
+                '@store': path.resolve(__dirname, 'app/store/')
+            }
         },
         module: {
             rules: [

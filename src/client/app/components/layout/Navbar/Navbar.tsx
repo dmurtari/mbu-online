@@ -1,7 +1,21 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
 
-class Navbar extends React.Component {
+import { getAuthenticationStatus } from '@store/authentication/selectors';
+import { IAuthenticationState } from '@store/authentication/reducers';
+import { IApplicationState } from '@store/index';
+import LoginButtons from './LoginButtons';
+
+interface IProps {
+    isAuthenticated: IAuthenticationState['authenticated'];
+}   
+
+class Navbar extends React.Component<IProps> {
+    constructor(props: IProps) {
+        super(props)
+    }
+
     render() {
         return (
             <nav className='navbar has-shadow'>
@@ -16,24 +30,7 @@ class Navbar extends React.Component {
                     <div className='navbar-menu'>
                         <div className='navbar-end'>
                             <span className='navbar-item'>
-                                <div className='field is-grouped'>
-                                    <div className='control'>
-                                        <Link
-                                            to='/login'
-                                            className='button is-primary'
-                                        >
-                                            Login
-                                        </Link>
-                                    </div>
-                                    <div className='control'>
-                                        <Link
-                                            to='/signup'
-                                            className='button is-info is-outlined'
-                                        >
-                                            Sign Up
-                                        </Link>
-                                    </div>
-                                </div>
+                                {this.props.isAuthenticated ? null : <LoginButtons />}                                    
                             </span>
                         </div>
                     </div>
@@ -43,4 +40,6 @@ class Navbar extends React.Component {
     }
 }
 
-export default Navbar;
+const mapStateToProps = (state: IApplicationState) => ({ isAuthenticated: getAuthenticationStatus(state) })
+
+export default connect(mapStateToProps)(Navbar);
