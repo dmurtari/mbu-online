@@ -5,7 +5,7 @@ interface IProps {
     messageClosed?: Function;
 }
 
-const ClosableError: React.SFC<IProps> = (props: IProps) => {
+const ClosableError: React.FunctionComponent<IProps> = (props: IProps) => {
     return (
         <div 
             className='notification is-warning'
@@ -19,7 +19,7 @@ const ClosableError: React.SFC<IProps> = (props: IProps) => {
             }
             <p>{props.message}</p>
         </div>
-    )
+    );
 }
 
 export default ClosableError;

@@ -11,33 +11,27 @@ interface IProps {
     isAuthenticated: IAuthenticationState['authenticated'];
 }   
 
-class Navbar extends React.Component<IProps> {
-    constructor(props: IProps) {
-        super(props)
-    }
-
-    render() {
-        return (
-            <nav className='navbar has-shadow'>
-                <div className='container'>
-                    <div className='navbar-brand'>
-                        <div className='navbar-item'>
-                            <Link to='/'>
-                                <h5 className='title is-5'>MBU Online</h5>
-                            </Link>
-                        </div>
-                    </div>
-                    <div className='navbar-menu'>
-                        <div className='navbar-end'>
-                            <span className='navbar-item'>
-                                {this.props.isAuthenticated ? null : <LoginButtons />}                                    
-                            </span>
-                        </div>
+const Navbar: React.FunctionComponent<IProps> = (props: IProps) => {
+    return (
+        <nav className='navbar has-shadow'>
+            <div className='container'>
+                <div className='navbar-brand'>
+                    <div className='navbar-item'>
+                        <Link to='/'>
+                            <h5 className='title is-5'>MBU Online</h5>
+                        </Link>
                     </div>
                 </div>
-            </nav>
-        );
-    }
+                <div className='navbar-menu'>
+                    <div className='navbar-end'>
+                        <span className='navbar-item'>
+                            {props.isAuthenticated ? null : <LoginButtons />}                                    
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    );
 }
 
 const mapStateToProps = (state: IApplicationState) => ({ isAuthenticated: getAuthenticationStatus(state) })
