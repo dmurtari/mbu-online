@@ -45,7 +45,8 @@ const scoutQuery: FindOptions = {
             'firstname',
             'lastname',
             'fullname',
-            'email'
+            'email',
+            'details'
         ]
     }]
 };
