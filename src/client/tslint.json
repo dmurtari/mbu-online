@@ -10,6 +10,7 @@
             "single"
         ],
         "jsx-alignment": true,
-        "jsx-no-multiline-js": false
+        "jsx-no-multiline-js": false,
+        "jsx-no-lambda": false
     }
 }

@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
-import { connect, useDispatch } from 'react-redux';
-import { Formik, Field, ErrorMessage, FormikHelpers } from 'formik';
+import { useDispatch } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import { Formik, Field, ErrorMessage, Form } from 'formik';
 import * as Yup from 'yup';
 
-import './Login.css';
 import { createLogin } from '@store/authentication/actions';
 import ClosableError from '@components/shared/ClosableError/ClosableError';
-import { bindActionCreators } from 'redux';
+
+import './Login.css';
 
 interface ILoginRequest {
     email: string;
@@ -37,29 +38,18 @@ const Login: React.FunctionComponent<RouteComponentProps> = (props) => {
         setError(null);
     }
 
-    function submitForm(values: ILoginRequest, actions: FormikHelpers<ILoginRequest>): void {
-        loginRequest.submit(values)
+    function submitForm(values: ILoginRequest): Promise<void> {
+        return loginRequest.submit(values)
             .then(() => {
                 props.history.push('/');
             })
             .catch(() => {
                 setError('Unable to log you in. Please check your credentials and try again.');
-            })
-            .then(() => {
-                actions.setSubmitting(false);
             });
     }
 
-    function navigateToSignup(): void {
-        props.history.push('/signup');
-    }
-
-    function navigateToReset(): void {
-        props.history.push('/reset');
-    }
-
     return (
-        <div className='column is-three-quarters is-offset-2'>
+        <div className='column is-three-quarters is-offset-2 Login'>
             <h1 className='title'>Login</h1>
             <h3 className='subtitle'>Welcome back to MBU Online!</h3>
             {
@@ -83,9 +73,8 @@ const Login: React.FunctionComponent<RouteComponentProps> = (props) => {
                     isSubmitting,
                     errors,
                     touched,
-                    handleSubmit
                 }) => (
-                    <form onSubmit={handleSubmit}>
+                    <Form>
                         <div className='field'>
                             <label
                                 htmlFor='email'
@@ -143,7 +132,7 @@ const Login: React.FunctionComponent<RouteComponentProps> = (props) => {
                                     type='button'
                                     className='button is-info is-outlined'
                                     disabled={isSubmitting}
-                                    onClick={navigateToSignup}
+                                    onClick={() => props.history.push('/signup')}
                                 >
                                     Create an account
                                 </button>
@@ -153,13 +142,13 @@ const Login: React.FunctionComponent<RouteComponentProps> = (props) => {
                                     type='button'
                                     className='button is-text'
                                     disabled={isSubmitting}
-                                    onClick={navigateToReset}
+                                    onClick={() => props.history.push('/reset')}
                                 >
                                     Create an account
                                 </button>
                             </div>
                         </div>
-                    </form>
+                    </Form>
                 )}
             </Formik>
         </div>
