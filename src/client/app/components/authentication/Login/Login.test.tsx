@@ -1,5 +1,10 @@
 import React from 'react';
+import { shallow } from 'enzyme';
 
-it('should render', () => {
-    
+import Login from './Login';
+
+describe('<Login />', () => {
+    it('renders', () => {
+        shallow(<Login />);
+    });
 });

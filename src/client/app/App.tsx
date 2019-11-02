@@ -8,11 +8,11 @@ import './App.css';
 import Navbar from './components/layout/Navbar/Navbar';
 import Login from './components/authentication/Login/Login';
 
-interface MyProps {
+interface IProps {
     store: Store;
 }
 
-const App: React.FC<MyProps> = ({ store }) => (
+const App: React.FC<IProps> = ({ store }) => (
     <Provider store={store}>
         <Navbar />
         <div className='container'>

@@ -1,10 +1,11 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { shallow } from 'enzyme';
+import { Store, createStore, combineReducers } from 'redux';
 
 import App from './App';
 
-it('renders without crashing', () => {
-    const div = document.createElement('div');
-    ReactDOM.render(<App store={{} as any}/>, div);
-    ReactDOM.unmountComponentAtNode(div);
+describe('<App />', () => {
+    it('renders', () => {
+        shallow(<App store={createStore(state => state)} />);
+    });
 });

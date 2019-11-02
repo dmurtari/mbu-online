@@ -21,7 +21,7 @@ const LoginButtons: React.FunctionComponent = () => {
                 </Link>
             </div>
         </div>
-    )
-}
+    );
+};
 
 export default LoginButtons;

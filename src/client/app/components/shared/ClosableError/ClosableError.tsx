@@ -6,20 +6,26 @@ interface IProps {
 }
 
 const ClosableError: React.FunctionComponent<IProps> = (props: IProps) => {
+    function closeMessage(): void {
+        props.messageClosed && props.messageClosed();
+    }
+
     return (
-        <div 
+        <div
             className='notification is-warning'
         >
             {
                 props.messageClosed &&
-                <button
-                    className='delete'
-                    onClick={() => props.messageClosed && props.messageClosed()}
-                ></button>
+                (
+                    <button
+                        className='delete'
+                        onClick={closeMessage}
+                    />
+                )
             }
             <p>{props.message}</p>
         </div>
     );
-}
+};
 
 export default ClosableError;

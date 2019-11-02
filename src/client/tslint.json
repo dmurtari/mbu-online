@@ -9,6 +9,7 @@
             true,
             "single"
         ],
-        "jsx-alignment": true
+        "jsx-alignment": true,
+        "jsx-no-multiline-js": false
     }
 }

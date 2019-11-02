@@ -1,10 +1,16 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { shallow } from 'enzyme';
 
 import Navbar from './Navbar';
 
-it('renders', () => {
-    const div = document.createElement('div');
-    ReactDOM.render(<Navbar />, div);
-    ReactDOM.unmountComponentAtNode(div);
-})
+jest.mock('react-redux', () => ({
+    useSelector: () => ({
+        getAuthenticationStatus: false
+    })
+}));
+
+describe('<Navbar />', () => {
+    it('renders', () => {
+        shallow(<Navbar />);
+    });
+});

@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
-import { connect } from 'react-redux';
-import { Formik, Field, ErrorMessage } from 'formik';
+import { connect, useDispatch } from 'react-redux';
+import { Formik, Field, ErrorMessage, FormikHelpers } from 'formik';
 import * as Yup from 'yup';
 
 import './Login.css';
-import { login } from '@store/authentication/actions';
+import { createLogin } from '@store/authentication/actions';
 import ClosableError from '@components/shared/ClosableError/ClosableError';
+import { bindActionCreators } from 'redux';
 
-interface IProps {
-    login: any;
+interface ILoginRequest {
+    email: string;
+    password: string;
 }
 
 const SignupSchema = Yup.object().shape({
@@ -17,11 +19,44 @@ const SignupSchema = Yup.object().shape({
         .email('Please enter a valid email address')
         .required('Please enter your email address'),
     password: Yup.string()
-        .required('Please enter your password') 
+        .required('Please enter your password')
 });
 
-const Login: React.FunctionComponent<IProps & RouteComponentProps> = (props) => {
+const Login: React.FunctionComponent<RouteComponentProps> = (props) => {
     const [error, setError] = useState<null | string>(null);
+    const dispatch = useDispatch();
+
+    const loginRequest = bindActionCreators(
+        {
+            submit: createLogin
+        },
+        dispatch
+    );
+
+    function clearError(): void {
+        setError(null);
+    }
+
+    function submitForm(values: ILoginRequest, actions: FormikHelpers<ILoginRequest>): void {
+        loginRequest.submit(values)
+            .then(() => {
+                props.history.push('/');
+            })
+            .catch(() => {
+                setError('Unable to log you in. Please check your credentials and try again.');
+            })
+            .then(() => {
+                actions.setSubmitting(false);
+            });
+    }
+
+    function navigateToSignup(): void {
+        props.history.push('/signup');
+    }
+
+    function navigateToReset(): void {
+        props.history.push('/reset');
+    }
 
     return (
         <div className='column is-three-quarters is-offset-2'>
@@ -29,29 +64,20 @@ const Login: React.FunctionComponent<IProps & RouteComponentProps> = (props) => 
             <h3 className='subtitle'>Welcome back to MBU Online!</h3>
             {
                 error &&
-                <ClosableError 
-                    message={error}
-                    messageClosed={() => setError(null)}
-                />
+                (
+                    <ClosableError
+                        message={error}
+                        messageClosed={clearError}
+                    />
+                )
             }
             <Formik
                 initialValues={{
-                    email: '', 
-                    password: '' 
-                }}
+                    email: '',
+                    password: ''
+                } as ILoginRequest}
                 validationSchema={SignupSchema}
-                onSubmit={(values, actions) => {
-                    props.login(values)
-                        .then(() => {
-                            props.history.push('/');
-                        })
-                        .catch(() => {
-                            setError('Unable to log you in. Please check your credentials and try again.');
-                        })
-                        .then(() => {
-                            actions.setSubmitting(false);
-                        });
-                }}
+                onSubmit={submitForm}
             >
                 {({
                     isSubmitting,
@@ -64,7 +90,7 @@ const Login: React.FunctionComponent<IProps & RouteComponentProps> = (props) => 
                             <label
                                 htmlFor='email'
                                 className='label'
-                            >   
+                            >
                                 Email
                             </label>
                             <div className='control'>
@@ -78,7 +104,8 @@ const Login: React.FunctionComponent<IProps & RouteComponentProps> = (props) => 
                             <ErrorMessage
                                 name='email'
                                 component='span'
-                                className='help is-danger' />
+                                className='help is-danger'
+                            />
                         </div>
                         <div className='field'>
                             <label
@@ -92,13 +119,14 @@ const Login: React.FunctionComponent<IProps & RouteComponentProps> = (props) => 
                                     type='password'
                                     name='password'
                                     className={`input is-expanded ${touched.password && errors.password && 'is-danger'}`}
-                                    placeholder='Password' 
+                                    placeholder='Password'
                                 />
                             </div>
                             <ErrorMessage
                                 name='password'
                                 component='span'
-                                className='help is-danger' />
+                                className='help is-danger'
+                            />
                         </div>
                         <div className='field is-grouped button-bar'>
                             <div className='control'>
@@ -115,7 +143,7 @@ const Login: React.FunctionComponent<IProps & RouteComponentProps> = (props) => 
                                     type='button'
                                     className='button is-info is-outlined'
                                     disabled={isSubmitting}
-                                    onClick={() => props.history.push('/signup')}
+                                    onClick={navigateToSignup}
                                 >
                                     Create an account
                                 </button>
@@ -125,7 +153,7 @@ const Login: React.FunctionComponent<IProps & RouteComponentProps> = (props) => 
                                     type='button'
                                     className='button is-text'
                                     disabled={isSubmitting}
-                                    onClick={() => props.history.push('/reset')}
+                                    onClick={navigateToReset}
                                 >
                                     Create an account
                                 </button>
@@ -136,8 +164,6 @@ const Login: React.FunctionComponent<IProps & RouteComponentProps> = (props) => 
             </Formik>
         </div>
     );
-}
+};
 
-const mapDispatchToProps = { login };
-
-export default connect(null, mapDispatchToProps)(withRouter(Login));
+export default withRouter(Login);
