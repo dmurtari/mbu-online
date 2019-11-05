@@ -1,0 +1,14 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "types": [
+            "jest"
+        ]
+    },
+    "include": [
+        "app/**/*",
+        "typings/**/*",
+        "../libs/interfaces/**/*"
+    ],
+    "exclude": []
+}

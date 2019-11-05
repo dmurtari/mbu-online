@@ -7,13 +7,9 @@ import * as Yup from 'yup';
 
 import { createLogin } from '@store/authentication/actions';
 import ClosableError from '@components/shared/ClosableError/ClosableError';
+import { LoginRequestDto } from '@interfaces/user.interface';
 
 import './Login.css';
-
-interface ILoginRequest {
-    email: string;
-    password: string;
-}
 
 const SignupSchema = Yup.object().shape({
     email: Yup.string()
@@ -38,7 +34,7 @@ const Login: React.FunctionComponent<RouteComponentProps> = (props) => {
         setError(null);
     }
 
-    function submitForm(values: ILoginRequest): Promise<void> {
+    function submitForm(values: LoginRequestDto): Promise<void> {
         return loginRequest.submit(values)
             .then(() => {
                 props.history.push('/');
@@ -65,7 +61,7 @@ const Login: React.FunctionComponent<RouteComponentProps> = (props) => {
                 initialValues={{
                     email: '',
                     password: ''
-                } as ILoginRequest}
+                } as LoginRequestDto}
                 validationSchema={SignupSchema}
                 onSubmit={submitForm}
             >

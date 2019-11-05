@@ -20,6 +20,7 @@ const ClosableError: React.FunctionComponent<IProps> = (props: IProps) => {
                     <button
                         className='delete'
                         onClick={closeMessage}
+                        id='closeErrorButton'
                     />
                 )
             }

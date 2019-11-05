@@ -13,7 +13,10 @@ const Navbar: React.FunctionComponent = () => {
             <div className='container'>
                 <div className='navbar-brand'>
                     <div className='navbar-item'>
-                        <Link to='/'>
+                        <Link
+                            to='/'
+                            id='title'
+                        >
                             <h5 className='title is-5'>MBU Online</h5>
                         </Link>
                     </div>

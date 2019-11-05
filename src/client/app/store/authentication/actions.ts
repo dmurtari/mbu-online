@@ -1,6 +1,8 @@
 import { Action, Dispatch } from 'redux';
 import axios from 'axios';
 
+import { LoginRequestDto } from '@interfaces/user.interface';
+
 export enum AuthenticationActionTypes {
     LOGIN = 'LOGIN',
     LOGOUT = 'LOGOUT'
@@ -14,7 +16,7 @@ export interface ILogoutAction extends Action {
     type: AuthenticationActionTypes.LOGOUT;
 }
 
-export const createLogin = (payload: any) => {
+export const createLogin = (payload: LoginRequestDto) => {
     return async (dispatch: Dispatch) => {
         await axios.post(`/api/signup`, payload);
         dispatch({
