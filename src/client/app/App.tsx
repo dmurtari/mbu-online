@@ -7,6 +7,7 @@ import { Store } from 'redux';
 import './App.css';
 import Navbar from './components/layout/Navbar/Navbar';
 import Login from './components/authentication/Login/Login';
+import ResetContainer from '@components/authentication/Reset/ResetContainer';
 
 interface IProps {
     store: Store;
@@ -19,6 +20,9 @@ const App: React.FC<IProps> = ({ store }) => (
             <Switch>
                 <Route path='/login'>
                     <Login />
+                </Route>
+                <Route path='/reset'>
+                    <ResetContainer />
                 </Route>
             </Switch>
         </div>

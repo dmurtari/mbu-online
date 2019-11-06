@@ -140,7 +140,7 @@ const Login: React.FunctionComponent<RouteComponentProps> = (props) => {
                                     disabled={isSubmitting}
                                     onClick={() => props.history.push('/reset')}
                                 >
-                                    Create an account
+                                    Forgot your password?
                                 </button>
                             </div>
                         </div>
