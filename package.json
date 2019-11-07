@@ -4,7 +4,7 @@
     "description": "MBU Registration Website",
     "scripts": {
         "start": "npm run serve",
-        "build": "npm run build-ts && npm run tslint",
+        "build": "npm run tslint && npm run build-ts",
         "postinstall": "npm run build-ts",
         "serve": "node dist/out-tsc/server/app.js",
         "watch-node": "nodemon dist/out-tsc/server/app.js",
@@ -14,8 +14,8 @@
         "api-test": "NODE_ENV=test && jest -i --config ./tests/jest.config.js",
         "watch-test": "NODE_ENV=test && jest -i --watch --config ./tests/jest.config.js",
         "build-ts": "tsc -p \"src/server/tsconfig.json\"",
-        "watch-ts": "tsc -w -p src/server",
-        "tslint": "tslint -c tslint.json -p src",
+        "watch-ts": "tsc -w -p \"src/server/tsconfig.json\"",
+        "tslint": "tslint -c tslint.json -p \"src/server/tsconfig.json\"",
         "debug": "npm run build && npm run watch-debug",
         "serve-debug": "nodemon --inspect dist/out-tsc/server/app.js",
         "watch-debug": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold\" \"npm run watch-ts\" \"npm run serve-debug\""
@@ -58,7 +58,6 @@
         "cross-env": "5.2.0",
         "faker": "4.1.0",
         "jest": "24.9.0",
-        "mocha": "6.1.4",
         "nodemon": "1.18.10",
         "sinon-chai": "3.3.0",
         "sinon": "7.2.2",

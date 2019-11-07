@@ -73,12 +73,10 @@ app.use('/api/badges', badgeRoutes);
 app.use('/api/scouts', scoutRoutes);
 
 app.get('*', (_req, res) => {
-    console.log('Defailt');
     res.sendFile(path.join(__dirname, '../client/index.html'));
 });
 
 app.use((_req, res, _next) => {
-    console.log('505')
     res.status(404).send();
 });
 
