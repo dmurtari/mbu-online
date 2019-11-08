@@ -48,7 +48,7 @@ if (env === 'development') {
 
 if (env === 'production') {
     app.use(morgan(morganFormat));
-    app.use(express.static(path.join(__dirname, '../node_modules/mbu-frontend/dist')));
+    app.use(express.static(path.join(__dirname, '../../client')));
 }
 
 app.use((_req: Request, res: Response, next: NextFunction) => {
@@ -73,7 +73,7 @@ app.use('/api/badges', badgeRoutes);
 app.use('/api/scouts', scoutRoutes);
 
 app.get('*', (_req, res) => {
-    res.sendFile(path.join(__dirname, '../client/index.html'));
+    res.sendFile(path.join(__dirname, '../../client/index.html'));
 });
 
 app.use((_req, res, _next) => {

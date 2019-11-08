@@ -3,6 +3,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
     parallel: false,
+    outputDir: path.join(__dirname, '../../dist/client'),
     configureWebpack: {
         resolve: {
             modules: [
