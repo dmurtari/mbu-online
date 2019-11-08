@@ -4,7 +4,7 @@
     "description": "MBU Registration Website",
     "scripts": {
         "start": "npm run serve",
-        "build": "npm run tslint && npm run build-ts",
+        "build": "npm run tslint && npm run build-ts && npm run client:build",
         "postinstall": "npm run build-ts",
         "serve": "node dist/out-tsc/server/app.js",
         "watch-node": "nodemon dist/out-tsc/server/app.js",
@@ -19,8 +19,8 @@
         "debug": "npm run build && npm run watch-debug",
         "serve-debug": "nodemon --inspect dist/out-tsc/server/app.js",
         "watch-debug": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold\" \"npm run watch-ts\" \"npm run serve-debug\"",
-        "serve:client": "VUE_CLI_SERVICE_CONFIG_PATH=$PWD/src/client/vue.config.js vue-cli-service serve src/client/src/main.js",
-        "build:client": "VUE_CLI_SERVICE_CONFIG_PATH=$PWD/src/client/vue.config.js vue-cli-service build src/client/src/main.js"
+        "client:serve": "VUE_CLI_SERVICE_CONFIG_PATH=$PWD/src/client/vue.config.js vue-cli-service serve src/client/src/main.js",
+        "client:build": "VUE_CLI_SERVICE_CONFIG_PATH=$PWD/src/client/vue.config.js vue-cli-service build src/client/src/main.js"
     },
     "repository": {
         "type": "git",
