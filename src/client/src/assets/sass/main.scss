@@ -1,0 +1,75 @@
+@import "font-awesome";
+@import "tooltip";
+
+$body-size: 14px !default;
+
+@import "~bulma/sass/utilities/initial-variables";
+@import "~bulma/sass/utilities/functions";
+
+// TODO: Revert these changes
+$primary: $turquoise;
+$primary-invert: findColorInvert($primary);
+$link: $primary !default;
+$link-invert: $primary-invert !default;
+$link-focus-border: $primary !default;
+
+@import "~bulma/bulma";
+
+span.select {
+  width: 100%;
+
+  select {
+    width: 100%;
+  }
+}
+
+.field .is-pulled-right {
+  margin-left: auto;
+}
+
+.loader-centered {
+  display: block;
+  margin: auto;
+  width: 5rem;
+  margin-top: 5rem
+}
+
+.fa {
+  font-size: 14px;
+}
+
+.titlebar-button {
+  margin-top: -.5rem;
+}
+
+.uppercase {
+  text-transform: uppercase;
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+    width: initial !important;
+    float: none !important;
+  }
+
+  #printable, #printable * {
+    visibility: visible;
+  }
+
+  .print-hidden, .print-hidden * {
+    visibility: hidden !important;
+  }
+
+  .print-break-before {
+    page-break-before: always !important;
+    break-before: page !important;
+  }
+
+  #printable {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+}
