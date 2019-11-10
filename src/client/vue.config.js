@@ -1,4 +1,5 @@
 const path = require('path')
+const webpack = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
@@ -14,13 +15,17 @@ module.exports = {
                 'vue$': 'vue/dist/vue.esm.js',
             }
         },
+        entry: {
+            app: ['webpack-hot-middleware/client']
+        },
         plugins: [
             new CopyWebpackPlugin([{
                 from: path.join(__dirname, 'public'),
                 to: path.join(__dirname, 'dist'),
                 toType: 'dir',
                 ignore: ['index.html', '.DS_Store']
-            }])
+            }]),
+            new webpack.HotModuleReplacementPlugin(),
         ]
     },
     chainWebpack: config => {

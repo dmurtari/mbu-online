@@ -9,6 +9,9 @@ import path from 'path';
 import compression from 'compression';
 import helmet from 'helmet';
 import history from 'connect-history-api-fallback';
+import webpack from 'webpack';
+import webpackDevMiddleware from 'webpack-dev-middleware';
+import webpackHotMiddleware from 'webpack-hot-middleware';
 
 import { sequelize } from './db';
 import { indexRoutes } from '@routes/index';
@@ -62,7 +65,6 @@ app.use((_req: Request, res: Response, next: NextFunction) => {
     next();
 });
 
-
 app.use(passport.initialize());
 
 app.use('/api', indexRoutes);
@@ -72,9 +74,21 @@ app.use('/api/events', eventRoutes);
 app.use('/api/badges', badgeRoutes);
 app.use('/api/scouts', scoutRoutes);
 
-app.get('*', (_req, res) => {
-    res.sendFile(path.join(__dirname, '../../client/index.html'));
-});
+if (env === 'development') {
+    const webpackConfig = require('@vue/cli-service/webpack.config.js');
+    webpackConfig.entry.app[0] = './src/client/src/main.js';
+
+    const compiler = webpack(webpackConfig);
+
+    app.use(webpackDevMiddleware(compiler, {
+        publicPath: webpackConfig.output.publicPath,
+    }));
+    app.use(webpackHotMiddleware(compiler));
+
+    app.get('*', (_req, res) => {
+        res.sendFile(path.join(compiler.outputPath, 'index.html'));
+    });
+}
 
 app.use((_req, res, _next) => {
     res.status(404).send();
