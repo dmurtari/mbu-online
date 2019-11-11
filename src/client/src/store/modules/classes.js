@@ -49,7 +49,6 @@ const actions = {
       return axios
         .get(URLS.EVENTS_URL + eventId + '/offerings/assignees')
         .then(response => {
-          console.info('Received classes', response.data);
           commit(types.SET_CLASSES, {
             eventId: String(eventId),
             classes: response.data
@@ -57,8 +56,7 @@ const actions = {
 
           resolve(response.data);
         })
-        .catch(err => {
-          console.error('Failed to get classes for event', eventId, err);
+        .catch(() => {
           reject();
         });
     });
@@ -82,16 +80,13 @@ const actions = {
             };
           });
 
-          console.info('Received class size information', sizes);
-
           commit(types.SET_CLASS_SIZES, {
             eventId: details.eventId,
             sizes: sizes
           });
           resolve(sizes);
         })
-        .catch(err => {
-          console.error('Failed to get class size limits', err);
+        .catch(() => {
           reject();
         });
     });

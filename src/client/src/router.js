@@ -371,7 +371,6 @@ function requireRole(role) {
           if ((store.getters.role === role || store.getters.isAdmin) && store.getters.isApproved) {
             next();
           } else {
-            console.warn('Role is not allowed access to this resource');
             next('/');
           }
         })
@@ -382,7 +381,6 @@ function requireRole(role) {
       if ((store.getters.role === role || store.getters.isAdmin) && store.getters.isApproved) {
         next();
       } else {
-        console.warn('Role is not allowed access to this resource');
         next('/');
       }
     }

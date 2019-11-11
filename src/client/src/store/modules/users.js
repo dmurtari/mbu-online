@@ -47,12 +47,10 @@ const actions = {
     return new Promise((resolve, reject) => {
       axios.put(URLS.USERS_URL + userId, { approved: true })
         .then(() => {
-          console.info('Approved user', userId);
           commit(types.APPROVE_USER, userId);
           resolve();
         })
-        .catch((err) => {
-          console.error('Failed to approve user', err);
+        .catch(() => {
           reject();
         })
     });
@@ -61,12 +59,10 @@ const actions = {
     return new Promise((resolve, reject) => {
       axios.delete(URLS.USERS_URL + userId)
         .then(() => {
-          console.info('Deleted user', userId);
           commit(types.DELETE_USER, userId);
           resolve();
         })
-        .catch((err) => {
-          console.error('Failed to delete user', err);
+        .catch(() => {
           reject();
         });
     })
@@ -75,12 +71,10 @@ const actions = {
     return new Promise((resolve, reject) => {
       axios.get(URLS.USERS_URL)
         .then((response) => {
-          console.info('Received users', response.data);
           commit(types.GET_USERS, response.data);
           resolve();
         })
-        .catch((err) => {
-          console.error('Error retrieving users', err.data);
+        .catch(() => {
           reject();
         })
     })

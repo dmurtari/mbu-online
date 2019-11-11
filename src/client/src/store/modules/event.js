@@ -101,12 +101,10 @@ const actions = {
       axios
         .post(URLS.EVENTS_URL, event)
         .then(response => {
-          console.info('Created event', response.data.event);
           commit(types.ADD_EVENT, response.data.event);
           resolve(response.data.event);
         })
         .catch(err => {
-          console.error('Failed to create event', err.response.data.message);
           reject(err.response.data.message);
         });
     });
@@ -116,39 +114,29 @@ const actions = {
       axios
         .post(URLS.EVENTS_URL + offering.eventId + '/badges', offering.details)
         .then(response => {
-          console.info(
-            'Created offering',
-            offering.details,
-            'for event',
-            offering.eventId
-          );
           commit(types.UPDATE_EVENT, response.data.event);
           resolve();
         })
         .catch(err => {
-          console.error('Failed to create offering', offering.details);
           reject(err.response.data.message);
         });
     });
   },
   createPurchasable({ commit }, details) {
     return new Promise((resolve, reject) => {
-      console.info('posting', details);
       axios
         .post(
           URLS.EVENTS_URL + details.eventId + '/purchasables',
           details.purchasable
         )
         .then(response => {
-          console.info('Added purchasable', details.purchasable);
           commit(types.SET_PURCHASABLES, {
             eventId: details.eventId,
             purchasables: response.data.purchasables
           });
           resolve();
         })
-        .catch(err => {
-          console.error('Failed to create purchasable', err);
+        .catch(() => {
           reject();
         });
     });
@@ -158,12 +146,10 @@ const actions = {
       axios
         .delete(URLS.EVENTS_URL + eventId)
         .then(() => {
-          console.info('Deleted event', eventId);
           commit(types.DELETE_EVENT, eventId);
           resolve();
         })
         .catch(() => {
-          console.error('Failed to delete event', eventId);
           reject();
         });
     });
@@ -175,17 +161,10 @@ const actions = {
           URLS.EVENTS_URL + details.eventId + '/badges/' + details.badgeId
         )
         .then(() => {
-          console.info(
-            'Deleted badge',
-            details.badgeId,
-            'from event',
-            details.eventId
-          );
           commit(types.DELETE_OFFERING, details);
           resolve();
         })
         .catch(() => {
-          console.error('Failed to delete offering', details.badgeId);
           reject();
         });
     });
@@ -200,17 +179,10 @@ const actions = {
           details.purchasableId
         )
         .then(() => {
-          console.info(
-            'Deleted item',
-            details.purchasableId,
-            'from event',
-            details.eventId
-          );
           commit(types.DELETE_PURCHASABLE, details);
           resolve();
         })
         .catch(() => {
-          console.error('Failed to delete item', details.purchasableId);
           reject();
         });
     });
@@ -224,25 +196,19 @@ const actions = {
       axios
         .get(URLS.EVENTS_URL)
         .then(response => {
-          console.info('Received events', response.data);
           commit(types.GET_EVENTS, response.data);
           resolve();
         })
         .catch(() => {
-          console.error('Failed to get events');
           reject();
         });
     });
   },
   getPurchasables({ commit }, details) {
-    console.log('Refresh purchasables', details);
     return new Promise((resolve, reject) => {
       axios
         .get(URLS.EVENTS_URL + details.eventId + '/purchasables')
         .then(response => {
-          console.info(
-            'Got new purchasables', response.data, 'for event', details.eventId
-          );
           commit(types.SET_PURCHASABLES, {
             eventId: details.eventId,
             purchasables: response.data
@@ -250,7 +216,6 @@ const actions = {
           resolve();
         })
         .catch(() => {
-          console.error('Failed to get purchasables');
           reject();
         });
     });
@@ -264,12 +229,10 @@ const actions = {
       axios
         .get(URLS.CURRENT_EVENT_URL)
         .then(response => {
-          console.info('Received current event', response.data);
           commit(types.SET_CURRENT, response.data);
           resolve(response.data);
         })
         .catch(() => {
-          console.error('Failed to get current event');
           reject();
         });
     });
@@ -283,15 +246,10 @@ const actions = {
       axios
         .post(URLS.CURRENT_EVENT_URL, { id: eventId })
         .then(response => {
-          console.info('Updated current event to', eventId);
           commit(types.SET_CURRENT, response.data.currentEvent);
           resolve(response.data.currentEvent);
         })
         .catch(err => {
-          console.error(
-            'Failed to save current event',
-            err.response.data.message
-          );
           reject(err.response.data.message);
         });
     });
@@ -301,12 +259,10 @@ const actions = {
       axios
         .put(URLS.EVENTS_URL + eventUpdate.id, eventUpdate)
         .then(response => {
-          console.info('Updated event to', response.data.event);
           commit(types.UPDATE_EVENT, response.data.event);
           resolve(response.data.event);
         })
         .catch(err => {
-          console.error('Failed to update event', err.response.data.message);
           reject(err.response.data.message);
         });
     });
@@ -319,12 +275,10 @@ const actions = {
           details.offering
         )
         .then(response => {
-          console.info('Updated offering for badge', details.badgeId);
           commit(types.UPDATE_OFFERING, response.data.offering);
           resolve();
         })
         .catch(() => {
-          console.error('Failed to update offering');
           reject();
         });
     });
@@ -346,8 +300,7 @@ const actions = {
           });
           resolve();
         })
-        .catch(err => {
-          console.error('Failed to update purchasable', err);
+        .catch(() => {
           reject();
         });
     });

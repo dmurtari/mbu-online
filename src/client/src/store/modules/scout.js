@@ -87,15 +87,13 @@ const actions = {
       axios.post(URLS.SCOUTS_URL + details.scoutId + '/registrations/' +
                  details.registrationId + '/purchases/', details.purchase)
         .then((response) => {
-          console.info('Created purchase for scout', details.scoutId, details.purchase);
           commit(types.SET_PURCHASES, {
             registrationId: details.registrationId,
             purchases: response.data.registration.purchases
           });
           resolve(response.data.registration.purchases);
         })
-        .catch((err) => {
-          console.error('Failed to purchase', details.purchase, err);
+        .catch(() => {
           reject();
         })
     });
@@ -106,12 +104,10 @@ const actions = {
         event_id: details.eventId
       })
         .then((response) => {
-          console.info('Created registration for scout', details.scoutId, 'event', details.eventId);
           commit(types.ADD_REGISTRATION, response.data.registration);
           resolve(response.data.registration);
         })
         .catch(() => {
-          console.error('Failed to register', details.scoutId, 'for', details.eventId);
           reject();
         })
     });
@@ -120,12 +116,10 @@ const actions = {
     return new Promise((resolve, reject) => {
       axios.post(URLS.USERS_URL + details.userId + '/scouts', details.scout)
         .then((response) => {
-          console.info('Added scout', response.data.scout, 'for user', details.userId);
           commit(types.ADD_SCOUT, response.data.scout);
           resolve(response.data.scout);
         })
         .catch((err) => {
-          console.error('Failed to create scout with error', err.response.data.message);
           reject(err.response.data.message);
         })
     });
@@ -135,12 +129,10 @@ const actions = {
       axios.delete(URLS.SCOUTS_URL + details.scoutId + '/registrations/' +
                    details.registrationId + '/purchases/' + details.purchasableId)
         .then(() => {
-          console.info('Removed item', details.purchasableId);
           commit(types.DELETE_PURCHASE, details);
           resolve();
         })
-        .catch((err) => {
-          console.error('Failed to delete purchasable', err);
+        .catch(() => {
           reject();
         });
     });
@@ -149,12 +141,10 @@ const actions = {
     return new Promise((resolve, reject) => {
       axios.delete(URLS.SCOUTS_URL + details.scoutId + '/registrations/' + details.eventId)
         .then(() => {
-          console.info('Deleted registration for event', details.eventId);
           commit(types.DELETE_REGISTRATION, details);
           resolve();
         })
-        .catch((err) => {
-          console.error('Failed to delete registration', err);
+        .catch(() => {
           reject();
         })
     });
@@ -163,12 +153,10 @@ const actions = {
     return new Promise((resolve, reject) => {
       axios.delete(URLS.USERS_URL + details.userId + '/scouts/' + details.scoutId)
         .then(() => {
-          console.info('Deleted scout', details.scoutId, 'for user', details.userId);
           commit(types.DELETE_SCOUT, details.scoutId);
           resolve()
         })
-        .catch((err) => {
-          console.errpr('Failed to delete scout with error', err);
+        .catch(() => {
           reject();
         })
     });
@@ -178,7 +166,6 @@ const actions = {
       axios.get(URLS.SCOUTS_URL + details.scoutId + '/registrations/' +
                 details.registrationId + '/purchases')
         .then((response) => {
-          console.info('Received purchases', response.data);
           commit(types.SET_PURCHASES, {
             scoutId: details.scoutId,
             registrationId: details.registrationId,
@@ -186,8 +173,7 @@ const actions = {
           });
           resolve();
         })
-        .catch((err) => {
-          console.error('Failed to fetch purchases with', err);
+        .catch(() => {
           reject();
         })
     });
@@ -197,7 +183,6 @@ const actions = {
       axios.get(URLS.SCOUTS_URL + details.scoutId + '/registrations/' +
                 details.registrationId + '/preferences')
         .then((response) => {
-          console.info('Received preferences', response.data);
           commit(types.SET_PREFERENCES, {
             scoutId: details.scoutId,
             registrationId: details.registrationId,
@@ -205,8 +190,7 @@ const actions = {
           });
           resolve();
         })
-        .catch((err) => {
-          console.error('Failed to fetch preferences with', err);
+        .catch(() => {
           reject();
         })
     });
@@ -215,12 +199,10 @@ const actions = {
     return new Promise((resolve, reject) => {
       axios.get(URLS.USERS_URL + userId + '/scouts/registrations')
         .then((response) => {
-          console.info('Got scouts for user', userId, response.data);
           commit(types.SET_SCOUTS, response.data);
           resolve(response.data);
         })
-        .catch((err) => {
-          console.error('Failed to get scouts', err);
+        .catch(() => {
           reject();
         })
     });
@@ -230,8 +212,6 @@ const actions = {
       axios.post(URLS.SCOUTS_URL + details.scoutId + '/registrations/' +
                  details.registrationId + '/preferences', details.preferences)
         .then((response) => {
-          console.info('Set preferences for registration', details.registrationId,
-                      response.data.registration.preferences);
           commit(types.SET_PREFERENCES, {
             scoutId: details.scoutId,
             registrationId: details.registrationId,
@@ -239,8 +219,7 @@ const actions = {
           });
           resolve(response.data.registration.preferences);
         })
-        .catch((err) => {
-          console.error('Failed to set preferences', err);
+        .catch(() => {
           reject();
         })
     });
@@ -249,12 +228,10 @@ const actions = {
     return new Promise((resolve, reject) => {
       axios.put(URLS.USERS_URL + details.userId + '/scouts/' + details.scout.id, details.scout)
         .then((response) => {
-          console.info('Updated scout', details.scout.id);
           commit(types.UPDATE_SCOUT, response.data.scout);
           resolve();
         })
-        .catch((err) => {
-          console.error('Failed to update scout', err);
+        .catch(() => {
           reject();
         })
     })

@@ -57,15 +57,13 @@ const actions = {
     return new Promise((resolve, reject) => {
       axios.get(getURL)
         .then((response) => {
-          console.info('Received registrations', response.data);
           commit(types.SET_EVENT_REGISTRATIONS, {
             eventId: eventId,
             registrations: response.data
           });
           resolve();
         })
-        .catch((err) => {
-          console.error('Failed to get registrations with', err);
+        .catch(() => {
           reject();
         });
     });
@@ -85,8 +83,7 @@ const actions = {
           })
           resolve(response.data);
         })
-        .catch((err)=> {
-          console.info('Failed to save completions', err);
+        .catch(()=> {
           reject();
         })
     });
@@ -96,8 +93,6 @@ const actions = {
       axios.post(URLS.SCOUTS_URL + details.scoutId + '/registrations/' +
         details.registrationId + '/assignments', details.assignments)
         .then((response) => {
-          console.info('Set assignments for registration', details.registrationId,
-            response.data.registration.assignments);
           commit(types.SET_ASSIGNMENTS, {
             eventId: details.eventId,
             registrationId: details.registrationId,
@@ -105,8 +100,7 @@ const actions = {
           });
           resolve(response.data.registration.assignments);
         })
-        .catch((err) => {
-          console.error('Failed to set assignments', err);
+        .catch(() => {
           reject();
         })
     });

@@ -311,8 +311,7 @@ export default {
           this.$router.push('/');
           this.error = '';
         })
-        .catch((err) => {
-          console.info(err)
+        .catch(() => {
           this.error = 'Error creating your account. Please try again.';
         })
         .then(() => {

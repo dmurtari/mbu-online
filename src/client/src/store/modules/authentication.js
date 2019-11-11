@@ -65,11 +65,9 @@ const actions = {
     return new Promise((resolve, reject) => {
       axios.get(URLS.USERS_URL + 'exists/' + email)
         .then((response) => {
-          console.info('Got response', response.data.exists);
           resolve(response.data.exists);
         })
-        .catch((err) => {
-          console.error('Failed to check for user', err);
+        .catch(() => {
           reject();
         });
     });
@@ -78,11 +76,9 @@ const actions = {
     return new Promise((resolve, reject) => {
       axios.post(URLS.SIGNUP_URL, credentials)
         .then((response) => {
-          console.info('Successfully created user');
           resolve(response.data.profile.id);
         })
         .catch((err) => {
-          console.error('Failed to create user');
           reject(err.response.data.message);
         });
     });
@@ -91,12 +87,10 @@ const actions = {
     return new Promise((resolve, reject) => {
       axios.delete(URLS.USERS_URL + id)
         .then(() => {
-          console.info('Account deleted');
           commit(types.LOGOUT);
           resolve();
         })
-        .catch((err) => {
-          console.error('Failed to delete account', err);
+        .catch(() => {
           reject();
         })
     });
@@ -109,12 +103,10 @@ const actions = {
         headers: { 'Authorization': token }
       })
         .then((response) => {
-          console.info('Successfully authenticated from JWT');
           commit(types.PROFILE, response.data.profile);
           resolve();
         })
-        .catch((err) => {
-          console.error('Failed to authenticate JWT', err);
+        .catch(() => {
           localStorage.removeItem('token');
           reject();
         });
@@ -124,12 +116,10 @@ const actions = {
     return new Promise((resolve, reject) => {
       axios.post(URLS.LOGIN_URL, credentials)
         .then((response) => {
-          console.info('Successfully logged in user');
           commit(types.LOGIN, response.data);
           resolve();
         })
         .catch((err) => {
-          console.error('Failed to login user');
           reject(err.response.data.message);
         });
     });
@@ -138,12 +128,10 @@ const actions = {
     return new Promise((resolve, reject) => {
       axios.post(URLS.SIGNUP_URL, credentials)
         .then((response) => {
-          console.info('Successfully created user');
           commit(types.LOGIN, response.data);
           resolve();
         })
         .catch((err) => {
-          console.error('Failed to create user');
           reject(err.response.data.message);
         });
     });
@@ -157,11 +145,9 @@ const actions = {
     return new Promise((resolve, reject) => {
       axios.post(URLS.FORGOT_URL, data)
         .then(() => {
-          console.info('Send reset email to', email);
           resolve();
         })
-        .catch((err) => {
-          console.error('Failed to send reset email', err);
+        .catch(() => {
           reject();
         });
     });
@@ -170,11 +156,9 @@ const actions = {
     return new Promise((resolve, reject) => {
       axios.post(URLS.RESET_API_URL, data)
         .then(() => {
-          console.info('Reset password');
           resolve()
         })
         .catch((err) => {
-          console.error('Failed to reset password', err.response.data);
           reject(err.response.data.message);
         });
     });
@@ -183,24 +167,20 @@ const actions = {
     return new Promise((resolve, reject) => {
       axios.put(URLS.USERS_URL + data.id, data)
         .then((response) => {
-          console.info('Updated profile');
 
           // Only login if user is updating their own profile
           if (state.profile.id == data.id) {
-            console.info('Logging in');
             commit(types.LOGIN, response.data);
           }
 
           resolve();
         })
         .catch((err) => {
-          console.error('Failed to update profile');
           reject(err.response.data.message);
         })
     });
   },
   logout({ commit }) {
-    console.info('Logging out');
     commit(types.LOGOUT);
   }
 };
