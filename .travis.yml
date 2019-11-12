@@ -1,7 +1,14 @@
 language: node_js
 services:
-  - postgresql
+- postgresql
 before_script:
-  - psql -c "CREATE DATABASE mbutest;" -U postgres
-  - psql -c "CREATE USER mbu;" -U postgres
+- psql -c "CREATE DATABASE mbutest;" -U postgres
+- psql -c "CREATE USER mbu;" -U postgres
 script: npm run test
+deploy:
+  provider: heroku
+  api_key:
+    secure: K4bBnA81724QjaVA4cMMae++9hVLcMUdSbASCymFue5+Zj1sqcDRSTJyte/W5R6SUczHeIuS6WhcL1w6umQrODRmkkY6QOjAtwwy4OZBsf4Ab81keZs+QZ61xzOJ4zbpbbJJNG8veSUh3TulpU6olKNBoDkq2ufC0tlzl4BVnm2lgvOF+K6/fMJE9Xl3lS/sKiTHAAS3vgdvrPEWbXJ5udY7ox6sC6duRuyOXlOteTw0BAK3d3xAbzYPBJwWA8KjCygH0pb8CBWwG4xkglJHPY9Zh/2WaXWj+PzKiuQjdc9fkXApIKfpg++o5fTsRUlrBpzQDP3ot5euylsikI/Ah9Db2Q//O5pMEgNGR8nkLMkzdeuSPevOQ01vo88hZuWfDdw2+B/YRXnBKVnTLlW37Sr+hoYRkWpTcII1gGMO+0tpeUCjt39QwHbQ3lrU9LOh0+xJeqgELG8WyEc1wNST26kgw9NnUYRmV5gdgiKhF3YcEYBYptkIl6/H8aNGxbHNaC95RJHsjrwNLSTGgFr5zT54uIVnPG3TASqvRyXet1DdVEiFABZGxGYGMWHnz0KhvX4R9+74sO5c+EDbbNFpfSm7MyxJOK80/G5bRB/EyTDwYwTtxKM1eJqWVi+RJJUMO47VOt2NPfHC/JuWUl1HjNEvy1kRzfWSmPCKQKv0qGc=
+  app: mbu-alpha
+  on:
+    repo: dmurtari/mbu-online
