@@ -31,12 +31,5 @@ module.exports = {
             config.plugin('hot')
                 .use(webpack.HotModuleReplacementPlugin);
         }
-
-        if (process.env.NODE_ENV === 'production') {
-            console.log('Adding BundleAnalyzerPlugin');
-
-            config.plugin('bundle')
-                .use(BundleAnalyzerPlugin);
-        }
     }
 }
