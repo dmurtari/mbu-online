@@ -52,7 +52,7 @@ export const createRegistration = async (req: Request, res: Response) => {
 export const createPreference = async (req: Request, res: Response) => {
     try {
         const scoutId = req.params.scoutId;
-        const registrationId = req.params.registrationId;
+        const registrationId = Number(req.params.registrationId);
 
         if (Array.isArray(req.body)) {
             await Preference.destroy({
@@ -112,7 +112,7 @@ export const createPreference = async (req: Request, res: Response) => {
 
 export const createAssignment = async (req: Request, res: Response) => {
     try {
-        const registrationId = req.params.registrationId;
+        const registrationId = Number(req.params.registrationId);
         let assignments: AssignmentInterface[];
 
         if (Array.isArray(req.body)) {
