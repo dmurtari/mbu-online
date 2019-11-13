@@ -22,6 +22,7 @@ const scoutQuery: FindOptions = {
         'fullname',
         'troop',
         'notes',
+        'birthday',
         'emergency_name',
         'emergency_relation',
         'emergency_phone'
