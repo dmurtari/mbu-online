@@ -25,7 +25,8 @@ const scoutQuery: FindOptions = {
         'birthday',
         'emergency_name',
         'emergency_relation',
-        'emergency_phone'
+        'emergency_phone',
+        'created_at'
     ],
     include: [{
         model: Event,
