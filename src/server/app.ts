@@ -26,19 +26,12 @@ const env = process.env.NODE_ENV || 'development';
 const port = process.env.PORT || 3000;
 const morganFormat = ':method :url :status :res[content-length] - :response-time ms';
 
-app.use(history({
-    // verbose: true
-}));
+app.use(history());
 
 app.use(compression());
 app.use(helmet());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-
-app.use((req, _res, next) => {
-    req.url = req.originalUrl;
-    next();
-});
 
 if (env === 'development') {
     app.use(morgan(morganFormat));
