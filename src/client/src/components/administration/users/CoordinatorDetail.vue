@@ -36,7 +36,7 @@
               <strong>Email: </strong> {{ user.email }}
             </li>
             <li>
-              <strong>User Since: </strong> {{ user.created_at | shortDate }}
+              <strong>User Since: </strong> {{ user.createdAt | shortDate }}
             </li>
           </ul>
         </div>

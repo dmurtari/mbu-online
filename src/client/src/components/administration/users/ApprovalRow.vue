@@ -3,7 +3,7 @@
     <td>{{ user.fullname }}</td>
     <td>{{ user.role | capitalize }}</td>
     <td>{{ user.email }}</td>
-    <td>{{ user.created_at | shortDate }}</td>
+    <td>{{ user.createdAt | shortDate }}</td>
     <td>
       <ul class="details-list">
         <li v-for="(value, key) in user.details" :key="value">
