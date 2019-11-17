@@ -5,8 +5,7 @@ module.exports = {
     mocha: true
   },
   'extends': [
-    'plugin:vue/essential',
-    'eslint:recommended'
+    '@vue/typescript'
   ],
   rules: {
     'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
@@ -15,6 +14,6 @@ module.exports = {
     'import/no-unassigned-import': 0
   },
   parserOptions: {
-    parser: 'babel-eslint'
+    parser: '@typescript-eslint/parser'
   }
 }
