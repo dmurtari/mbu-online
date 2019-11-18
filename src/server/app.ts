@@ -44,7 +44,7 @@ if (env === 'development') {
 
 if (env === 'production') {
     app.use(morgan(morganFormat));
-    app.use(express.static(path.join(__dirname, '../../client')));
+    app.use(express.static(path.join(__dirname, '../client')));
 }
 
 app.use((_req: Request, res: Response, next: NextFunction) => {
