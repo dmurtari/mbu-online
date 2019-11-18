@@ -68,17 +68,15 @@ app.use('/api/badges', badgeRoutes);
 app.use('/api/scouts', scoutRoutes);
 
 if (env === 'development') {
-    const webpackConfig = require('@vue/cli-service/webpack.config.js');
-    webpackConfig.entry.app[0] = './src/client/src/main.js';
-
-    const compiler = webpack(webpackConfig);
+    const config = require('../../../src/client/webpack.config.js')();
+    const compiler = webpack(config);
 
     app.use(webpackDevMiddleware(compiler, {
-        publicPath: webpackConfig.output.publicPath,
+        publicPath: config.output.publicPath,
     }));
     app.use(webpackHotMiddleware(compiler));
 
-    app.get('*', (_req, res) => {
+    app.get('*', (req, res) => {
         res.sendFile(path.join(compiler.outputPath, 'index.html'));
     });
 }
