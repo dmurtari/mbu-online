@@ -3,13 +3,15 @@ import {
   createLocalVue
 } from '@vue/test-utils';
 import Vuex from 'vuex';
-import { expect } from 'chai'
+import chai, { expect } from 'chai'
 import sinon from 'sinon';
+import sinonChai from 'sinon-chai';
 
 import OfferingList from './OfferingList.vue';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
+chai.use(sinonChai);
 
 describe('OfferingList.vue', () => {
   let wrapper, getters, store, actions, expectedOfferings;
