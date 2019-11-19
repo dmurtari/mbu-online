@@ -82,10 +82,6 @@ describe('PurchasedItem.vue', () => {
         button.trigger('click');
       });
 
-      it('should set the deleting property', () => {
-        expect(wrapper.vm.deleting).to.be.true;
-      });
-
       it('should trigger the vuex delete method', () => {
         expect(actions.deletePurchase).to.have.been.calledWith(sinon.match.any, {
           purchasableId: 1,
