@@ -68,12 +68,10 @@ app.use('/api/badges', badgeRoutes);
 app.use('/api/scouts', scoutRoutes);
 
 if (env === 'development') {
-    const config = require('../../../src/client/webpack.config.js')();
+    const config = require('../../../src/client/webpack.dev.js');
     const compiler = webpack(config);
 
-    app.use(webpackDevMiddleware(compiler, {
-        publicPath: config.output.publicPath,
-    }));
+    app.use(webpackDevMiddleware(compiler));
     app.use(webpackHotMiddleware(compiler));
 
     app.get('*', (req, res) => {
